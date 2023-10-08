@@ -12,14 +12,25 @@ import {useQueriesStore} from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
 
 
+interface CryptsScreenProps {
+    explore: (...args: any[]) => any;
+    attack: (...args: any[]) => any;
+    flee: (...args: any[]) => any;
+}
+
 /**
  * @container
  * @description
  */
-export default function CryptsScreen() {
+
+export default function CryptsScreen({
+                                         explore,
+                                         attack,
+                                         flee,
+                                     }: CryptsScreenProps) {
+
 
     const adventurer = useAdventurerStore((state) => state.adventurer);
-
 
     const [formData, setFormData] = useState<FormData>({
         name: "",
@@ -42,11 +53,8 @@ export default function CryptsScreen() {
         setStep(1);
     }
 
-    const onAttack = ()=>{
-        alert("attack");
-    }
 
-    const onExit = ()=>{
+    const onExit = () => {
         // alert("exit");
         setStep(1);
     }
@@ -71,7 +79,7 @@ export default function CryptsScreen() {
                     <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <MapInfo handleBack={onBack} handleEnter={onEnter} ></MapInfo>
+                    <MapInfo handleBack={onBack} handleEnter={onEnter}></MapInfo>
                 </div>
             </div>
         );
@@ -84,7 +92,7 @@ export default function CryptsScreen() {
                     <Info adventurer={adventurer}/>
                 </div>
                 {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
-                    <MapAction attack={onAttack} exit={onExit}></MapAction>
+                <MapAction attack={attack} exit={onExit}></MapAction>
                 {/*</div>*/}
             </div>
         );

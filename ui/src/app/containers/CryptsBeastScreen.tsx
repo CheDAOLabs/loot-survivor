@@ -196,7 +196,7 @@ export default function BeastScreen({attack, flee, exit}: BeastScreenProps) {
     const [monsterIndex, setMonsterIndex] = useState(4)
 
     const onAttack = async (index) => {
-        // await attack(false, beastData);
+        await attack(false, beastData);
         setMonsterIndex(index)
         setIsVictory(true)
     }

@@ -160,7 +160,7 @@ export default function Home() {
     setNotLoading,
   } = useQueriesStore();
 
-  const { spawn, explore, attack, flee, upgrade, multicall } = syscalls({
+  const { spawn, explore, attack, flee, upgrade, multicall,attack2 } = syscalls({
     gameContract,
     lordsContract,
     addTransaction,
@@ -556,7 +556,9 @@ export default function Home() {
                   {screen === "settings" && <Settings />}
                   {screen === "player" && <Player />}
                   {screen === "wallet" && <WalletSelect />}
-                  {screen === "crypts" && <CryptsScreen />}
+                  {screen === "crypts" && <CryptsScreen  explore={explore}
+                                                         attack={()=>{}}
+                                                         flee={flee} />}
 
                 </>
                 {/* )} */}
