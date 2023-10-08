@@ -36,6 +36,8 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
         (state) => state.data.battlesByBeastQuery?.battles || []
     );
 
+    const [isVictory, setIsVictory] = useState(false)
+
     const [buttonText, setButtonText] = useState("Flee!");
 
     const handleMouseEnter = () => {
@@ -45,6 +47,15 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
     const handleMouseLeave = () => {
         setButtonText("Flee!");
     };
+
+    const onAttack = () => {
+        setIsVictory(true)
+    }
+
+    const onConfirm = ()=>{
+        setIsVictory(false)
+
+}
 
     const attackButtonsData: ButtonData[] = [
         {
@@ -118,6 +129,14 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
         beastData?.special3 ?? ""
     );
 
+    const [selectedOption, setSelectedOption] = useState('option1');
+
+    const handleOptionChange = (option) => {
+        // alert("handleOptionChange: " + option);
+        setSelectedOption(option);
+    };
+
+
     const BattleLog: React.FC = () => (
         <div className="flex flex-col p-2 items-center">
             <div>
@@ -166,7 +185,7 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
             </div>
 
             <div className="flex flex-col gap-1 sm:gap-0 items-center sm:w-1/2 sm:p-4 order-1 text-lg">
-                {isAlive && (
+                {isAlive && !isVictory && (
                     <>
                         <div className="flex flex-row gap-2 sm:flex-col items-center justify-center">
                             <h3>BUFF</h3>
@@ -186,12 +205,57 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
                             <div className="lg text-center text-gray-500">MONSTER 1</div>
                             <div className="lg text-center text-gray-500">MONSTER 2</div>
                             <div className="lg text-center text-gray-500">MONSTER 3</div>
-                            <Button size={"lg"} >ATTACK</Button>
+                            <Button size={"lg"} onClick={onAttack}>ATTACK</Button>
                             <div className="lg text-center">MONSTER 5</div>
                             <div className="lg text-center">MONSTER 6</div>
                             <div className="lg text-center">MONSTER 7</div>
                             <div className="lg text-center">MONSTER 8</div>
                         </div>
+                    </>
+                )}
+
+                {isAlive && isVictory && (
+                    <>
+                        <h3>VICTORY</h3>
+                        <h4>CHOOSE A BUFF EFFECT</h4>
+
+                        <div className="flex flex-col m-3">
+
+                            <Button
+                                size={"lg"}
+                                className={`${
+                                    selectedOption === 'option1' ? '' : 'bg-gray-800 text-white'
+                                } m-1 `}
+                                onClick={() => handleOptionChange('option1')}
+                            >
+                                HEALTHY: +5
+                            </Button>
+
+                            <Button
+                                size={"lg"}
+                                className={`${
+                                    selectedOption === 'option2' ? '' : 'bg-gray-800 text-white'
+                                } m-1 `}
+                                onClick={() => handleOptionChange('option2')}
+                            >
+                                POWER: +10%
+                            </Button>
+
+                            <Button
+                                size={"lg"}
+                                className={`${
+                                    selectedOption === 'option3' ? '' : 'bg-gray-800 text-white'
+                                } m-1`}
+                                onClick={() => handleOptionChange('option3')}
+                            >
+                                LUCKY: +9999
+                            </Button>
+
+
+                        </div>
+
+                        <Button size={"lg"} className="" onClick={onConfirm}>CONFIRM</Button>
+
                     </>
                 )}
 
