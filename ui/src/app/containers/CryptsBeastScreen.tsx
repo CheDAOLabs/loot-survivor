@@ -16,13 +16,15 @@ interface BeastScreenProps {
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
     exit: (...args: any[]) => any;
+    explore: (...args: any[]) => any;
+
 }
 
 /**
  * @container
  * @description Provides the beast screen for adventurer battles.
  */
-export default function BeastScreen({attack, flee, exit}: BeastScreenProps) {
+export default function BeastScreen({attack, flee, exit, explore}: BeastScreenProps) {
     const adventurer = useAdventurerStore((state) => state.adventurer);
     const loading = useLoadingStore((state) => state.loading);
     const resetNotification = useLoadingStore((state) => state.resetNotification);
@@ -195,8 +197,18 @@ export default function BeastScreen({attack, flee, exit}: BeastScreenProps) {
 
     const [monsterIndex, setMonsterIndex] = useState(4)
 
+
     const onAttack = async (index) => {
-        await attack(false, beastData);
+
+        if (!hasBeast) {
+            await explore(true);
+            return;
+        }
+
+        await attack(true, beastData);
+
+
+
         setMonsterIndex(index)
         setIsVictory(true)
     }

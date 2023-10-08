@@ -738,6 +738,7 @@ export function syscalls({
   };
 
   const attack2 = async (tillDeath: boolean, beastData: any) => {
+    console.log("attack2")
     resetData("latestMarketItemsQuery");
     addToCalls({
       contractAddress: gameContract?.address ?? "",

@@ -79,7 +79,7 @@ export default function CryptsScreen({
                     <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <MapInfo handleBack={onBack} handleEnter={onEnter}></MapInfo>
+                    <MapInfo handleBack={onBack} handleEnter={onEnter}/>
                 </div>
             </div>
         );
@@ -92,7 +92,7 @@ export default function CryptsScreen({
                     <Info adventurer={adventurer}/>
                 </div>
                 {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
-                <MapAction attack={attack} exit={onExit}></MapAction>
+                <MapAction attack={attack} exit={onExit} flee={flee} explore={explore}/>
                 {/*</div>*/}
             </div>
         );
