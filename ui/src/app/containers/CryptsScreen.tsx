@@ -74,9 +74,9 @@ export default function CryptsScreen() {
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
                     <Info adventurer={adventurer}/>
                 </div>
-                <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
+                {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
                     <MapAction handleBack={onEnterCode} setFormData={setFormData} formData={formData}></MapAction>
-                </div>
+                {/*</div>*/}
             </div>
         );
     }

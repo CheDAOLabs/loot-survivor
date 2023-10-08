@@ -43,7 +43,7 @@ export const EnterCode = ({
 
     return (
         <>
-            <div className="sm:w-3/4 text-center p-4 uppercase 2xl:flex 2xl:flex-col 2xl:gap-10 2xl:h-[700px]">
+            <div className="text-center p-4 uppercase 2xl:flex 2xl:flex-col 2xl:gap-10 2xl:h-[700px]">
                 <h3 className="2xl:text-5xl">Please Enter The Code</h3>
                 <div className="relative items-center flex flex-col gap-2">
                     <input

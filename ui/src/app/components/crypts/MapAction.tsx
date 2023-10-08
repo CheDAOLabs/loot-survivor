@@ -1,7 +1,7 @@
 import React, {useState, ChangeEvent} from "react";
 import {Button} from "../buttons/Button";
 import {FormData} from "@/app/types";
-import BeastScreen from "../../containers/BeastScreen";
+import CryptsBeastScreen from "../../containers/CryptsBeastScreen";
 import Discovery from "../actions/Discovery";
 import MazeLoader from "../icons/MazeLoader";
 import VerticalKeyboardControl from "../menu/VerticalMenu";
@@ -15,7 +15,6 @@ interface MapActionProps {
 export const MapAction = ({
                               attack, flee
                           }: MapActionProps) => {
-    const [isMaxLength, setIsMaxLength] = useState(false);
 
     const hasBeast = useAdventurerStore((state) => state.computed.hasBeast);
 
@@ -25,9 +24,13 @@ export const MapAction = ({
         <>
             {
                 hasBeast ? (
-                    <BeastScreen attack={attack} flee={flee}/>
+                    <CryptsBeastScreen attack={attack} flee={flee}/>
                 ) : (
-                    <></>
+                    <div className="flex flex-col sm:flex-row flex-wrap">
+                        <div className="flex flex-row items-center justify-center mr-3">
+                            <h3 className="text-center">&nbsp;&nbsp;&nbsp;Please Select an Adventurer</h3>
+                        </div>
+                    </div>
                 )
             }
         </>
