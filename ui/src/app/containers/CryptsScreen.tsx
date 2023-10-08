@@ -36,7 +36,16 @@ export default function CryptsScreen({
         name: "",
     });
 
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(()=>{
+        if(window.monsterIndex===0 || window.monsterIndex===undefined){
+            console.log("step 1")
+            return 1;
+        }else {
+            console.log("step 3")
+            return 3;
+        }
+
+    });
 
 
     const onEnterCode = () => {
@@ -45,8 +54,15 @@ export default function CryptsScreen({
         setStep(2);
     }
 
+    // const setAdventurer = useAdventurerStore((state) => state.setAdventurer);
+
+
     const onEnter = () => {
         setStep(3);
+
+        if(!window.monsterIndex) {
+            window.monsterIndex=1;
+        }
     }
 
     const onBack = () => {

@@ -163,53 +163,72 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         return <BattleLog/>;
     }
 
-    const [monsters, setMonster] = useState([
-        {
-            name: "MONSTER 1",
-            status: "dead",
-        },
-        {
-            name: "MONSTER 2",
-            status: "dead",
+    const [monsters, setMonster] = useState(()=>{
+        let monsters = [
+            {
+                name: "MONSTER 1",
+                status: "attack",
+            },
+            {
+                name: "MONSTER 2",
+                status: "alive",
 
-        },
-        {
-            name: "MONSTER 3",
-            status: "dead",
-        },
-        {
-            name: "MONSTER 4",
-            status: "attack",
-        },
-        {
-            name: "MONSTER 5",
-            status: "alive",
-        },
-        {
-            name: "MONSTER 6",
-            status: "alive",
-        },
-        {
-            name: "MONSTER 7",
-            status: "alive",
-        },
-    ]);
+            },
+            {
+                name: "MONSTER 3",
+                status: "alive",
+            },
+            {
+                name: "MONSTER 4",
+                status: "alive",
+            },
+            {
+                name: "MONSTER 5",
+                status: "alive",
+            },
+            {
+                name: "MONSTER 6",
+                status: "alive",
+            },
+            {
+                name: "MONSTER 7",
+                status: "alive",
+            },
+        ]
 
-    const [monsterIndex, setMonsterIndex] = useState(4)
+
+        if(window.monsterIndex !==0 && window.monsterIndex!==undefined){
+            for(let i=0;i<=window.monsterIndex;i++){
+                monsters[i].status="dead";
+            }
+            monsters[window.monsterIndex].status="attack"
+        }
+
+        console.log("monsters",monsters);
+        return monsters;
+    });
+
+    // const [monsterIndex, setMonsterIndex] = useState(4)
+
 
 
     const onAttack = async (index) => {
 
-        if (!hasBeast) {
+
+        console.log("onAttack")
+        if (!hasBeast || beastData.health==0) {
             await explore(true);
             return;
         }
+
+        window.monsterIndex+=1;
 
         await attack(true, beastData);
 
 
 
-        setMonsterIndex(index)
+        // setMonsterIndex(index)
+        // window.monsterIndex = index
         setIsVictory(true)
     }
 
@@ -218,13 +237,14 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         // for(let i=0 ;i<monsters.length;i++){
         //
         // }
-        monsters[monsterIndex].status = 'dead';
+        monsters[adventurer.monsterIndex].status = 'dead';
 
-        if (monsterIndex + 1 === monsters.length) {
+        if (window.monsterIndex + 1 === monsters.length) {
             setIsClearance(true);
         } else {
-            monsters[monsterIndex + 1].status = "attack";
+            monsters[window.monsterIndex + 1].status = "attack";
         }
+        window.monsterIndex +=1;
 
     }
 
