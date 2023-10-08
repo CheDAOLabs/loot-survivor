@@ -48,15 +48,6 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
         setButtonText("Flee!");
     };
 
-    const onAttack = () => {
-        setIsVictory(true)
-    }
-
-    const onConfirm = ()=>{
-        setIsVictory(false)
-
-}
-
     const attackButtonsData: ButtonData[] = [
         {
             id: 1,
@@ -166,6 +157,54 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
         return <BattleLog/>;
     }
 
+    const [monsters, setMonster] = useState([
+        {
+            name: "MONSTER 1",
+            status: "dead",
+        },
+        {
+            name: "MONSTER 2",
+            status: "dead",
+
+        },
+        {
+            name: "MONSTER 3",
+            status: "dead",
+        },
+        {
+            name: "MONSTER 4",
+            status: "attack",
+        },
+        {
+            name: "MONSTER 5",
+            status: "alive",
+        },
+        {
+            name: "MONSTER 6",
+            status: "alive",
+        },
+        {
+            name: "MONSTER 7",
+            status: "alive",
+        },
+    ]);
+
+    const [monsterIndex, setMonsterIndex] = useState(4)
+
+    const onAttack = (index) => {
+        setMonsterIndex(index)
+        setIsVictory(true)
+    }
+
+    const onConfirm = () => {
+        setIsVictory(false)
+        // for(let i=0 ;i<monsters.length;i++){
+        //
+        // }
+        monsters[monsterIndex].status='dead';
+        monsters[monsterIndex+1].status="attack";
+    }
+
     return (
         <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row">
 
@@ -201,15 +240,26 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
                                 <p>HEALTY:99</p>
                             </div>
                         </div>
-                        <div>
-                            <div className="lg text-center text-gray-500">MONSTER 1</div>
-                            <div className="lg text-center text-gray-500">MONSTER 2</div>
-                            <div className="lg text-center text-gray-500">MONSTER 3</div>
-                            <Button size={"lg"} onClick={onAttack}>ATTACK</Button>
-                            <div className="lg text-center">MONSTER 5</div>
-                            <div className="lg text-center">MONSTER 6</div>
-                            <div className="lg text-center">MONSTER 7</div>
-                            <div className="lg text-center">MONSTER 8</div>
+                        <div className="flex flex-col">
+                            {monsters.map((monster, index) => (
+                                <Button
+                                    size={"lg"}
+                                    disabled={monster.status == 'dead'}
+                                    key={index}
+                                    onClick={() => {
+                                        if (monster.status === 'attack') {
+                                            onAttack(index);
+                                        }
+                                    }}
+                                    className={`${
+                                        monster.status === 'alive' ? 'bg-black-800 text-green' : ''
+                                    } p-1 `}
+                                >
+                                    {monster.status === 'attack' ? "ATTACK" : monster.name}
+
+                                </Button>
+                            ))}
+
                         </div>
                     </>
                 )}
