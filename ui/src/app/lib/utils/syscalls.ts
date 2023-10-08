@@ -224,6 +224,7 @@ export function syscalls({
       undefined
     );
     try {
+      window.monsterIndex=0;
       const tx = await handleSubmitCalls(writeAsync);
       setTxHash(tx.transaction_hash);
       addTransaction({

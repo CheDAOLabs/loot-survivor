@@ -199,9 +199,11 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
         if(window.monsterIndex !==0 && window.monsterIndex!==undefined){
             for(let i=0;i<=window.monsterIndex;i++){
-                monsters[i].status="dead";
+                if(monsters[i-1]) {
+                    monsters[i - 1].status = "dead";
+                }
             }
-            monsters[window.monsterIndex].status="attack"
+            monsters[window.monsterIndex-1].status="attack"
         }
 
         console.log("monsters",monsters);
@@ -244,13 +246,14 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         } else {
             monsters[window.monsterIndex + 1].status = "attack";
         }
-        window.monsterIndex +=1;
+        // window.monsterIndex +=1;
 
     }
 
     const [isClearance, setIsClearance] = useState(false);
 
     const onExit = async () => {
+        window.monsterIndex=0;
         exit();
     }
 
@@ -290,7 +293,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
                                 <p>HEALTY:99</p>
                             </div>
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col mt-3">
                             {monsters.map((monster, index) => (
                                 <Button
                                     size={"lg"}
