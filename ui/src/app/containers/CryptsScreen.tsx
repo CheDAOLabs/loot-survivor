@@ -2,13 +2,11 @@ import React, {ChangeEvent, useState} from "react";
 import {Button} from "../components/buttons/Button";
 
 
-export interface CryptsProps {
-    setFormData: (data: FormData) => void;
-    formData: FormData;
-    handleBack: () => void;
-    step: number;
-    setStep: (step: number) => void;
-}
+import {EnterCode} from "../components/crypts/EnterCode";
+import Info from "../components/adventurer/Info";
+import {NullAdventurer} from "../types";
+import {useQueriesStore} from "../hooks/useQueryStore";
+
 
 /**
  * @container
@@ -16,47 +14,37 @@ export interface CryptsProps {
  */
 export default function CryptsScreen() {
 
+    const { data, setData, setIsLoading, setNotLoading, refetch } =
+        useQueriesStore();
 
-    const [isMaxLength, setIsMaxLength] = useState(false);
 
-    const handleChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-    ) => {
-        const {name, value} = e.target;
-        setFormData({
-            ...formData,
-            [name]: value.slice(0, 13),
-        });
-        if (value.length >= 13) {
-            setIsMaxLength(true);
-        } else {
-            setIsMaxLength(false);
-        }
-    };
+    const adventurer =
+        data.leaderboardByIdQuery?.adventurers[0] ?? NullAdventurer;
 
-    return (
 
-        <div className="sm:w-3/4 text-center p-4 uppercase 2xl:flex 2xl:flex-col 2xl:gap-10 2xl:h-[700px]">
-            <h3 className="2xl:text-5xl">Please Enter The Code</h3>
-            <div className="relative items-center flex flex-col gap-2">
-                <input
-                    type="text"
-                    name="name"
-                    onChange={handleChange}
-                    className="p-1 m-2 2xl:h-16 2xl:w-64 2xl:text-4xl bg-terminal-black border border-terminal-green animate-pulse transform"
-                    maxLength={13}
-                />
-                {isMaxLength && (
-                    <p className="absolute top-10 sm:top-20">MAX LENGTH!</p>
-                )}
+
+    const [formData, setFormData] = useState<FormData>({
+        name: "",
+    });
+
+    const [step, setStep] = useState(1);
+
+
+    const onEnterCode = ()=>{
+        // alert("entercode");
+        console.log(formData);
+        setStep(2);
+    }
+    if (step === 1) {
+        return (
+            <div className="flex flex-col sm:flex-row flex-wrap">
+                <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
+                    <Info adventurer={adventurer}/>
+                </div>
+                <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
+                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData}></EnterCode>
+                </div>
             </div>
-            <div className="hidden sm:flex flex-row justify-center">
-                <Button size={"lg"}>INQUIRE</Button>
-            </div>
-            <div className="hidden sm:flex flex-row justify-center 2xl:gap-10">
-                <a>CODING LIBRARY</a>
-                <a>MY CC</a>
-            </div>
-        </div>
-    );
+        );
+    }
 }
