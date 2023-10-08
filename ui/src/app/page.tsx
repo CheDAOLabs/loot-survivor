@@ -557,7 +557,7 @@ export default function Home() {
                   {screen === "player" && <Player />}
                   {screen === "wallet" && <WalletSelect />}
                   {screen === "crypts" && <CryptsScreen  explore={explore}
-                                                         attack={()=>{}}
+                                                         attack={attack2}
                                                          flee={flee} />}
 
                 </>

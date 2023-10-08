@@ -883,8 +883,8 @@ export function syscalls({
               adventurerDiedEvent.data[0]
           );
         }
-        setScreen("start");
-        setStartOption("create adventurer");
+        //setScreen("start");
+        //setStartOption("create adventurer");
       }
 
       const newItemsAvailableEvents = events.filter(
