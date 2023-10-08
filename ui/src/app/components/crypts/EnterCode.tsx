@@ -6,14 +6,12 @@ export interface AdventurerNameProps {
     setFormData: (data: FormData) => void;
     formData: any;
     handleBack: () => void;
-    step: number;
 }
 
 export const EnterCode = ({
                                    setFormData,
                                    formData,
                                    handleBack,
-                                   step,
                                }: AdventurerNameProps) => {
     const [isMaxLength, setIsMaxLength] = useState(false);
 

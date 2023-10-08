@@ -224,13 +224,13 @@ export function syscalls({
       undefined
     );
     try {
-      window.monsterIndex=0;
+      (window as any).monsterIndex=0;
       const tx = await handleSubmitCalls(writeAsync);
       setTxHash(tx.transaction_hash);
       addTransaction({
         hash: tx?.transaction_hash,
         metadata: {
-          method: `Spawn ${formData.name}`,
+          method: `Spawn ${(formData as any).name}`,
         },
       });
       const receipt = await account?.waitForTransaction(tx.transaction_hash, {

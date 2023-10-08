@@ -82,13 +82,11 @@ export default function CryptsScreen({
                     <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData} ></EnterCode>
+                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData} />
                 </div>
             </div>
         );
-    }
-
-    if (step === 2) {
+    }else if (step === 2) {
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
@@ -99,9 +97,7 @@ export default function CryptsScreen({
                 </div>
             </div>
         );
-    }
-
-    if (step === 3) {
+    }else if (step === 3) {
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
@@ -112,5 +108,7 @@ export default function CryptsScreen({
                 {/*</div>*/}
             </div>
         );
+    }else {
+        return (<></>);
     }
 }

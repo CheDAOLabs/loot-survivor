@@ -5,12 +5,8 @@ import {constants, Provider, Contract} from "starknet";
 
 
 export interface MapInfoProps {
-    setFormData: (data: FormData) => void;
-    formData: FormData;
     handleBack: () => void;
     handleEnter: () => void;
-    step: number;
-    setStep: (step: number) => void;
 }
 
 
@@ -259,12 +255,8 @@ const abi = [
 const address = "0x0188ddc140efc0761c47e154b5bfd81ec36c0ed61a1dda92dadb826ae4c87d99";
 
 export const MapInfo = ({
-                            setFormData,
-                            formData,
                             handleBack,
                             handleEnter,
-                            step,
-                            setStep,
                         }: MapInfoProps) => {
     const [isMaxLength, setIsMaxLength] = useState(false);
 

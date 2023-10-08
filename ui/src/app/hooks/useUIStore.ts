@@ -16,7 +16,8 @@ export type ScreenPage =
   | "player"
   | "wallet"
   | "tutorial"
-  | "create adventurer";
+  | "create adventurer"
+  | "crypts";
 
 type State = {
   disconnected: boolean;
