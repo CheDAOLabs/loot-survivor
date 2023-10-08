@@ -10,21 +10,22 @@ import useAdventurerStore from "../../hooks/useAdventurerStore";
 interface MapActionProps {
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
+    exit: (...args: any[]) => any;
 }
 
 export const MapAction = ({
-                              attack, flee
+                              attack, flee, exit
                           }: MapActionProps) => {
 
     const hasBeast = useAdventurerStore((state) => state.computed.hasBeast);
 
-    const adventurer = useAdventurerStore((state) => state.adventurer);
+    // const adventurer = useAdventurerStore((state) => state.adventurer);
 
     return (
         <>
             {
                 hasBeast ? (
-                    <CryptsBeastScreen attack={attack} flee={flee}/>
+                    <CryptsBeastScreen attack={attack} flee={flee} exit={exit}/>
                 ) : (
                     <div className="flex flex-col sm:flex-row flex-wrap">
                         <div className="flex flex-row items-center justify-center mr-3">

@@ -46,6 +46,11 @@ export default function CryptsScreen() {
         alert("attack");
     }
 
+    const onExit = ()=>{
+        // alert("exit");
+        setStep(1);
+    }
+
     if (step === 1) {
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
@@ -79,7 +84,7 @@ export default function CryptsScreen() {
                     <Info adventurer={adventurer}/>
                 </div>
                 {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
-                    <MapAction attack={onAttack}></MapAction>
+                    <MapAction attack={onAttack} exit={onExit}></MapAction>
                 {/*</div>*/}
             </div>
         );

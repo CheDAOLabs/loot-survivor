@@ -8,17 +8,21 @@ import React, {useState} from "react";
 import {processBeastName} from "../lib/utils";
 import {Battle, NullDiscovery, NullBeast} from "../types";
 import {Button} from "../components/buttons/Button";
+import Neck from "../../../public/icons/loot/neck.svg";
+import Heart from "../../../public/icons/heart.svg";
+import {HeartVitalityIcon} from "../components/icons/Icons";
 
 interface BeastScreenProps {
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
+    exit: (...args: any[]) => any;
 }
 
 /**
  * @container
  * @description Provides the beast screen for adventurer battles.
  */
-export default function BeastScreen({attack, flee}: BeastScreenProps) {
+export default function BeastScreen({attack, flee, exit}: BeastScreenProps) {
     const adventurer = useAdventurerStore((state) => state.adventurer);
     const loading = useLoadingStore((state) => state.loading);
     const resetNotification = useLoadingStore((state) => state.resetNotification);
@@ -191,19 +195,33 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
 
     const [monsterIndex, setMonsterIndex] = useState(4)
 
-    const onAttack = (index) => {
+    const onAttack = async (index) => {
+        // await attack(false, beastData);
         setMonsterIndex(index)
         setIsVictory(true)
     }
 
-    const onConfirm = () => {
+    const onConfirm = async () => {
         setIsVictory(false)
         // for(let i=0 ;i<monsters.length;i++){
         //
         // }
-        monsters[monsterIndex].status='dead';
-        monsters[monsterIndex+1].status="attack";
+        monsters[monsterIndex].status = 'dead';
+
+        if (monsterIndex + 1 === monsters.length) {
+            setIsClearance(true);
+        } else {
+            monsters[monsterIndex + 1].status = "attack";
+        }
+
     }
+
+    const [isClearance, setIsClearance] = useState(false);
+
+    const onExit = async () => {
+        exit();
+    }
+
 
     return (
         <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row">
@@ -224,7 +242,7 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
             </div>
 
             <div className="flex flex-col gap-1 sm:gap-0 items-center sm:w-1/2 sm:p-4 order-1 text-lg">
-                {isAlive && !isVictory && (
+                {isAlive && !isVictory && !isClearance && (
                     <>
                         <div className="flex flex-row gap-2 sm:flex-col items-center justify-center">
                             <h3>BUFF</h3>
@@ -264,7 +282,7 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
                     </>
                 )}
 
-                {isAlive && isVictory && (
+                {isAlive && isVictory && !isClearance && (
                     <>
                         <h3>VICTORY</h3>
                         <h4>CHOOSE A BUFF EFFECT</h4>
@@ -308,6 +326,21 @@ export default function BeastScreen({attack, flee}: BeastScreenProps) {
 
                     </>
                 )}
+
+                {isClearance && (
+                    <>
+                        <h3>FULL CLEARANCE</h3>
+                        <h4>YOU WON ALL THE BATTLES</h4>
+                        <div className="flex flex-col ">
+                            <div className="flex flex-row bg-terminal-green text-black mb-1 px-9">XP:55</div>
+                            <div className="flex flex-row bg-terminal-green text-black mb-1 px-9">
+                                <HeartVitalityIcon className=""/>:+55
+                            </div>
+                        </div>
+                        <Button size={"lg"} onClick={exit}>EXIT</Button>
+                    </>
+                )}
+
 
                 <div className="hidden sm:block xl:h-[500px] 2xl:h-full">
                     {(hasBeast || formatBattles.length > 0) && <BattleLog/>}
