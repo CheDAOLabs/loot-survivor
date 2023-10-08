@@ -1,45 +1,26 @@
-import React, { useState, ChangeEvent } from "react";
-import { Button } from "../buttons/Button";
-import { FormData } from "@/app/types";
+import React, {useState, ChangeEvent} from "react";
+import {Button} from "../buttons/Button";
+import {FormData} from "@/app/types";
 
-export interface AdventurerNameProps {
+export interface MapInfoProps {
     setFormData: (data: FormData) => void;
     formData: FormData;
     handleBack: () => void;
+    handleEnter: () => void;
     step: number;
     setStep: (step: number) => void;
 }
 
 export const MapInfo = ({
-                              setFormData,
-                              formData,
-                              handleBack,
-                              step,
-                              setStep,
-                          }: AdventurerNameProps) => {
+                            setFormData,
+                            formData,
+                            handleBack,
+                            handleEnter,
+                            step,
+                            setStep,
+                        }: MapInfoProps) => {
     const [isMaxLength, setIsMaxLength] = useState(false);
 
-    const handleChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-    ) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value.slice(0, 13),
-        });
-        if (value.length >= 13) {
-            setIsMaxLength(true);
-        } else {
-            setIsMaxLength(false);
-        }
-    };
-
-    const handleNameEntry = (name: string) => {
-        setFormData({ ...formData, name: name });
-        setTimeout(() => {
-            setStep(step + 1);
-        }, 1000);
-    };
 
     return (
         <>
@@ -54,7 +35,7 @@ export const MapInfo = ({
 
                 <div className="hidden sm:flex flex-row justify-center 2xl:gap-10 mt-3">
                     <Button size={"lg"} onClick={handleBack}>BACK</Button>
-                    <Button size={"lg"} className="ml-3" onClick={handleBack}>ENTER</Button>
+                    <Button size={"lg"} className="ml-3" onClick={handleEnter}>ENTER</Button>
 
                 </div>
             </div>
