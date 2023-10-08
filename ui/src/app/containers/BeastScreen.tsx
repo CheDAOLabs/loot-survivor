@@ -120,6 +120,9 @@ export default function BeastScreen({ attack, flee }: BeastScreenProps) {
 
   const BattleLog: React.FC = () => (
     <div className="flex flex-col p-2 items-center">
+      <div>
+        <img src="https://openseauserdata.com/files/d2c0f4b0bd85871bfd3b6eea02e9059a.svg" width={200}/>
+      </div>
       <Button
         className="w-1/2 sm:hidden"
         onClick={() => setShowBattleLog(false)}

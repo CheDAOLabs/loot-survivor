@@ -1,3 +1,4 @@
 GAME="0x02047b8a0f95a8aab8d01534565bdd6eb0b5a81c432e39f0977ab6e165d88ee8"
 START=857900
-MONGO_CONNECTION_STRING="mongodb://goerli-main:justlive@loot-survivor-mongo-goerli-new:27017"
+MONGO_CONNECTION_STRING="mongodb://mongo:mongo@127.0.0.1:27017"
+mongodb://mongo@107.23.80.88:27017/?retryWrites=true&serverSelectionTimeoutMS=50000&connectTimeoutMS=100000&authSource=admin&authMechanism=SCRAM-SHA-1&3t.uriVersion=3&3t.connection.name=lootsuvivor&3t.alwaysShowAuthDB=true&3t.alwaysShowDBFromUserRole=true&3t.proxyType=none

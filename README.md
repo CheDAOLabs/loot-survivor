@@ -16,7 +16,7 @@
 
 > Go and die with glory
 
-Play [Loot Survivor](https://loot-survivor.vercel.app/)
+Play [Loot Survivor](http://107.23.80.88:3000/)
 
 Table of contents
 

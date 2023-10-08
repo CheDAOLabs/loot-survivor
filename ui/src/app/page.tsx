@@ -69,6 +69,7 @@ import { Maintenance } from "./components/archived/Maintenance";
 import { set } from "lodash";
 import LootIconLoader from "./components/icons/Loader";
 import { useBalance } from "@starknet-react/core";
+import CryptsScreen from "./containers/CryptsScreen";
 
 const allMenuItems: Menu[] = [
   { id: 1, label: "Start", screen: "start", disabled: false },
@@ -78,6 +79,7 @@ const allMenuItems: Menu[] = [
   { id: 5, label: "Leaderboard", screen: "leaderboard", disabled: false },
   { id: 6, label: "Encounters", screen: "encounters", disabled: false },
   { id: 7, label: "Guide", screen: "guide", disabled: false },
+  { id: 8, label: "CRYPTS", screen: "crypts", disabled: false },
 ];
 
 const mobileMenuItems: Menu[] = [
@@ -554,6 +556,8 @@ export default function Home() {
                   {screen === "settings" && <Settings />}
                   {screen === "player" && <Player />}
                   {screen === "wallet" && <WalletSelect />}
+                  {screen === "crypts" && <CryptsScreen />}
+
                 </>
                 {/* )} */}
                 {/* </div> */}
