@@ -32,12 +32,12 @@ export default function CryptsScreen({
 
     const adventurer = useAdventurerStore((state) => state.adventurer);
 
-    const [formData, setFormData] = useState<FormData>({
+    const [formData, setFormData] = useState({
         name: "",
     });
 
     const [step, setStep] = useState(()=>{
-        if(window.monsterIndex===0 || window.monsterIndex===undefined){
+        if((window as any).monsterIndex===0 || (window as any).monsterIndex===undefined){
             console.log("step 1")
             return 1;
         }else {
@@ -60,8 +60,8 @@ export default function CryptsScreen({
     const onEnter = () => {
         setStep(3);
 
-        if(!window.monsterIndex) {
-            window.monsterIndex=1;
+        if(!(window as any).monsterIndex) {
+            (window as any).monsterIndex=1;
         }
     }
 
@@ -82,7 +82,7 @@ export default function CryptsScreen({
                     <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData}></EnterCode>
+                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData} ></EnterCode>
                 </div>
             </div>
         );

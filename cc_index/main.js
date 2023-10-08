@@ -1,19 +1,6 @@
-import React, {useState, ChangeEvent} from "react";
-import {Button} from "../buttons/Button";
-import {FormData} from "@/app/types";
-import {constants, Provider, Contract} from "starknet";
-
-
-export interface MapInfoProps {
-    setFormData: (data: FormData) => void;
-    formData: FormData;
-    handleBack: () => void;
-    handleEnter: () => void;
-    step: number;
-    setStep: (step: number) => void;
-}
-
-
+const express = require('express')
+const app = express()
+const {Provider,Contract,constants} = require('starknet');
 
 const abi = [
     {
@@ -26,6 +13,22 @@ const abi = [
             }
         ],
         "state_mutability": "external"
+    },
+    {
+        "name": "owner_of",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::starknet::contract_address::ContractAddress"
+            }
+        ],
+        "state_mutability": "view"
     },
     {
         "name": "core::integer::u256",
@@ -257,52 +260,80 @@ const abi = [
     }
 ];
 const address = "0x0188ddc140efc0761c47e154b5bfd81ec36c0ed61a1dda92dadb826ae4c87d99";
+const provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
+const contract = new Contract(abi, address, provider);
 
-export const MapInfo = ({
-                            setFormData,
-                            formData,
-                            handleBack,
-                            handleEnter,
-                            step,
-                            setStep,
-                        }: MapInfoProps) => {
-    const [isMaxLength, setIsMaxLength] = useState(false);
+app.use(express.static('public'));
 
-    const [info, setInfo] = useState(async () => {
-        console.log("init map info");
+let tokens = [];
 
+function retryOperation(operation,args, maxRetries, delay) {
+    return new Promise((resolve, reject) => {
+        let retries = 0;
 
-        let provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
+        function tryOperation() {
+            operation(args)
+                .then(result => {
+                    // 操作成功，返回结果
+                    resolve(result);
+                })
+                .catch(error => {
+                    retries++;
 
-        let contract = new Contract(abi, address, provider);
-        let token_id = 1;
+                    if (retries <= maxRetries) {
+                        // 输出重试次数和错误信息
+                        console.log(`Retry ${retries} failed with error: ${error}`);
 
+                        // 延迟一段时间后再次尝试
+                        setTimeout(tryOperation, delay);
+                    } else {
+                        // 达到最大重试次数，拒绝Promise并返回错误信息
+                        reject(new Error(`Max retries reached with error: ${error}`));
+                    }
+                });
+        }
 
-        const dungeon_data = await contract.generate_dungeon(token_id);
-        console.log("dungeon_data",dungeon_data);
-
-        //todo
-
+        tryOperation();
     });
+}
+
+const getMeta = async (tokenId)=>{
+    const dungeon_data = await retryOperation(contract.generate_dungeon,tokenId,1000,100000000000);
+    console.log(dungeon_data);
 
 
-    return (
-        <>
-            <div className=" text-center p-4 uppercase 2xl:flex 2xl:flex-col 2xl:gap-10 2xl:h-[700px]">
-                <div className="2xl:text-3xl">Owner: 0x02851980De030A......703C03160C23aD7ac86A<br/>Type: Divine Crypt<br/>ADMISSION FEE: 1/20
-                </div>
+}
+
+getMeta(1);
+
+app.get('/metadata/:tokenId',  (req, res) => {
 
 
-                <div className="hidden sm:flex flex-row justify-center 2xl:gap-10">
-                    <img src="https://openseauserdata.com/files/d2c0f4b0bd85871bfd3b6eea02e9059a.svg" width={200}/>
-                </div>
 
-                <div className="hidden sm:flex flex-row justify-center 2xl:gap-10 mt-3">
-                    <Button size={"lg"} onClick={handleBack}>BACK</Button>
-                    <Button size={"lg"} className="ml-3" onClick={handleEnter}>ENTER</Button>
 
-                </div>
-            </div>
-        </>
-    );
-};
+    let {tokenId} = req.params;
+    tokenId = tokenId.replace(".json", "");
+
+
+
+
+
+
+
+    const domain = req.hostname;
+    const protocol = "https"//req.protocol;
+
+    console.log("Request for token " + tokenId + " from " + domain + " (" + protocol + ")");
+
+    const metadata = {
+        "name": "Stark ID: " + tokenId,
+        "description": "This token represents an identity on StarkNet.",
+        "image": protocol + "://" + domain + "/images/" + tokenId % 12 + ".png",
+        "expiry": null,
+        "attributes": null
+    }
+
+    res.json(metadata);
+});
+
+app.listen(3001)

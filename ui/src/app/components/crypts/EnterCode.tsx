@@ -4,10 +4,9 @@ import { FormData } from "@/app/types";
 
 export interface AdventurerNameProps {
     setFormData: (data: FormData) => void;
-    formData: FormData;
+    formData: any;
     handleBack: () => void;
     step: number;
-    setStep: (step: number) => void;
 }
 
 export const EnterCode = ({
@@ -15,7 +14,6 @@ export const EnterCode = ({
                                    formData,
                                    handleBack,
                                    step,
-                                   setStep,
                                }: AdventurerNameProps) => {
     const [isMaxLength, setIsMaxLength] = useState(false);
 
@@ -36,9 +34,9 @@ export const EnterCode = ({
 
     const handleNameEntry = (name: string) => {
         setFormData({ ...formData, name: name });
-        setTimeout(() => {
-            setStep(step + 1);
-        }, 1000);
+        // setTimeout(() => {
+        //     setStep(step + 1);
+        // }, 1000);
     };
 
     return (
