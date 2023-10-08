@@ -42,7 +42,15 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         (state) => state.data.battlesByBeastQuery?.battles || []
     );
 
-    const [isVictory, setIsVictory] = useState(false)
+    const [isVictory, setIsVictory] = useState(()=>{
+            if( window.isVictory){
+                return true;
+            }else{
+                return false;
+            }
+
+    })
+
 
     const [buttonText, setButtonText] = useState("Flee!");
 
@@ -226,16 +234,19 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         window.monsterIndex+=1;
 
         await attack(true, beastData);
-
+        console.log("attack succ");
 
 
         // setMonsterIndex(index)
         // window.monsterIndex = index
-        setIsVictory(true)
+        // setIsVictory(true)
+        window.isVictory = true;
     }
 
     const onConfirm = async () => {
         setIsVictory(false)
+        window.isVictory=false;
+
         // for(let i=0 ;i<monsters.length;i++){
         //
         // }
