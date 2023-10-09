@@ -138,7 +138,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
     const [selectedOption, setSelectedOption] = useState('option1');
 
-    const handleOptionChange = (option:any) => {
+    const handleOptionChange = (option: any) => {
         // alert("handleOptionChange: " + option);
         setSelectedOption(option);
     };
@@ -214,6 +214,12 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
                 }
             }
             monsters[(window as any).monsterIndex - 1].status = "attack"
+
+            for (let i = (window as any).monsterIndex = 0; i <= monsters.length; i++) {
+                if (monsters[i]) {
+                    monsters[i].status = "dead";
+                }
+            }
         }
 
         console.log("monsters", monsters);
@@ -223,7 +229,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
     // const [monsterIndex, setMonsterIndex] = useState(4)
 
 
-    const onAttack = async (index:any) => {
+    const onAttack = async (index: any) => {
 
 
         console.log("onAttack")
