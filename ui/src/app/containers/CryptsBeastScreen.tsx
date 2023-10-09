@@ -390,21 +390,21 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
                     </>
                 )}
 
-                {!isAlive && (
-                    <>
-                        <h3>DEFEAT</h3>
-                        <h4>UNFORTUNATELY,<br/>YOU WERE DEFEATED BY MONSTER 1 </h4>
+                {/*{!isAlive && (*/}
+                {/*    <>*/}
+                {/*        <h3>DEFEAT</h3>*/}
+                {/*        <h4>UNFORTUNATELY,<br/>YOU WERE DEFEATED BY MONSTER 1 </h4>*/}
 
-                        <h3>REWARDS</h3>
-                        <div className="flex flex-row">
-                            <div className="flex flex-row bg-terminal-green text-black mb-1 px-9">XP:55</div>
-                            <div className="flex flex-row bg-terminal-green text-black mb-1 px-9">
-                                <HeartVitalityIcon className=""/>:+55
-                            </div>
-                        </div>
-                        <Button size={"lg"} onClick={exit}>EXIT</Button>
-                    </>
-                )}
+                {/*        <h3>REWARDS</h3>*/}
+                {/*        <div className="flex flex-row">*/}
+                {/*            <div className="flex flex-row bg-terminal-green text-black mb-1 px-9">XP:55</div>*/}
+                {/*            <div className="flex flex-row bg-terminal-green text-black mb-1 px-9">*/}
+                {/*                <HeartVitalityIcon className=""/>:+55*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*        <Button size={"lg"} onClick={exit}>EXIT</Button>*/}
+                {/*    </>*/}
+                {/*)}*/}
 
 
                 <div className="hidden sm:block xl:h-[500px] 2xl:h-full">
