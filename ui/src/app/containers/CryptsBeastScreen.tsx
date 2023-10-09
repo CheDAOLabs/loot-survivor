@@ -247,22 +247,8 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
     const [isClearance, setIsClearance] = useState(false);
 
     const onConfirm = async () => {
-       
         setIsVictory(false);
         (window as any).isVictory = false;
-
-        // for(let i=0 ;i<monsters.length;i++){
-        //
-        // }
-        monsters[(window as any).monsterIndex].status = 'dead';
-
-        if ((window as any).monsterIndex + 1 === monsters.length) {
-            setIsClearance(true);
-        } else {
-            monsters[(window as any).monsterIndex + 1].status = "attack";
-        }
-        // (window as any).monsterIndex +=1;
-
     }
 
 
