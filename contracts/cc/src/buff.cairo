@@ -27,3 +27,15 @@ fn get_buffs() -> Array<Buff> {
     buffs.append(Buff{id:7,strength:0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 10 });
     buffs
 }
+
+ #[cfg(test)]
+ mod tests {
+     use debug::PrintTrait;
+     use cc::buff::get_buffs;
+     #[test]
+     #[available_gas(50000)]
+     fn test_buff() {
+         let mut buffs = get_buffs();
+         assert(*buffs.at(0).id==0,'')
+     }
+ }
