@@ -30,7 +30,7 @@ export const MapInfo = ({
 
                 <div className="hidden sm:flex flex-row justify-center 2xl:gap-10"  >
                     {/*<img src="https://openseauserdata.com/files/d2c0f4b0bd85871bfd3b6eea02e9059a.svg" width={200}/>*/}
-                    <div style={{"height":"300px","width":"300px"}} dangerouslySetInnerHTML={{__html:svg}}/>
+                    <div style={{"height":"200px","width":"200px"}} dangerouslySetInnerHTML={{__html:svg}}/>
                 </div>
 
                 <div className="hidden sm:flex flex-row justify-center 2xl:gap-10 mt-3">
