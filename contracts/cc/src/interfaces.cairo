@@ -1,18 +1,19 @@
 use starknet::ContractAddress;
-use core::{result::ResultTrait, traits::Into, array::SpanTrait, serde::Serde, clone::Clone};
 
+#[derive(Copy, Drop, Serde)]
 struct EntityData {
     x: Span<u8>,
     y: Span<u8>,
     entity_data: Span<u8>
 }
 
+#[derive(Copy, Drop, Serde)]
 struct Pack {
     first: felt252,
     second: felt252,
     third: felt252
 }
-// #[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
 struct DungeonSerde {
     size: u8,
     environment: u8,
@@ -32,7 +33,7 @@ trait ICryptsAndCaverns<TState> {
 
     fn generate_dungeon(self: @TState, token_id: u128) -> DungeonSerde;
 
-    fn get_seed(token_id: u128) -> u256;
+    fn get_seed(self: @TState, token_id: u128) -> u256;
 
     fn mint(ref self: TState) -> u128;
 }

@@ -8,6 +8,7 @@ lootitems = { path = "../loot" }
 survivor = { path = "../adventurer" }
 market = { path = "../market" }
 obstacles = { path = "../obstacles" }
+cc = { path = "../cc" }
 openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.7.0" }
 
 [[target.starknet-contract]]
