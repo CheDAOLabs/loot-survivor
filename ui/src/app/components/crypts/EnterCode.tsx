@@ -1,24 +1,28 @@
-import React, { useState, ChangeEvent } from "react";
-import { Button } from "../buttons/Button";
-import { FormData } from "@/app/types";
+import React, {useState, ChangeEvent} from "react";
+import {Button} from "../buttons/Button";
+import {FormData} from "@/app/types";
+import {constants, Contract, Provider, num} from "starknet";
 
 export interface AdventurerNameProps {
     setFormData: (data: FormData) => void;
     formData: any;
     handleBack: () => void;
+    loading: any;
 }
 
+
 export const EnterCode = ({
-                                   setFormData,
-                                   formData,
-                                   handleBack,
-                               }: AdventurerNameProps) => {
+                              setFormData,
+                              formData,
+                              handleBack,
+                              loading
+                          }: AdventurerNameProps) => {
     const [isMaxLength, setIsMaxLength] = useState(false);
 
     const handleChange = (
         e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData({
             ...formData,
             [name]: value.slice(0, 13),
@@ -31,7 +35,7 @@ export const EnterCode = ({
     };
 
     const handleNameEntry = (name: string) => {
-        setFormData({ ...formData, name: name });
+        setFormData({...formData, name: name});
         // setTimeout(() => {
         //     setStep(step + 1);
         // }, 1000);
@@ -56,6 +60,13 @@ export const EnterCode = ({
                 <div className="hidden sm:flex flex-row justify-center">
                     <Button size={"lg"} onClick={handleBack}>INQUIRE</Button>
                 </div>
+
+                {loading ? (
+                    <div className="m-1">
+                        <p className="loading-ellipsis">Loading</p>
+                    </div>
+                ) : (<></>)}
+
                 <div className="hidden sm:flex flex-row justify-center 2xl:gap-10">
                     <a>CODING LIBRARY</a>
                     <a>MY CC</a>

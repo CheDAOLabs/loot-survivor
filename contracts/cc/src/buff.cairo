@@ -36,6 +36,6 @@ fn get_buffs() -> Array<Buff> {
      #[available_gas(50000)]
      fn test_buff() {
          let mut buffs = get_buffs();
-         assert(*buffs.at(0).id==0,'')
+         assert(*buffs.at(0).id==0,'wrong')
      }
  }
