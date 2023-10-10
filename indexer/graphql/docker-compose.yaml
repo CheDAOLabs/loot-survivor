@@ -11,4 +11,4 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - mongo-goerli:/data/db
+      - ./mongo-goerli:/data/db
