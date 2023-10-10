@@ -1,6 +1,6 @@
 version: "3"
 
-services: 
+services:
   mongo-goerli:
     image: mongo:latest
     container_name: mongo-goerli
@@ -10,9 +10,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: apibara
     ports:
     - 27017:27017
-  
-volumes:
-  - mongo-goerli:/data/db
 
 volumes:
-  mongo-goerli:
+  - mongo-goerli:/data/db
