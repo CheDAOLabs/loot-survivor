@@ -2,30 +2,26 @@ import type { Config } from "https://esm.sh/@apibara/indexer";
 import type { Block, Starknet } from "https://esm.sh/@apibara/indexer/starknet";
 import type { Mongo } from "https://esm.sh/@apibara/indexer/sink/mongo";
 import type { Console } from "https://esm.sh/@apibara/indexer/sink/console";
-import {
-  AMBUSHED_BY_BEAST,
-  ATTACKED_BEAST,
-  ATTACKED_BY_BEAST,
-  DISCOVERED_BEAST,
-  parseAmbushedByBeast,
-  parseAttackedBeast,
-  parseDiscoveredBeast,
-  parseSlayedBeast,
-  SLAYED_BEAST,
-} from "./utils/events.ts";
+import { hash } from "https://esm.sh/starknet";
+
 import { insertBeast, updateBeastHealth } from "./utils/helpers.ts";
 import { MONGO_CONNECTION_STRING } from "./utils/constants.ts";
 
-const GAME = Deno.env.get("GAME");
-const START = +(Deno.env.get("START") || 0);
+const GAME = "0x0148079ed14213e39516a4d366395b0feef93f6f31af364a1022bb2da454d7fa";
+const START = 880650;
+
+function eventKey(name: string) {
+  const h = BigInt(hash.getSelectorFromName(name));
+  return `0x${h.toString(16).padStart(64, "0")}`;
+}
+
+export const MINT = eventKey("cc_starknet::Dungeons::Minted");
+
 
 const filter = {
   header: { weak: true },
   events: [
-    { fromAddress: GAME, keys: [DISCOVERED_BEAST] },
-    { fromAddress: GAME, keys: [AMBUSHED_BY_BEAST] },
-    { fromAddress: GAME, keys: [ATTACKED_BEAST] },
-    { fromAddress: GAME, keys: [SLAYED_BEAST] },
+    { fromAddress: GAME, keys: [MINT] },
   ],
 };
 
@@ -50,80 +46,6 @@ export default function transform({ header, events }: Block) {
 
   return events.flatMap(({ event }) => {
     switch (event.keys[0]) {
-      case DISCOVERED_BEAST: {
-        const { value } = parseDiscoveredBeast(event.data, 0);
-        console.log("DISCOVERED_BEAST", "->", "BEASTS UPDATES");
-        return [
-          insertBeast({
-            beast: value.id,
-            adventurerId: value.adventurerState.adventurerId,
-            seed: value.seed,
-            health: value.adventurerState.adventurer.beastHealth,
-            level: value.beastSpec.level,
-            special1: value.beastSpec.specials.special1,
-            special2: value.beastSpec.specials.special2,
-            special3: value.beastSpec.specials.special3,
-            slayed: false,
-            slainOnTime: null,
-            createdTime: new Date().toISOString(),
-            lastUpdatedTime: new Date().toISOString(),
-            timestamp: new Date().toISOString(),
-          }),
-        ];
-      }
-      case AMBUSHED_BY_BEAST: {
-        const { value } = parseAmbushedByBeast(event.data, 0);
-        console.log("AMBUSHED_BY_BEAST", "->", "BEASTS UPDATES");
-        return [
-          insertBeast({
-            beast: value.id,
-            adventurerId: value.adventurerState.adventurerId,
-            seed: value.seed,
-            health: value.adventurerState.adventurer.beastHealth,
-            level: value.beastSpec.level,
-            special1: value.beastSpec.specials.special1,
-            special2: value.beastSpec.specials.special2,
-            special3: value.beastSpec.specials.special3,
-            slayed: false,
-            slainOnTime: null,
-            createdTime: new Date().toISOString(),
-            lastUpdatedTime: new Date().toISOString(),
-            timestamp: new Date().toISOString(),
-          }),
-        ];
-      }
-      case ATTACKED_BEAST: {
-        const { value } = parseAttackedBeast(event.data, 0);
-        console.log("ATTACKED_BEAST", "->", "BEASTS UPDATES");
-        return [
-          updateBeastHealth({
-            beast: value.id,
-            adventurerId: value.adventurerState.adventurerId,
-            seed: value.seed,
-            health: value.adventurerState.adventurer.beastHealth,
-            slayed: false,
-            slainOnTime: null,
-            lastUpdatedTime: new Date().toISOString(),
-            timestamp: new Date().toISOString(),
-          }),
-        ];
-      }
-      case SLAYED_BEAST: {
-        const { value } = parseSlayedBeast(event.data, 0);
-        console.log("SLAYED_BEAST", "->", "BEASTS UPDATES");
-        return [
-          updateBeastHealth({
-            beast: value.id,
-            adventurerId: value.adventurerState.adventurerId,
-            seed: value.seed,
-            health: value.adventurerState.adventurer.beastHealth,
-            slayed: true,
-            slainOnTime: new Date().toISOString(),
-            lastUpdatedTime: new Date().toISOString(),
-            timestamp: new Date().toISOString(),
-          }),
-        ];
-      }
       default: {
         console.warn("Unknown event", event.keys[0]);
         return [];
