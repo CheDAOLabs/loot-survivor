@@ -4,7 +4,6 @@ import type { Mongo } from "https://esm.sh/@apibara/indexer/sink/mongo";
 import type { Console } from "https://esm.sh/@apibara/indexer/sink/console";
 import { hash } from "https://esm.sh/starknet";
 
-import { insertBeast, updateBeastHealth } from "./utils/helpers.ts";
 import { MONGO_CONNECTION_STRING } from "./utils/constants.ts";
 
 const GAME = "0x0148079ed14213e39516a4d366395b0feef93f6f31af364a1022bb2da454d7fa";
