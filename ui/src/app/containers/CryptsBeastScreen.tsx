@@ -207,6 +207,8 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         ]
 
 
+        console.log("monsterIndex on render",(window as any).monsterIndex)
+
         if ((window as any).monsterIndex !== 0 && (window as any).monsterIndex !== undefined) {
             for (let i = 0; i <= (window as any).monsterIndex; i++) {
                 if (monsters[i - 1]) {
@@ -215,7 +217,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
             }
             monsters[(window as any).monsterIndex - 1].status = "attack"
 
-            for (let i = (window as any).monsterIndex = 0; i <= monsters.length; i++) {
+            for (let i = (window as any).monsterIndex ; i <= monsters.length; i++) {
                 if (monsters[i]) {
                     monsters[i].status = "dead";
                 }
