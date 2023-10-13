@@ -219,7 +219,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
             for (let i = (window as any).monsterIndex ; i <= monsters.length; i++) {
                 if (monsters[i]) {
-                    monsters[i].status = "dead";
+                    monsters[i].status = "alive";
                 }
             }
         }
