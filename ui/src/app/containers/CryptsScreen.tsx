@@ -740,6 +740,7 @@ export default function CryptsScreen({
             console.log("monsterIndex",(window as any).monsterIndex)
         }
 
+        console.log("monsterIndex after enter",(window as any).monsterIndex)
         setStep(3);
 
     }
