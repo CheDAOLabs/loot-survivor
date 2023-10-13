@@ -732,14 +732,20 @@ export default function CryptsScreen({
 
 
     const onEnter = () => {
+
+        console.log('onEnter')
+        if(!(window as any).monsterIndex || (window as any).monsterIndex==0) {
+            (window as any).monsterIndex=1;
+        }else{
+            console.log("monsterIndex",(window as any).monsterIndex)
+        }
+
         setStep(3);
 
-        if(!(window as any).monsterIndex) {
-            (window as any).monsterIndex=1;
-        }
     }
 
     const onBack = () => {
+        console.log("onBack")
         setStep(1);
     }
 
