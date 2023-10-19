@@ -671,7 +671,7 @@ export default function CryptsScreen({
 
     const [step, setStep] = useState(() => {
 
-        const monsterIndex = (Number)(Storage.get('monsterIndex_' + adventurer?.id)) || 0;
+        const monsterIndex = (Number)(Storage.get('monsterIndex' + adventurer?.id)) || 0;
 
         if (monsterIndex === 0) {
             console.log("step 1")

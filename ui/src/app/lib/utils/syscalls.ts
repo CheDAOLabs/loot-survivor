@@ -558,7 +558,7 @@ export function syscalls({
       });
 
       Storage.set('victory' + adventurer?.id, JSON.stringify(true));
-      const monsterIndex = (Number)(Storage.get('monsterIndex_' + adventurer?.id)) || 0;
+      const monsterIndex = (Number)(Storage.get('monsterIndex' + adventurer?.id)) || 0;
       Storage.set('monsterIndex' + adventurer?.id, monsterIndex+1);
 
 

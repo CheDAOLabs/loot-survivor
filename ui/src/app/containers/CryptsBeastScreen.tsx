@@ -448,7 +448,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
             },
         ]
 
-        const monsterIndex = (Number)(Storage.get('monsterIndex_' + adventurer?.id)) || 0;
+        const monsterIndex = (Number)(Storage.get('monsterIndex' + adventurer?.id)) || 0;
 
         if (monsterIndex) {
             for (let i = 0; i <= monsterIndex; i++) {
