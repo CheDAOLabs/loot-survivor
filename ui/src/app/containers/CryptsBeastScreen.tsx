@@ -494,17 +494,21 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
             return;
         }
 
-        (window as any).monsterIndex += 1;
+        try {
+            let res =  await attack(true, beastData);
+            console.log("attack succ",res);
+            Storage.set('victory' + adventurer?.id, JSON.stringify(true));
+            (window as any).monsterIndex += 1;
 
-        await attack(true, beastData);
-        console.log("attack succ");
+        }catch (e){
+            console.error(e);
+        }
 
 
         // setMonsterIndex(index)
         // (window as any).monsterIndex = index
         // setIsVictory(true)
         // (window as any).isVictory = true;
-        Storage.set('victory' + adventurer?.id, JSON.stringify(true));
     }
 
     const [isClearance, setIsClearance] = useState(false);
