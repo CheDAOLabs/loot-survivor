@@ -4,7 +4,7 @@ import {BeastDisplay} from "../components/beast/BeastDisplay";
 import useLoadingStore from "../hooks/useLoadingStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
 import {useQueriesStore} from "../hooks/useQueryStore";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {processBeastName} from "../lib/utils";
 import {Battle, NullDiscovery, NullBeast} from "../types";
 import {Button} from "../components/buttons/Button";
@@ -13,96 +13,96 @@ import Heart from "../../../public/icons/heart.svg";
 import {HeartVitalityIcon} from "../components/icons/Icons";
 
 
-const buffs =  [
-        {
-            "id": 0,
-            "strength": 1,
-            "dexterity": 0,
-            "vitality": 0,
-            "intelligence": 0,
-            "wisdom": 0,
-            "charisma": 0,
-            "luck": 0,
-            "hp": 0
-        },
-        {
-            "id": 1,
-            "strength": 0,
-            "dexterity": 1,
-            "vitality": 0,
-            "intelligence": 0,
-            "wisdom": 0,
-            "charisma": 0,
-            "luck": 0,
-            "hp": 0
-        },
-        {
-            "id": 2,
-            "strength": 0,
-            "dexterity": 0,
-            "vitality": 1,
-            "intelligence": 0,
-            "wisdom": 0,
-            "charisma": 0,
-            "luck": 0,
-            "hp": 0
-        },
-        {
-            "id": 3,
-            "strength": 0,
-            "dexterity": 0,
-            "vitality": 0,
-            "intelligence": 1,
-            "wisdom": 0,
-            "charisma": 0,
-            "luck": 0,
-            "hp": 0
-        },
-        {
-            "id": 4,
-            "strength": 0,
-            "dexterity": 0,
-            "vitality": 0,
-            "intelligence": 0,
-            "wisdom": 1,
-            "charisma": 0,
-            "luck": 0,
-            "hp": 0
-        },
-        {
-            "id": 5,
-            "strength": 0,
-            "dexterity": 0,
-            "vitality": 0,
-            "intelligence": 0,
-            "wisdom": 0,
-            "charisma": 1,
-            "luck": 0,
-            "hp": 0
-        },
-        {
-            "id": 6,
-            "strength": 0,
-            "dexterity": 0,
-            "vitality": 0,
-            "intelligence": 0,
-            "wisdom": 0,
-            "charisma": 0,
-            "luck": 1,
-            "hp": 0
-        },
-        {
-            "id": 7,
-            "strength": 0,
-            "dexterity": 0,
-            "vitality": 0,
-            "intelligence": 0,
-            "wisdom": 0,
-            "charisma": 0,
-            "luck": 0,
-            "hp": 10
-        }
-    ];
+const buffs = [
+    {
+        "id": 0,
+        "strength": 1,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 0
+    },
+    {
+        "id": 1,
+        "strength": 0,
+        "dexterity": 1,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 0
+    },
+    {
+        "id": 2,
+        "strength": 0,
+        "dexterity": 0,
+        "vitality": 1,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 0
+    },
+    {
+        "id": 3,
+        "strength": 0,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 1,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 0
+    },
+    {
+        "id": 4,
+        "strength": 0,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 1,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 0
+    },
+    {
+        "id": 5,
+        "strength": 0,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 1,
+        "luck": 0,
+        "hp": 0
+    },
+    {
+        "id": 6,
+        "strength": 0,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 1,
+        "hp": 0
+    },
+    {
+        "id": 7,
+        "strength": 0,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 10
+    }
+];
 
 function getRandomBuff() {
     const randomIndex = Math.floor(Math.random() * buffs.length);
@@ -304,7 +304,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         ]
 
 
-        console.log("monsterIndex on render",(window as any).monsterIndex)
+        console.log("monsterIndex on render", (window as any).monsterIndex)
 
         if ((window as any).monsterIndex !== 0 && (window as any).monsterIndex !== undefined) {
             for (let i = 0; i <= (window as any).monsterIndex; i++) {
@@ -314,7 +314,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
             }
             monsters[(window as any).monsterIndex - 1].status = "attack"
 
-            for (let i = (window as any).monsterIndex ; i <= monsters.length; i++) {
+            for (let i = (window as any).monsterIndex; i <= monsters.length; i++) {
                 if (monsters[i]) {
                     monsters[i].status = "alive";
                 }
@@ -324,6 +324,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         console.log("monsters", monsters);
         return monsters;
     });
+
 
     // const [monsterIndex, setMonsterIndex] = useState(4)
 
@@ -362,8 +363,23 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         exit();
     }
 
+    const [MyBuff, setMyBuff] = useState({
+        strength: 0,
+        dexterity: 0,
+        vitality: 0,
+        intelligence: 0,
+        wisdom: 0,
+        charisma: 0,
+        luck: 0,
+        hp: 0
+    });
 
-    return (
+    useEffect(() => {
+
+    },[(window) as any]);
+
+
+        return (
         <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row">
 
             <div className="sm:w-1/2 order-1 sm:order-2">
@@ -386,17 +402,21 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
                     <>
                         <div className="flex flex-row gap-2 sm:flex-col items-center justify-center">
                             <h3>BUFF</h3>
-                            <div className="flex  gap-2">
-                                <p>HEALTY:99</p>
-                                <p>ATTACK:99</p>
-                                <p>LUCKY:99</p>
+                            <div className="flex gap-2 ">
+                                <p>STRENGTH:{MyBuff.strength}</p>
+                                <p>DEXTERITY:{MyBuff.dexterity}</p>
+                                <p>VITALITY:{MyBuff.vitality}</p>
                             </div>
                             <div className="flex  gap-2 border-b border-terminal-green">
-                                <p>POWER:99</p>
-                                <p>BUFF:99</p>
-                                <p>BUFFTEXT:99</p>
-                                <p>HEALTY:99</p>
+                                <p>INTELLIGENCE:{MyBuff.intelligence}</p>
+                                <p>WISDOM:{MyBuff.wisdom}</p>
+                                <p>CHARISMA:{MyBuff.charisma}</p>
                             </div>
+                            <div className="flex  gap-2 border-b border-terminal-green">
+                                <p>LUCK:{MyBuff.luck}</p>
+                                <p>HP:{MyBuff.hp}</p>
+                            </div>
+
                         </div>
                         <div className="flex flex-col mt-3">
                             {monsters.map((monster, index) => (
