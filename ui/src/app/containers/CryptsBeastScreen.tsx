@@ -234,10 +234,12 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
     );
 
     const [selectedOption, setSelectedOption] = useState('option1');
+    const [selectedValue, setSelectedValue] = useState(0);
 
-    const handleOptionChange = (option: any) => {
+    const handleOptionChange = (option: any,value:any) => {
         // alert("handleOptionChange: " + option);
         setSelectedOption(option);
+        setSelectedValue(value);
     };
 
 
@@ -352,7 +354,38 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
     const [isClearance, setIsClearance] = useState(false);
 
+
     const onConfirm = async () => {
+
+
+        switch (selectedOption) {
+            case 'strength':
+                MyBuff.strength += selectedValue;
+                break
+            case 'dexterity':
+                MyBuff.dexterity += selectedValue;
+                break
+            case 'vitality':
+                MyBuff.vitality += selectedValue;
+                break
+            case 'intelligence':
+                MyBuff.intelligence += selectedValue;
+                break
+            case 'wisdom':
+                MyBuff.wisdom += selectedValue;
+                break
+            case 'charisma':
+                MyBuff.charisma += selectedValue;
+                break
+            case 'luck':
+                MyBuff.luck += selectedValue;
+                break
+            case 'hp':
+                MyBuff.hp += selectedValue;
+                break
+
+        }
+
         setIsVictory(false);
         (window as any).isVictory = false;
     }
@@ -372,6 +405,40 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         charisma: 0,
         luck: 0,
         hp: 0
+    });
+
+    const [currBuff,setCurrBuff] = useState(()=>{
+
+        let result = [];
+        const buff1 = getRandomBuff();
+        const buff2 = getRandomBuff();
+        const buff3 = getRandomBuff();
+
+        for (const [key, value] of Object.entries(buff1)) {
+            if(key!="ID" &&  value>0) {
+                result.push({
+                    key: key.toUpperCase(),
+                    value: value
+                });
+            }
+        }
+        for (const [key, value] of Object.entries(buff2)) {
+            if(key!="ID" &&  value>0) {
+                result.push({
+                    key: key.toUpperCase(),
+                    value: value
+                });
+            }
+        }
+        for (const [key, value] of Object.entries(buff3)) {
+            if(key!="ID" &&  value>0) {
+                result.push({
+                    key: key.toUpperCase(),
+                    value: value
+                });
+            }
+        }
+        return result;
     });
 
     useEffect(() => {
@@ -449,35 +516,17 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
                         <div className="flex flex-col m-3">
 
-                            <Button
-                                size={"lg"}
-                                className={`${
-                                    selectedOption === 'option1' ? '' : 'bg-gray-800 text-white'
-                                } m-1 `}
-                                onClick={() => handleOptionChange('option1')}
-                            >
-                                HEALTHY: +5
-                            </Button>
-
-                            <Button
-                                size={"lg"}
-                                className={`${
-                                    selectedOption === 'option2' ? '' : 'bg-gray-800 text-white'
-                                } m-1 `}
-                                onClick={() => handleOptionChange('option2')}
-                            >
-                                POWER: +10%
-                            </Button>
-
-                            <Button
-                                size={"lg"}
-                                className={`${
-                                    selectedOption === 'option3' ? '' : 'bg-gray-800 text-white'
-                                } m-1`}
-                                onClick={() => handleOptionChange('option3')}
-                            >
-                                LUCKY: +9999
-                            </Button>
+                            {currBuff.map((cb, index) => (
+                                <Button
+                                    size={"lg"}
+                                    className={`${
+                                        selectedOption === cb.key ? '' : 'bg-gray-800 text-white'
+                                    } m-1 `}
+                                    onClick={() => handleOptionChange(cb.key,cb.value)}
+                                >
+                                    {cb.key}: +{cb.value}
+                                </Button>
+                            ))}
 
 
                         </div>
