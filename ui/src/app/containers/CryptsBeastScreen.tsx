@@ -357,35 +357,36 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
     const onConfirm = async () => {
 
-
-        switch (selectedOption) {
+        let myBuff = JSON.parse(JSON.stringify(MyBuff));
+        switch (selectedOption.toLowerCase()) {
             case 'strength':
-                MyBuff.strength += selectedValue;
+                myBuff.strength += selectedValue;
                 break
             case 'dexterity':
-                MyBuff.dexterity += selectedValue;
+                myBuff.dexterity += selectedValue;
                 break
             case 'vitality':
-                MyBuff.vitality += selectedValue;
+                myBuff.vitality += selectedValue;
                 break
             case 'intelligence':
-                MyBuff.intelligence += selectedValue;
+                myBuff.intelligence += selectedValue;
                 break
             case 'wisdom':
-                MyBuff.wisdom += selectedValue;
+                myBuff.wisdom += selectedValue;
                 break
             case 'charisma':
-                MyBuff.charisma += selectedValue;
+                myBuff.charisma += selectedValue;
                 break
             case 'luck':
-                MyBuff.luck += selectedValue;
+                myBuff.luck += selectedValue;
                 break
             case 'hp':
-                MyBuff.hp += selectedValue;
+                myBuff.hp += selectedValue;
                 break
 
         }
 
+        setMyBuff(myBuff);
         setIsVictory(false);
         (window as any).isVictory = false;
     }
@@ -407,39 +408,22 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         hp: 0
     });
 
-    const [currBuff,setCurrBuff] = useState(()=>{
+    const randBuff = ()=>{
 
         let result = [];
         const buff1 = getRandomBuff();
-        const buff2 = getRandomBuff();
-        const buff3 = getRandomBuff();
-
         for (const [key, value] of Object.entries(buff1)) {
-            if(key!="ID" &&  value>0) {
+            if(key!="id" &&  value>0) {
                 result.push({
                     key: key.toUpperCase(),
                     value: value
                 });
             }
         }
-        for (const [key, value] of Object.entries(buff2)) {
-            if(key!="ID" &&  value>0) {
-                result.push({
-                    key: key.toUpperCase(),
-                    value: value
-                });
-            }
-        }
-        for (const [key, value] of Object.entries(buff3)) {
-            if(key!="ID" &&  value>0) {
-                result.push({
-                    key: key.toUpperCase(),
-                    value: value
-                });
-            }
-        }
+
         return result;
-    });
+    };
+    const [currBuff,setCurrBuff] = useState(randBuff());
 
     useEffect(() => {
 
