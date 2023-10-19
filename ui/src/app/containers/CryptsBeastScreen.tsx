@@ -17,8 +17,8 @@ const buffs = [
     {
         "id": 0,
         "strength": 1,
-        "dexterity": 0,
-        "vitality": 0,
+        "dexterity": 1,
+        "vitality": 1,
         "intelligence": 0,
         "wisdom": 0,
         "charisma": 0,
@@ -29,8 +29,8 @@ const buffs = [
         "id": 1,
         "strength": 0,
         "dexterity": 1,
-        "vitality": 0,
-        "intelligence": 0,
+        "vitality": 1,
+        "intelligence": 1,
         "wisdom": 0,
         "charisma": 0,
         "luck": 0,
@@ -41,8 +41,8 @@ const buffs = [
         "strength": 0,
         "dexterity": 0,
         "vitality": 1,
-        "intelligence": 0,
-        "wisdom": 0,
+        "intelligence": 1,
+        "wisdom": 1,
         "charisma": 0,
         "luck": 0,
         "hp": 0
@@ -53,8 +53,8 @@ const buffs = [
         "dexterity": 0,
         "vitality": 0,
         "intelligence": 1,
-        "wisdom": 0,
-        "charisma": 0,
+        "wisdom": 1,
+        "charisma": 1,
         "luck": 0,
         "hp": 0
     },
@@ -65,8 +65,8 @@ const buffs = [
         "vitality": 0,
         "intelligence": 0,
         "wisdom": 1,
-        "charisma": 0,
-        "luck": 0,
+        "charisma": 1,
+        "luck": 1,
         "hp": 0
     },
     {
@@ -77,14 +77,102 @@ const buffs = [
         "intelligence": 0,
         "wisdom": 0,
         "charisma": 1,
+        "luck": 1,
+        "hp": 20
+    },
+    {
+        "id": 6,
+        "strength": 1,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 1,
+        "hp": 20
+    },
+    {
+        "id": 7,
+        "strength": 1,
+        "dexterity": 1,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 20
+    },
+    {
+        "id": 8,
+        "strength": 1,
+        "dexterity": 0,
+        "vitality": 1,
+        "intelligence": 0,
+        "wisdom": 1,
+        "charisma": 0,
         "luck": 0,
         "hp": 0
     },
     {
-        "id": 6,
+        "id": 9,
+        "strength": 0,
+        "dexterity": 1,
+        "vitality": 0,
+        "intelligence": 1,
+        "wisdom": 0,
+        "charisma": 1,
+        "luck": 0,
+        "hp": 0
+    },
+    {
+        "id": 10,
+        "strength": 0,
+        "dexterity": 0,
+        "vitality": 1,
+        "intelligence": 0,
+        "wisdom": 1,
+        "charisma": 0,
+        "luck": 1,
+        "hp": 0
+    },
+    {
+        "id": 11,
         "strength": 0,
         "dexterity": 0,
         "vitality": 0,
+        "intelligence": 1,
+        "wisdom": 0,
+        "charisma": 1,
+        "luck": 0,
+        "hp": 20
+    },
+    {
+        "id": 12,
+        "strength": 1,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 1,
+        "charisma": 0,
+        "luck": 1,
+        "hp": 0
+    },
+    {
+        "id": 13,
+        "strength": 1,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 1,
+        "luck": 0,
+        "hp": 20
+    },
+    {
+        "id": 14,
+        "strength": 1,
+        "dexterity": 0,
+        "vitality": 1,
         "intelligence": 0,
         "wisdom": 0,
         "charisma": 0,
@@ -92,15 +180,70 @@ const buffs = [
         "hp": 0
     },
     {
-        "id": 7,
+        "id": 15,
         "strength": 0,
-        "dexterity": 0,
+        "dexterity": 1,
         "vitality": 0,
-        "intelligence": 0,
+        "intelligence": 1,
         "wisdom": 0,
         "charisma": 0,
         "luck": 0,
-        "hp": 10
+        "hp": 20
+    },
+    {
+        "id": 16,
+        "strength": 1,
+        "dexterity": 0,
+        "vitality": 0,
+        "intelligence": 1,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 1,
+        "hp": 0
+    },
+    {
+        "id": 17,
+        "strength": 0,
+        "dexterity": 1,
+        "vitality": 0,
+        "intelligence": 0,
+        "wisdom": 1,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 20
+    },
+    {
+        "id": 18,
+        "strength": 1,
+        "dexterity": 0,
+        "vitality": 1,
+        "intelligence": 0,
+        "wisdom": 0,
+        "charisma": 1,
+        "luck": 0,
+        "hp": 0
+    },
+    {
+        "id": 19,
+        "strength": 0,
+        "dexterity": 1,
+        "vitality": 0,
+        "intelligence": 1,
+        "wisdom": 0,
+        "charisma": 0,
+        "luck": 1,
+        "hp": 0
+    },
+    {
+        "id": 20,
+        "strength": 0,
+        "dexterity": 0,
+        "vitality": 1,
+        "intelligence": 0,
+        "wisdom": 1,
+        "charisma": 0,
+        "luck": 0,
+        "hp": 20
     }
 ];
 
@@ -398,7 +541,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         }
 
         setMyBuff(myBuff);
-        Storage.set('buff',JSON.stringify(myBuff));
+        Storage.set('buff_' + adventurer?.id, JSON.stringify(myBuff));
         setIsVictory(false);
         (window as any).isVictory = false;
     }
@@ -429,7 +572,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
     useEffect(() => {
 
-        const bf = Storage.get('buff');
+        const bf = Storage.get('buff_' + adventurer?.id);
         if (bf) {
             const buff = JSON.parse(bf);
             setMyBuff(buff);
