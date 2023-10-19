@@ -415,7 +415,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         return <BattleLog/>;
     }
 
-    const [monsters,] = useState(() => {
+    const monsters=() => {
         let monsters = [
             {
                 name: "MONSTER 1",
@@ -468,7 +468,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
         console.log("monsters", monsters);
         return monsters;
-    });
+    };
 
     const [MyBuff, setMyBuff] = useState({
         strength: 0,
@@ -631,7 +631,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
                         </div>
                         <div className="flex flex-col mt-3">
-                            {monsters.map((monster, index) => (
+                            {monsters().map((monster, index) => (
                                 <Button
                                     size={"lg"}
                                     disabled={monster.status == 'dead'}
