@@ -735,6 +735,8 @@ export default function CryptsScreen({
 
         console.log('onEnter')
 
+        Storage.set('monsterIndex' + adventurer?.id, 1);
+
         setStep(3);
 
     }
