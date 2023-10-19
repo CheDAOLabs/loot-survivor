@@ -284,14 +284,14 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         (state) => state.data.battlesByBeastQuery?.battles || []
     );
 
-    const [isVictory, setIsVictory] = useState(() => {
-        if ((window as any).isVictory) {
-            return true;
-        } else {
-            return false;
-        }
-
-    })
+    // const [isVictory, setIsVictory] = useState(() => {
+    //     if ((window as any).isVictory) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    //
+    // })
 
 
     const [buttonText, setButtonText] = useState("Flee!");
@@ -503,7 +503,8 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         // setMonsterIndex(index)
         // (window as any).monsterIndex = index
         // setIsVictory(true)
-        (window as any).isVictory = true;
+        // (window as any).isVictory = true;
+        Storage.set('victory' + adventurer?.id, JSON.stringify(true));
     }
 
     const [isClearance, setIsClearance] = useState(false);
@@ -542,7 +543,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
         setMyBuff(myBuff);
         Storage.set('buff_' + adventurer?.id, JSON.stringify(myBuff));
-        setIsVictory(false);
+        Storage.set('victory' + adventurer?.id, JSON.stringify(false));
         (window as any).isVictory = false;
     }
 
@@ -580,6 +581,13 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
     }, [(window) as any]);
 
+    const isVictory = ()=>{
+        let res = Storage.get('victory' + adventurer?.id);
+        if(res){
+            return JSON.parse(res);
+        }
+        return false;
+    }
 
     return (
         <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row">
@@ -644,7 +652,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
                     </>
                 )}
 
-                {isAlive && isVictory && !isClearance && (
+                {isAlive && isVictory() && !isClearance && (
                     <>
                         <h3>VICTORY</h3>
                         <h4>CHOOSE A BUFF EFFECT</h4>
