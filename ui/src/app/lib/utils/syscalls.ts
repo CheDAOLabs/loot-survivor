@@ -197,6 +197,8 @@ export function syscalls({
     };
     addToCalls(approveLordsTx);
 
+    console.log("a",getKeyFromValue(gameData.ITEMS, formData.startingWeapon) );
+    console.log("b", getKeyFromValue(gameData.CLASSES, formData.class) ?? "");
     const mintAdventurerTx = {
       contractAddress: gameContract?.address ?? "",
       entrypoint: "start",

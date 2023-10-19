@@ -197,12 +197,12 @@ export interface ItemPurchase {
 
 export interface UpgradeStats {
   [key: string]: number;
-  Strength: number;
-  Dexterity: number;
-  Vitality: number;
-  Intelligence: number;
-  Wisdom: number;
-  Charisma: number;
+      Strength: number;
+      Dexterity: number;
+      Vitality: number;
+      Intelligence: number;
+      Wisdom: number;
+      Charisma: number;
 }
 
 export interface UpgradeSummary {

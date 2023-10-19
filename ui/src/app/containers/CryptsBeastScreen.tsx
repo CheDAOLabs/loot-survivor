@@ -12,6 +12,103 @@ import Neck from "../../../public/icons/loot/neck.svg";
 import Heart from "../../../public/icons/heart.svg";
 import {HeartVitalityIcon} from "../components/icons/Icons";
 
+
+const buffs =  [
+        {
+            "id": 0,
+            "strength": 1,
+            "dexterity": 0,
+            "vitality": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0,
+            "luck": 0,
+            "hp": 0
+        },
+        {
+            "id": 1,
+            "strength": 0,
+            "dexterity": 1,
+            "vitality": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0,
+            "luck": 0,
+            "hp": 0
+        },
+        {
+            "id": 2,
+            "strength": 0,
+            "dexterity": 0,
+            "vitality": 1,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0,
+            "luck": 0,
+            "hp": 0
+        },
+        {
+            "id": 3,
+            "strength": 0,
+            "dexterity": 0,
+            "vitality": 0,
+            "intelligence": 1,
+            "wisdom": 0,
+            "charisma": 0,
+            "luck": 0,
+            "hp": 0
+        },
+        {
+            "id": 4,
+            "strength": 0,
+            "dexterity": 0,
+            "vitality": 0,
+            "intelligence": 0,
+            "wisdom": 1,
+            "charisma": 0,
+            "luck": 0,
+            "hp": 0
+        },
+        {
+            "id": 5,
+            "strength": 0,
+            "dexterity": 0,
+            "vitality": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 1,
+            "luck": 0,
+            "hp": 0
+        },
+        {
+            "id": 6,
+            "strength": 0,
+            "dexterity": 0,
+            "vitality": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0,
+            "luck": 1,
+            "hp": 0
+        },
+        {
+            "id": 7,
+            "strength": 0,
+            "dexterity": 0,
+            "vitality": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0,
+            "luck": 0,
+            "hp": 10
+        }
+    ];
+
+function getRandomBuff() {
+    const randomIndex = Math.floor(Math.random() * buffs.length);
+    return buffs[randomIndex];
+}
+
 interface BeastScreenProps {
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;

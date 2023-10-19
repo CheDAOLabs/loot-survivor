@@ -225,6 +225,12 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
     potions?: number,
     items?: any[]
   ) => {
+
+    console.log("currenUpgrades", currenUpgrades);
+    console.log("potions", potions);
+    console.log("items", items);
+    console.log("potionAmount",potionAmount)
+
     removeEntrypointFromCalls("upgrade_adventurer");
     const upgradeTx = {
       contractAddress: gameContract?.address ?? "",
