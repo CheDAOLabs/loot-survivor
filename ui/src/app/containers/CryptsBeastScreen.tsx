@@ -544,7 +544,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         setMyBuff(myBuff);
         Storage.set('buff_' + adventurer?.id, JSON.stringify(myBuff));
         Storage.set('victory' + adventurer?.id, JSON.stringify(false));
-        (window as any).isVictory = false;
+        // (window as any).isVictory = false;
     }
 
 
@@ -584,8 +584,10 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
     const isVictory = ()=>{
         let res = Storage.get('victory' + adventurer?.id);
         if(res){
+            console.log("isVictory", JSON.parse(res));
             return JSON.parse(res);
         }
+        console.log("isVictory",false);
         return false;
     }
 
@@ -608,7 +610,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
             </div>
 
             <div className="flex flex-col gap-1 sm:gap-0 items-center sm:w-1/2 sm:p-4 order-1 text-lg">
-                {isAlive && !isVictory && !isClearance && (
+                {isAlive && !isVictory() && !isClearance && (
                     <>
                         <div className="flex flex-row gap-2 sm:flex-col items-center justify-center">
                             <h3>BUFF</h3>
