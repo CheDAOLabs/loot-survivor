@@ -11,7 +11,7 @@ import {Button} from "../components/buttons/Button";
 import Neck from "../../../public/icons/loot/neck.svg";
 import Heart from "../../../public/icons/heart.svg";
 import {HeartVitalityIcon} from "../components/icons/Icons";
-
+import Storage from "../lib/storage";
 
 const buffs = [
     {
@@ -236,7 +236,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
     const [selectedOption, setSelectedOption] = useState('option1');
     const [selectedValue, setSelectedValue] = useState(0);
 
-    const handleOptionChange = (option: any,value:any) => {
+    const handleOptionChange = (option: any, value: any) => {
         // alert("handleOptionChange: " + option);
         setSelectedOption(option);
         setSelectedValue(value);
@@ -327,6 +327,17 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         return monsters;
     });
 
+    const [MyBuff, setMyBuff] = useState({
+        strength: 0,
+        dexterity: 0,
+        vitality: 0,
+        intelligence: 0,
+        wisdom: 0,
+        charisma: 0,
+        luck: 0,
+        hp: 0
+    });
+
 
     // const [monsterIndex, setMonsterIndex] = useState(4)
 
@@ -387,6 +398,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         }
 
         setMyBuff(myBuff);
+        Storage.set('buff',JSON.stringify(myBuff));
         setIsVictory(false);
         (window as any).isVictory = false;
     }
@@ -397,23 +409,13 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         exit();
     }
 
-    const [MyBuff, setMyBuff] = useState({
-        strength: 0,
-        dexterity: 0,
-        vitality: 0,
-        intelligence: 0,
-        wisdom: 0,
-        charisma: 0,
-        luck: 0,
-        hp: 0
-    });
 
-    const randBuff = ()=>{
+    const randBuff = () => {
 
         let result = [];
         const buff1 = getRandomBuff();
         for (const [key, value] of Object.entries(buff1)) {
-            if(key!="id" &&  value>0) {
+            if (key != "id" && value > 0) {
                 result.push({
                     key: key.toUpperCase(),
                     value: value
@@ -423,14 +425,20 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
         return result;
     };
-    const [currBuff,setCurrBuff] = useState(randBuff());
+    const [currBuff, setCurrBuff] = useState(randBuff());
 
     useEffect(() => {
 
-    },[(window) as any]);
+        const bf = Storage.get('buff');
+        if (bf) {
+            const buff = JSON.parse(bf);
+            setMyBuff(buff);
+        }
+
+    }, [(window) as any]);
 
 
-        return (
+    return (
         <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row">
 
             <div className="sm:w-1/2 order-1 sm:order-2">
@@ -506,7 +514,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
                                     className={`${
                                         selectedOption === cb.key ? '' : 'bg-gray-800 text-white'
                                     } m-1 `}
-                                    onClick={() => handleOptionChange(cb.key,cb.value)}
+                                    onClick={() => handleOptionChange(cb.key, cb.value)}
                                 >
                                     {cb.key}: +{cb.value}
                                 </Button>
