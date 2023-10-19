@@ -10,6 +10,7 @@ import { QueryKey } from "@/app/hooks/useQueryStore";
 import { getKeyFromValue, stringToFelt, getRandomNumber } from ".";
 import { parseEvents } from "./parseEvents";
 import { processNotifications } from "@/app/components/notifications/NotificationHandler";
+import Storage from "@/app/lib/storage";
 
 export interface SyscallsProps {
   gameContract: any;
@@ -226,7 +227,6 @@ export function syscalls({
       undefined
     );
     try {
-      (window as any).monsterIndex=0;
       const tx = await handleSubmitCalls(writeAsync);
       setTxHash(tx.transaction_hash);
       addTransaction({
@@ -556,6 +556,12 @@ export function syscalls({
       setData("battlesByTxHashQuery", {
         battles: null,
       });
+
+      Storage.set('victory' + adventurer?.id, JSON.stringify(true));
+      const monsterIndex = (Number)(Storage.get('monsterIndex_' + adventurer?.id)) || 0;
+      Storage.set('monsterIndex' + adventurer?.id, monsterIndex+1);
+
+
       const events = await parseEvents(
         receipt as InvokeTransactionReceiptResponse,
         queryData.adventurerByIdQuery?.adventurers[0] ?? NullAdventurer

@@ -415,7 +415,7 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         return <BattleLog/>;
     }
 
-    const monsters=() => {
+    const monsters = () => {
         let monsters = [
             {
                 name: "MONSTER 1",
@@ -448,18 +448,17 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
             },
         ]
 
+        const monsterIndex = (Number)(Storage.get('monsterIndex_' + adventurer?.id)) || 0;
 
-        console.log("monsterIndex on render", (window as any).monsterIndex)
-
-        if ((window as any).monsterIndex !== 0 && (window as any).monsterIndex !== undefined) {
-            for (let i = 0; i <= (window as any).monsterIndex; i++) {
+        if (monsterIndex) {
+            for (let i = 0; i <= monsterIndex; i++) {
                 if (monsters[i - 1]) {
                     monsters[i - 1].status = "dead";
                 }
             }
-            monsters[(window as any).monsterIndex - 1].status = "attack"
+            monsters[monsterIndex - 1].status = "attack"
 
-            for (let i = (window as any).monsterIndex; i <= monsters.length; i++) {
+            for (let i = monsterIndex; i <= monsters.length; i++) {
                 if (monsters[i]) {
                     monsters[i].status = "alive";
                 }
@@ -495,12 +494,12 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
         }
 
         try {
-            let res =  await attack(true, beastData);
-            console.log("attack succ",res);
-            Storage.set('victory' + adventurer?.id, JSON.stringify(true));
-            (window as any).monsterIndex += 1;
+            let res = await attack(true, beastData);
+            console.log("attack succ", res);
+            // Storage.set('victory' + adventurer?.id, JSON.stringify(true));
+            // (window as any).monsterIndex += 1;
 
-        }catch (e){
+        } catch (e) {
             console.error(e);
         }
 
@@ -553,7 +552,6 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
 
     const onExit = async () => {
-        (window as any).monsterIndex = 0;
         exit();
     }
 
@@ -585,13 +583,13 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
 
     }, [(window) as any]);
 
-    const isVictory = ()=>{
+    const isVictory = () => {
         let res = Storage.get('victory' + adventurer?.id);
-        if(res){
+        if (res) {
             console.log("isVictory", JSON.parse(res));
             return JSON.parse(res);
         }
-        console.log("isVictory",false);
+        console.log("isVictory", false);
         return false;
     }
 

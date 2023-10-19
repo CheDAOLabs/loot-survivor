@@ -11,6 +11,7 @@ import {NullAdventurer} from "../types";
 import {useQueriesStore} from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
 import {constants, Contract, num, Provider, shortString} from "starknet";
+import Storage from "@/app/lib/storage";
 
 
 interface CryptsScreenProps {
@@ -651,8 +652,6 @@ const abi = [
 const address = "0x04f40722dc2ea00f32f44d73d4075be51c62ce9679db2ccf2bebbd3aba0c54c7";
 
 
-
-
 /**
  * @container
  * @description
@@ -670,11 +669,14 @@ export default function CryptsScreen({
         name: "",
     });
 
-    const [step, setStep] = useState(()=>{
-        if((window as any).monsterIndex===0 || (window as any).monsterIndex===undefined){
+    const [step, setStep] = useState(() => {
+
+        const monsterIndex = (Number)(Storage.get('monsterIndex_' + adventurer?.id)) || 0;
+
+        if (monsterIndex === 0) {
             console.log("step 1")
             return 1;
-        }else {
+        } else {
             console.log("step 3")
             return 3;
         }
@@ -682,8 +684,7 @@ export default function CryptsScreen({
     });
 
 
-
-    const decode_string=(array:any)=> {
+    const decode_string = (array: any) => {
         let result = "";
         for (let i = 0; i < array.length; i++) {
             let temp = shortString.decodeShortString(array[i]);
@@ -693,10 +694,10 @@ export default function CryptsScreen({
         return result;
     };
 
-    const [owner,setOwner]=useState("0x....")
-    const [name,setName]=useState("loading")
-    const [svg,setSvg]=useState("")
-    const [loading,setLoading] = useState(false)
+    const [owner, setOwner] = useState("0x....")
+    const [name, setName] = useState("loading")
+    const [svg, setSvg] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const onEnterCode = async () => {
         // alert("entercode");
@@ -709,19 +710,18 @@ export default function CryptsScreen({
         let token_id = (Number)(formData.name);
 
         const owner = await contract.owner_of(token_id);
-        console.log("owner:",num.toHex(owner))
+        console.log("owner:", num.toHex(owner))
         setOwner(num.toHex(owner))
 
 
-
         const dungeon_data = await contract.generate_dungeon(token_id);
-        console.log("dungeon_data",dungeon_data);
+        console.log("dungeon_data", dungeon_data);
         const name = decode_string(dungeon_data.dungeon_name);
         setName(name);
 
         const svg = await contract.get_svg(token_id);
         const svg_str = decode_string(svg);
-        console.log("svg",svg_str)
+        console.log("svg", svg_str)
         setSvg(svg_str)
 
         setLoading(false);
@@ -734,13 +734,7 @@ export default function CryptsScreen({
     const onEnter = () => {
 
         console.log('onEnter')
-        if(!(window as any).monsterIndex || (window as any).monsterIndex==0) {
-            (window as any).monsterIndex=1;
-        }else{
-            console.log("monsterIndex",(window as any).monsterIndex)
-        }
 
-        console.log("monsterIndex after enter",(window as any).monsterIndex)
         setStep(3);
 
     }
@@ -763,11 +757,12 @@ export default function CryptsScreen({
                     <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData} loading={loading} />
+                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData}
+                               loading={loading}/>
                 </div>
             </div>
         );
-    }else if (step === 2) {
+    } else if (step === 2) {
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
@@ -778,7 +773,7 @@ export default function CryptsScreen({
                 </div>
             </div>
         );
-    }else if (step === 3) {
+    } else if (step === 3) {
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
@@ -789,7 +784,7 @@ export default function CryptsScreen({
                 {/*</div>*/}
             </div>
         );
-    }else {
+    } else {
         return (<></>);
     }
 }
