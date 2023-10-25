@@ -135,6 +135,62 @@ mod Game {
         _rotate_global_entropy(ref self);
     }
 
+    #[external(v0)]
+    fn buff_adventurer(
+            ref self: ContractState,
+            adventurer_id: u256,
+            stat_upgrades: Stats,
+        ) {
+            // get adventurer from storage and apply stat boosts
+            let (mut adventurer, stat_boosts) = _unpack_adventurer_with_stat_boosts(
+                @self, adventurer_id
+            );
+
+            // get bag from storage
+            let mut bag = _bag_unpacked(@self, adventurer_id);
+
+            // assert action is valid
+            _assert_ownership(@self, adventurer_id);
+            _assert_not_dead(adventurer);
+            _assert_not_in_battle(adventurer);
+            _assert_upgrades_available(adventurer);
+            _assert_stat_balance(adventurer, stat_upgrades);
+
+            // get number of blocks between actions
+            let (exceeded_idle_threshold, num_blocks) = _idle_longer_than_penalty_threshold(
+                adventurer
+            );
+
+            // if adventurer exceeded idle penalty threshold
+            if exceeded_idle_threshold {
+                // apply penalty and return
+                _apply_idle_penalty(ref self, adventurer_id, ref adventurer, num_blocks);
+                return;
+            }
+
+            // get number of stat upgrades available before we use them
+            let pre_upgrade_stat_points = adventurer.stat_points_available;
+
+            // upgrade adventurer's stats
+            _upgrade_stats(@self, ref adventurer, stat_upgrades);
+
+            // update players last action block number
+            adventurer.set_last_action(starknet::get_block_info().unbox().block_number);
+
+            // emit adventurer upgraded event
+            __event_AdventurerUpgraded(ref self, adventurer, adventurer_id, bag, stat_upgrades);
+
+            // if the upgrade mutated the adventurer's bag
+            if (bag.mutated) {
+                _pack_bag(ref self, adventurer_id, bag);
+            }
+
+            // remove stat boosts, pack, and save adventurer
+            _pack_adventurer_remove_stat_boost(
+                ref self, ref adventurer, adventurer_id, stat_boosts
+            );
+        }
+
     // ------------------------------------------ //
     // ------------ Impl ------------------------ //
     // ------------------------------------------ //
