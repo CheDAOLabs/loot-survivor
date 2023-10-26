@@ -232,6 +232,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
     console.log("potionAmount",potionAmount)
 
     removeEntrypointFromCalls("upgrade_adventurer");
+    removeEntrypointFromCalls("buff_adventurer");
     const upgradeTx = {
       contractAddress: gameContract?.address ?? "",
       entrypoint: "upgrade_adventurer",

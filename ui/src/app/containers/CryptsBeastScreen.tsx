@@ -229,6 +229,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     const [selectedValue, setSelectedValue] = useState(0);
     
     const handleOptionChange = (option: any, value: any) => {
+        removeEntrypointFromCalls("upgrade_adventurer");
         // alert("handleOptionChange: " + option);
         if (selectedOption != option) {
             setSelectedOption(option);

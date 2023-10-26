@@ -98,7 +98,7 @@ export default function MarketplaceScreen({
     : 0;
 
   const underMaxItems = adventurerItems.length < 19;
-
+  
   return (
     <>
       {underMaxItems ? (
