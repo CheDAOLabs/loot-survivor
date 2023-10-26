@@ -301,16 +301,18 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
             setSelectedOption(option);
             setSelectedValue(value);
             
-            handleAddUpgradeTx();
+            handleAddUpgradeTx(option, value);
         }
     };
     
     const handleAddUpgradeTx = (
-        currenUpgrades?: UpgradeStats,
-        potions?: number
+        option: string,
+        value: number
     ) => {
         
-        console.log("currenUpgrades", currenUpgrades);
+        option = option.toLowerCase();
+        console.log("option", option);
+        console.log("value", value);
         
         removeEntrypointFromCalls("buff_adventurer");
         const upgradeTx = {
@@ -321,26 +323,26 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
                 adventurer?.id?.toString() ?? "",
                 "0",
                 // potion
-                potions ? potions.toString() : potionAmount.toString(),
+                option === "hp" ? value.toString() : potionAmount.toString(),
                 // statUpgrades
-                currenUpgrades
-                    ? currenUpgrades["Strength"].toString()
-                    : upgrades["Strength"].toString(),
-                currenUpgrades
-                    ? currenUpgrades["Dexterity"].toString()
-                    : upgrades["Dexterity"].toString(),
-                currenUpgrades
-                    ? currenUpgrades["Vitality"].toString()
-                    : upgrades["Vitality"].toString(),
-                currenUpgrades
-                    ? currenUpgrades["Intelligence"].toString()
-                    : upgrades["Intelligence"].toString(),
-                currenUpgrades
-                    ? currenUpgrades["Wisdom"].toString()
-                    : upgrades["Wisdom"].toString(),
-                currenUpgrades
-                    ? currenUpgrades["Charisma"].toString()
-                    : upgrades["Charisma"].toString(),
+                option === "strength"
+                    ? value.toString()
+                    : "0",
+                option === "dexterity"
+                    ? value.toString()
+                    : "0",
+                option === "vitality"
+                    ? value.toString()
+                    : "0",
+                option === "intelligence"
+                    ? value.toString()
+                    : "0",
+                option === "wisdom"
+                    ? value.toString()
+                    : "0",
+                option === "charisma"
+                    ? value.toString()
+                    : "0",
             ],
         };
         addToCalls(upgradeTx);
@@ -350,7 +352,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         resetNotification();
         await upgrade(upgrades, [], 0);
         setPotionAmount(0);
-        setUpgrades({ ...ZeroUpgrade });
+        setUpgrades({...ZeroUpgrade});
     };
     
     const BattleLog: React.FC = () => (
