@@ -141,10 +141,13 @@ mod Game {
             adventurer_id: u256,
             stat_upgrades: Stats,
         ) {
+
             // get adventurer from storage and apply stat boosts
             let (mut adventurer, stat_boosts) = _unpack_adventurer_with_stat_boosts(
                 @self, adventurer_id
             );
+
+            adventurer.increase_stat_points_available(1);
 
             // get bag from storage
             let mut bag = _bag_unpacked(@self, adventurer_id);

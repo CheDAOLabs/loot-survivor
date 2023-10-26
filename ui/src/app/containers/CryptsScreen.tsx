@@ -18,6 +18,7 @@ interface CryptsScreenProps {
     explore: (...args: any[]) => any;
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
+    upgrade: (...args: any[]) => any
 }
 
 const abi = [
@@ -943,6 +944,7 @@ export default function CryptsScreen({
     explore,
     attack,
     flee,
+    upgrade
 }: CryptsScreenProps) {
 
 
@@ -1065,7 +1067,7 @@ export default function CryptsScreen({
                     <Info adventurer={adventurer} />
                 </div>
                 {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
-                <MapAction attack={attack} exit={onExit} flee={flee} explore={explore} />
+                <MapAction attack={ attack } exit={ onExit } flee={ flee } explore={ explore } upgrade={ upgrade }/>
                 {/*</div>*/}
             </div>
         );

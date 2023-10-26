@@ -6,13 +6,16 @@ import useAdventurerStore from "../hooks/useAdventurerStore";
 import { useQueriesStore } from "../hooks/useQueryStore";
 import React, { useEffect, useState } from "react";
 import { processBeastName } from "../lib/utils";
-import { Battle, NullDiscovery, NullBeast } from "../types";
+import { Battle, NullDiscovery, NullBeast, UpgradeStats, ZeroUpgrade } from "../types";
 import { Button } from "../components/buttons/Button";
 // import Neck from "../../../public/icons/loot/neck.svg";
 // import Heart from "../../../public/icons/heart.svg";
 import { HeartVitalityIcon } from "../components/icons/Icons";
 import Storage from "../lib/storage";
 import useTransactionCartStore from "../hooks/useTransactionCartStore"
+import { useContracts } from "@/app/hooks/useContracts";
+import useUIStore from "@/app/hooks/useUIStore";
+import { syscalls } from "../lib/utils/syscalls"
 
 const buffs = [
     {
@@ -157,14 +160,14 @@ interface BeastScreenProps {
     flee: (...args: any[]) => any;
     exit: (...args: any[]) => any;
     explore: (...args: any[]) => any;
-    
+    upgrade: (...args: any[]) => any;
 }
 
 /**
  * @container
  * @description Provides the beast screen for adventurer battles.
  */
-export default function BeastScreen({attack, flee, exit, explore}: BeastScreenProps) {
+export default function BeastScreen({attack, flee, exit, explore, upgrade}: BeastScreenProps) {
     /* eslint-disable */
     
     const adventurer = useAdventurerStore((state) => state.adventurer);
@@ -188,6 +191,12 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
     const removeEntrypointFromCalls = useTransactionCartStore(
         (state) => state.removeEntrypointFromCalls
     );
+    const {gameContract, lordsContract} = useContracts();
+    const upgrades = useUIStore((state) => state.upgrades);
+    const setUpgrades = useUIStore((state) => state.setUpgrades);
+    const potionAmount = useUIStore((state) => state.potionAmount);
+    const setPotionAmount = useUIStore((state) => state.setPotionAmount);
+    
     
     // const [isVictory, setIsVictory] = useState(() => {
     //     if ((window as any).isVictory) {
@@ -292,10 +301,57 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
             setSelectedOption(option);
             setSelectedValue(value);
             
-            
+            handleAddUpgradeTx();
         }
     };
     
+    const handleAddUpgradeTx = (
+        currenUpgrades?: UpgradeStats,
+        potions?: number
+    ) => {
+        
+        console.log("currenUpgrades", currenUpgrades);
+        
+        removeEntrypointFromCalls("upgrade_adventurer");
+        const upgradeTx = {
+            contractAddress: gameContract?.address ?? "",
+            entrypoint: "buff_adventurer",
+            calldata: [
+                // adventurerId
+                adventurer?.id?.toString() ?? "",
+                "0",
+                // potion
+                potions ? potions.toString() : potionAmount.toString(),
+                // statUpgrades
+                currenUpgrades
+                    ? currenUpgrades["Strength"].toString()
+                    : upgrades["Strength"].toString(),
+                currenUpgrades
+                    ? currenUpgrades["Dexterity"].toString()
+                    : upgrades["Dexterity"].toString(),
+                currenUpgrades
+                    ? currenUpgrades["Vitality"].toString()
+                    : upgrades["Vitality"].toString(),
+                currenUpgrades
+                    ? currenUpgrades["Intelligence"].toString()
+                    : upgrades["Intelligence"].toString(),
+                currenUpgrades
+                    ? currenUpgrades["Wisdom"].toString()
+                    : upgrades["Wisdom"].toString(),
+                currenUpgrades
+                    ? currenUpgrades["Charisma"].toString()
+                    : upgrades["Charisma"].toString(),
+            ],
+        };
+        addToCalls(upgradeTx);
+    };
+    
+    const handleSubmitUpgradeTx = async () => {
+        resetNotification();
+        await upgrade(upgrades, [], 0);
+        setPotionAmount(0);
+        setUpgrades({ ...ZeroUpgrade });
+    };
     
     const BattleLog: React.FC = () => (
         <div className="flex flex-col p-2 items-center">
@@ -449,13 +505,14 @@ export default function BeastScreen({attack, flee, exit, explore}: BeastScreenPr
             case 'hp':
                 myBuff.hp += selectedValue;
                 break
-            
         }
         
         setMyBuff(myBuff);
         Storage.set('buff_' + adventurer?.id, JSON.stringify(myBuff));
         Storage.set('victory' + adventurer?.id, JSON.stringify(false));
         // (window as any).isVictory = false;
+        
+        await handleSubmitUpgradeTx();
     }
     
     
