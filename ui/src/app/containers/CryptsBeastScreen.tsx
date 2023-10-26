@@ -312,7 +312,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         
         console.log("currenUpgrades", currenUpgrades);
         
-        removeEntrypointFromCalls("upgrade_adventurer");
+        removeEntrypointFromCalls("buff_adventurer");
         const upgradeTx = {
             contractAddress: gameContract?.address ?? "",
             entrypoint: "buff_adventurer",

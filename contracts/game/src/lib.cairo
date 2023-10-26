@@ -156,7 +156,7 @@ mod Game {
         _assert_not_dead(adventurer);
         _assert_not_in_battle(adventurer);
         _assert_upgrades_available(adventurer);
-        _assert_stat_balance(adventurer, stat_upgrades);
+        // _assert_stat_balance(adventurer, stat_upgrades);
 
         // get number of blocks between actions
         let (exceeded_idle_threshold, num_blocks) = _idle_longer_than_penalty_threshold(adventurer);
