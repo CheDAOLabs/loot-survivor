@@ -26,7 +26,6 @@ const buffs = [
         "intelligence": 0,
         "wisdom": 0,
         "charisma": 0,
-        "hp": 0
     },
     {
         "id": 1,
@@ -36,7 +35,6 @@ const buffs = [
         "intelligence": 1,
         "wisdom": 0,
         "charisma": 0,
-        "hp": 0
     },
     {
         "id": 2,
@@ -46,7 +44,6 @@ const buffs = [
         "intelligence": 1,
         "wisdom": 1,
         "charisma": 0,
-        "hp": 0
     },
     {
         "id": 3,
@@ -56,98 +53,34 @@ const buffs = [
         "intelligence": 1,
         "wisdom": 1,
         "charisma": 1,
-        "hp": 0
     },
     {
         "id": 4,
         "strength": 1,
-        "dexterity": 1,
-        "vitality": 0,
+        "dexterity": 0,
+        "vitality": 1,
         "intelligence": 0,
-        "wisdom": 0,
+        "wisdom": 1,
         "charisma": 0,
-        "hp": 20
     },
     {
         "id": 5,
-        "strength": 1,
-        "dexterity": 0,
-        "vitality": 1,
-        "intelligence": 0,
-        "wisdom": 1,
-        "charisma": 0,
-        "hp": 0
+        "strength": 0,
+        "dexterity": 1,
+        "vitality": 0,
+        "intelligence": 1,
+        "wisdom": 0,
+        "charisma": 1,
     },
     {
         "id": 6,
-        "strength": 0,
-        "dexterity": 1,
-        "vitality": 0,
-        "intelligence": 1,
-        "wisdom": 0,
-        "charisma": 1,
-        "hp": 0
-    },
-    {
-        "id": 7,
-        "strength": 0,
-        "dexterity": 0,
-        "vitality": 0,
-        "intelligence": 1,
-        "wisdom": 0,
-        "charisma": 1,
-        "hp": 20
-    },
-    {
-        "id": 8,
-        "strength": 1,
-        "dexterity": 0,
-        "vitality": 0,
-        "intelligence": 0,
-        "wisdom": 0,
-        "charisma": 1,
-        "hp": 20
-    },
-    {
-        "id": 9,
-        "strength": 0,
-        "dexterity": 1,
-        "vitality": 0,
-        "intelligence": 1,
-        "wisdom": 0,
-        "charisma": 0,
-        "hp": 20
-    },
-    {
-        "id": 10,
-        "strength": 0,
-        "dexterity": 1,
-        "vitality": 0,
-        "intelligence": 0,
-        "wisdom": 1,
-        "charisma": 0,
-        "hp": 20
-    },
-    {
-        "id": 11,
         "strength": 1,
         "dexterity": 0,
         "vitality": 1,
         "intelligence": 0,
         "wisdom": 0,
         "charisma": 1,
-        "hp": 0
     },
-    {
-        "id": 12,
-        "strength": 0,
-        "dexterity": 0,
-        "vitality": 1,
-        "intelligence": 0,
-        "wisdom": 1,
-        "charisma": 0,
-        "hp": 20
-    }
 ];
 
 function getRandomBuff() {
