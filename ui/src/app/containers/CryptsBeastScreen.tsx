@@ -391,7 +391,6 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
             {
                 name: "MONSTER 2",
                 status: "alive",
-                
             },
             {
                 name: "MONSTER 3",
