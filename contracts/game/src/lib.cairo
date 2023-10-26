@@ -168,7 +168,27 @@ mod Game {
         }
 
         // upgrade adventurer's stats
-        _upgrade_stats(@self, ref adventurer, stat_upgrades);
+        if stat_upgrades.strength != 0 {
+            adventurer.stats.increase_strength(stat_upgrades.strength);
+        }
+        if stat_upgrades.dexterity != 0 {
+            adventurer.stats.increase_dexterity(stat_upgrades.dexterity);
+        }
+        if stat_upgrades.vitality != 0 {
+            adventurer.stats.increase_vitality(stat_upgrades.vitality);
+            adventurer
+                .increase_health(VITALITY_INSTANT_HEALTH_BONUS * stat_upgrades.vitality.into());
+        }
+        if stat_upgrades.intelligence != 0 {
+            adventurer.stats.increase_intelligence(stat_upgrades.intelligence);
+        }
+        if stat_upgrades.wisdom != 0 {
+            adventurer.stats.increase_wisdom(stat_upgrades.wisdom);
+        }
+        if stat_upgrades.charisma != 0 {
+            adventurer.stats.increase_charisma(stat_upgrades.charisma);
+        }
+        adventurer.stat_points_available -= 1;
 
         // update players last action block number
         adventurer.set_last_action(starknet::get_block_info().unbox().block_number);
