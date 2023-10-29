@@ -21,14 +21,14 @@ COPY env-goerli .
 COPY deno.json .
 
 # Copy scripts folder into the container
-COPY scripts /scripts
+COPY scripts ./scripts
 
 # Make individual scripts executable
-RUN chmod +x /scripts/*.sh
+RUN chmod +x ./scripts/*.sh
 
 # Copy and set permissions for master script
-COPY master_script.sh /master_script.sh
-RUN chmod +x /master_script.sh
+COPY master_script.sh ./master_script.sh
+RUN chmod +x ./master_script.sh
 
 # Run your script
-CMD ["/master_script.sh"]
+CMD ["./master_script.sh"]
