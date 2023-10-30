@@ -656,7 +656,6 @@ export async function parseEvents(
         );
         events.push({ name: eventName, data: adventurerLeveledUpEvent });
         break;
-        // todo
       case "NewItemsAvailable":
         const newItems = raw.data.slice(41);
         const newItemsIds = [];

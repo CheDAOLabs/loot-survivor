@@ -551,6 +551,8 @@ export function syscalls({
       const receipt = await account?.waitForTransaction(tx.transaction_hash, {
         retryInterval: 2000,
       });
+      
+      console.log("receipt", receipt);
 
       // reset battles by tx hash
       setData("battlesByTxHashQuery", {
@@ -566,6 +568,8 @@ export function syscalls({
         receipt as InvokeTransactionReceiptResponse,
         queryData.adventurerByIdQuery?.adventurers[0] ?? NullAdventurer
       );
+      
+      console.log("events", events);
 
       // If there are any equip or drops, do them first
       handleEquip(events, setData, setAdventurer, queryData);
