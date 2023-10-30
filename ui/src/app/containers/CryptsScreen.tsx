@@ -18,18 +18,13 @@ interface CryptsScreenProps {
     explore: (...args: any[]) => any;
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
-    upgrade: (...args: any[]) => any
+    upgrade: (...args: any[]) => any;
 }
 
 const abi = [
     {
-        "type": "impl",
-        "name": "ERC721Enumerable",
-        "interface_name": "cc_starknet::IERC721Enumerable"
-    },
-    {
-        "type": "struct",
         "name": "core::integer::u256",
+        "type": "struct",
         "members": [
             {
                 "name": "low",
@@ -42,571 +37,11 @@ const abi = [
         ]
     },
     {
-        "type": "interface",
-        "name": "cc_starknet::IERC721Enumerable",
-        "items": [
-            {
-                "type": "function",
-                "name": "total_supply",
-                "inputs": [],
-                "outputs": [
-                    {
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "token_by_index",
-                "inputs": [
-                    {
-                        "name": "index",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "token_of_owner_by_index",
-                "inputs": [
-                    {
-                        "name": "owner",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "index",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "state_mutability": "view"
-            }
-        ]
-    },
-    {
-        "type": "impl",
-        "name": "ERC721EnumerableCamelOnly",
-        "interface_name": "cc_starknet::IERC721EnumerableCamelOnly"
-    },
-    {
-        "type": "interface",
-        "name": "cc_starknet::IERC721EnumerableCamelOnly",
-        "items": [
-            {
-                "type": "function",
-                "name": "totalSupply",
-                "inputs": [],
-                "outputs": [
-                    {
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "tokenByIndex",
-                "inputs": [
-                    {
-                        "name": "index",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "tokenOfOwnerByIndex",
-                "inputs": [
-                    {
-                        "name": "owner",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "index",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "state_mutability": "view"
-            }
-        ]
-    },
-    {
-        "type": "impl",
-        "name": "ERC721Impl",
-        "interface_name": "openzeppelin::token::erc721::interface::IERC721"
-    },
-    {
-        "type": "struct",
-        "name": "core::array::Span::<core::felt252>",
-        "members": [
-            {
-                "name": "snapshot",
-                "type": "@core::array::Array::<core::felt252>"
-            }
-        ]
-    },
-    {
-        "type": "enum",
-        "name": "core::bool",
-        "variants": [
-            {
-                "name": "False",
-                "type": "()"
-            },
-            {
-                "name": "True",
-                "type": "()"
-            }
-        ]
-    },
-    {
-        "type": "interface",
-        "name": "openzeppelin::token::erc721::interface::IERC721",
-        "items": [
-            {
-                "type": "function",
-                "name": "balance_of",
-                "inputs": [
-                    {
-                        "name": "account",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "owner_of",
-                "inputs": [
-                    {
-                        "name": "token_id",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "transfer_from",
-                "inputs": [
-                    {
-                        "name": "from",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "to",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "token_id",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [],
-                "state_mutability": "external"
-            },
-            {
-                "type": "function",
-                "name": "safe_transfer_from",
-                "inputs": [
-                    {
-                        "name": "from",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "to",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "token_id",
-                        "type": "core::integer::u256"
-                    },
-                    {
-                        "name": "data",
-                        "type": "core::array::Span::<core::felt252>"
-                    }
-                ],
-                "outputs": [],
-                "state_mutability": "external"
-            },
-            {
-                "type": "function",
-                "name": "approve",
-                "inputs": [
-                    {
-                        "name": "to",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "token_id",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [],
-                "state_mutability": "external"
-            },
-            {
-                "type": "function",
-                "name": "set_approval_for_all",
-                "inputs": [
-                    {
-                        "name": "operator",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "approved",
-                        "type": "core::bool"
-                    }
-                ],
-                "outputs": [],
-                "state_mutability": "external"
-            },
-            {
-                "type": "function",
-                "name": "get_approved",
-                "inputs": [
-                    {
-                        "name": "token_id",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "is_approved_for_all",
-                "inputs": [
-                    {
-                        "name": "owner",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "operator",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::bool"
-                    }
-                ],
-                "state_mutability": "view"
-            }
-        ]
-    },
-    {
-        "type": "impl",
-        "name": "ERC721MetadataImpl",
-        "interface_name": "cc_starknet::IERC721Metadata"
-    },
-    {
-        "type": "interface",
-        "name": "cc_starknet::IERC721Metadata",
-        "items": [
-            {
-                "type": "function",
-                "name": "name",
-                "inputs": [],
-                "outputs": [
-                    {
-                        "type": "core::felt252"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "symbol",
-                "inputs": [],
-                "outputs": [
-                    {
-                        "type": "core::felt252"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "token_uri",
-                "inputs": [
-                    {
-                        "name": "token_id",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::array::Array::<core::felt252>"
-                    }
-                ],
-                "state_mutability": "view"
-            }
-        ]
-    },
-    {
-        "type": "impl",
-        "name": "ERC721MetadataCamelOnlyImpl",
-        "interface_name": "cc_starknet::IERC721MetadataCamelOnly"
-    },
-    {
-        "type": "interface",
-        "name": "cc_starknet::IERC721MetadataCamelOnly",
-        "items": [
-            {
-                "type": "function",
-                "name": "tokenURI",
-                "inputs": [
-                    {
-                        "name": "tokenId",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::array::Array::<core::felt252>"
-                    }
-                ],
-                "state_mutability": "view"
-            }
-        ]
-    },
-    {
-        "type": "impl",
-        "name": "ERC721CamelOnlyImpl",
-        "interface_name": "openzeppelin::token::erc721::interface::IERC721CamelOnly"
-    },
-    {
-        "type": "interface",
-        "name": "openzeppelin::token::erc721::interface::IERC721CamelOnly",
-        "items": [
-            {
-                "type": "function",
-                "name": "balanceOf",
-                "inputs": [
-                    {
-                        "name": "account",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "ownerOf",
-                "inputs": [
-                    {
-                        "name": "tokenId",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "transferFrom",
-                "inputs": [
-                    {
-                        "name": "from",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "to",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "tokenId",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [],
-                "state_mutability": "external"
-            },
-            {
-                "type": "function",
-                "name": "safeTransferFrom",
-                "inputs": [
-                    {
-                        "name": "from",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "to",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "tokenId",
-                        "type": "core::integer::u256"
-                    },
-                    {
-                        "name": "data",
-                        "type": "core::array::Span::<core::felt252>"
-                    }
-                ],
-                "outputs": [],
-                "state_mutability": "external"
-            },
-            {
-                "type": "function",
-                "name": "setApprovalForAll",
-                "inputs": [
-                    {
-                        "name": "operator",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "approved",
-                        "type": "core::bool"
-                    }
-                ],
-                "outputs": [],
-                "state_mutability": "external"
-            },
-            {
-                "type": "function",
-                "name": "getApproved",
-                "inputs": [
-                    {
-                        "name": "tokenId",
-                        "type": "core::integer::u256"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    }
-                ],
-                "state_mutability": "view"
-            },
-            {
-                "type": "function",
-                "name": "isApprovedForAll",
-                "inputs": [
-                    {
-                        "name": "owner",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    },
-                    {
-                        "name": "operator",
-                        "type": "core::starknet::contract_address::ContractAddress"
-                    }
-                ],
-                "outputs": [
-                    {
-                        "type": "core::bool"
-                    }
-                ],
-                "state_mutability": "view"
-            }
-        ]
-    },
-    {
+        "name": "test_get_svg",
         "type": "function",
-        "name": "mint",
-        "inputs": [],
-        "outputs": [],
-        "state_mutability": "external"
-    },
-    {
-        "type": "function",
-        "name": "supports_interface",
         "inputs": [
             {
-                "name": "interface_id",
-                "type": "core::felt252"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "core::bool"
-            }
-        ],
-        "state_mutability": "view"
-    },
-    {
-        "type": "function",
-        "name": "supportsInterface",
-        "inputs": [
-            {
-                "name": "interfaceId",
-                "type": "core::felt252"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "core::bool"
-            }
-        ],
-        "state_mutability": "view"
-    },
-    {
-        "type": "function",
-        "name": "get_seeds",
-        "inputs": [
-            {
-                "name": "token_id",
-                "type": "core::integer::u256"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "core::integer::u256"
-            }
-        ],
-        "state_mutability": "view"
-    },
-    {
-        "type": "function",
-        "name": "token_URI",
-        "inputs": [
-            {
-                "name": "token_id",
+                "name": "seed",
                 "type": "core::integer::u256"
             }
         ],
@@ -618,24 +53,8 @@ const abi = [
         "state_mutability": "view"
     },
     {
-        "type": "function",
-        "name": "get_svg",
-        "inputs": [
-            {
-                "name": "token_id",
-                "type": "core::integer::u256"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "core::array::Array::<core::felt252>"
-            }
-        ],
-        "state_mutability": "view"
-    },
-    {
-        "type": "struct",
         "name": "cc_starknet::utils::pack::Pack",
+        "type": "struct",
         "members": [
             {
                 "name": "first",
@@ -652,8 +71,56 @@ const abi = [
         ]
     },
     {
-        "type": "struct",
+        "name": "test_get_layout",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "seed",
+                "type": "core::integer::u256"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "(cc_starknet::utils::pack::Pack, core::integer::u8)"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "test_get_name",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "seed",
+                "type": "core::integer::u256"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "(core::array::Array::<core::felt252>, core::felt252, core::integer::u8)"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "test_get_entities",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "seed",
+                "type": "core::integer::u256"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "(core::array::Array::<core::integer::u8>, core::array::Array::<core::integer::u8>, core::array::Array::<core::integer::u8>)"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
         "name": "core::array::Span::<core::integer::u8>",
+        "type": "struct",
         "members": [
             {
                 "name": "snapshot",
@@ -662,8 +129,8 @@ const abi = [
         ]
     },
     {
-        "type": "struct",
         "name": "cc_starknet::Dungeons::EntityDataSerde",
+        "type": "struct",
         "members": [
             {
                 "name": "x",
@@ -680,8 +147,18 @@ const abi = [
         ]
     },
     {
+        "name": "core::array::Span::<core::felt252>",
         "type": "struct",
+        "members": [
+            {
+                "name": "snapshot",
+                "type": "@core::array::Array::<core::felt252>"
+            }
+        ]
+    },
+    {
         "name": "cc_starknet::Dungeons::DungeonSerde",
+        "type": "struct",
         "members": [
             {
                 "name": "size",
@@ -718,11 +195,11 @@ const abi = [
         ]
     },
     {
+        "name": "test_generate_dungeon",
         "type": "function",
-        "name": "generate_dungeon",
         "inputs": [
             {
-                "name": "token_id",
+                "name": "seed",
                 "type": "core::integer::u256"
             }
         ],
@@ -734,12 +211,311 @@ const abi = [
         "state_mutability": "view"
     },
     {
+        "name": "test_get_dungeon_storage",
         "type": "function",
-        "name": "get_entities",
         "inputs": [
             {
                 "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "cc_starknet::Dungeons::DungeonSerde"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "mint",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "core::integer::u128"
+            }
+        ],
+        "state_mutability": "external"
+    },
+    {
+        "name": "owner_of",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::starknet::contract_address::ContractAddress"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "balance_of",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "account",
+                "type": "core::starknet::contract_address::ContractAddress"
+            }
+        ],
+        "outputs": [
+            {
                 "type": "core::integer::u256"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "safe_transfer_from",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "from",
+                "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+                "name": "to",
+                "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [],
+        "state_mutability": "view"
+    },
+    {
+        "name": "transfer_from",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "from",
+                "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+                "name": "to",
+                "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [],
+        "state_mutability": "view"
+    },
+    {
+        "name": "approve",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "to",
+                "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+    },
+    {
+        "name": "core::bool",
+        "type": "enum",
+        "variants": [
+            {
+                "name": "False",
+                "type": "()"
+            },
+            {
+                "name": "True",
+                "type": "()"
+            }
+        ]
+    },
+    {
+        "name": "set_approval_for_all",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "operator",
+                "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+                "name": "approved",
+                "type": "core::bool"
+            }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+    },
+    {
+        "name": "get_approved",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::starknet::contract_address::ContractAddress"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "is_approved_for_all",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "owner",
+                "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+                "name": "operator",
+                "type": "core::starknet::contract_address::ContractAddress"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::bool"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "name",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "core::felt252"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "symbol",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "core::felt252"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "token_uri",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::felt252"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "support_interface",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "interface_id",
+                "type": "core::felt252"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::bool"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "get_seeds",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::integer::u256"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "token_URI_not_work_yet",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::array::Span::<core::felt252>"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "get_svg",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "core::array::Array::<core::felt252>"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "generate_dungeon",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "cc_starknet::Dungeons::DungeonSerde"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
+        "name": "get_entities",
+        "type": "function",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u128"
             }
         ],
         "outputs": [
@@ -750,8 +526,8 @@ const abi = [
         "state_mutability": "view"
     },
     {
-        "type": "function",
         "name": "get_layout",
+        "type": "function",
         "inputs": [
             {
                 "name": "seed",
@@ -770,12 +546,12 @@ const abi = [
         "state_mutability": "view"
     },
     {
-        "type": "function",
         "name": "get_size",
+        "type": "function",
         "inputs": [
             {
                 "name": "token_id",
-                "type": "core::integer::u256"
+                "type": "core::integer::u128"
             }
         ],
         "outputs": [
@@ -786,12 +562,12 @@ const abi = [
         "state_mutability": "view"
     },
     {
-        "type": "function",
         "name": "get_environment",
+        "type": "function",
         "inputs": [
             {
                 "name": "token_id",
-                "type": "core::integer::u256"
+                "type": "core::integer::u128"
             }
         ],
         "outputs": [
@@ -802,12 +578,12 @@ const abi = [
         "state_mutability": "view"
     },
     {
-        "type": "function",
         "name": "get_name",
+        "type": "function",
         "inputs": [
             {
                 "name": "token_id",
-                "type": "core::integer::u256"
+                "type": "core::integer::u128"
             }
         ],
         "outputs": [
@@ -818,122 +594,63 @@ const abi = [
         "state_mutability": "view"
     },
     {
-        "type": "constructor",
         "name": "constructor",
+        "type": "constructor",
         "inputs": []
     },
     {
-        "type": "event",
+        "kind": "struct",
         "name": "cc_starknet::Dungeons::Minted",
-        "kind": "struct",
+        "type": "event",
         "members": [
             {
+                "kind": "key",
                 "name": "account",
-                "type": "core::starknet::contract_address::ContractAddress",
-                "kind": "key"
+                "type": "core::starknet::contract_address::ContractAddress"
             },
             {
+                "kind": "data",
                 "name": "token_id",
-                "type": "core::integer::u256",
-                "kind": "data"
+                "type": "core::integer::u128"
             }
         ]
     },
     {
-        "type": "event",
-        "name": "cc_starknet::Dungeons::Transfer",
         "kind": "struct",
+        "name": "cc_starknet::Dungeons::Claimed",
+        "type": "event",
         "members": [
             {
-                "name": "from",
-                "type": "core::starknet::contract_address::ContractAddress",
-                "kind": "key"
+                "kind": "key",
+                "name": "account",
+                "type": "core::starknet::contract_address::ContractAddress"
             },
             {
-                "name": "to",
-                "type": "core::starknet::contract_address::ContractAddress",
-                "kind": "key"
-            },
-            {
+                "kind": "data",
                 "name": "token_id",
-                "type": "core::integer::u256",
-                "kind": "key"
+                "type": "core::integer::u128"
             }
         ]
     },
     {
-        "type": "event",
-        "name": "cc_starknet::Dungeons::Approval",
-        "kind": "struct",
-        "members": [
-            {
-                "name": "owner",
-                "type": "core::starknet::contract_address::ContractAddress",
-                "kind": "key"
-            },
-            {
-                "name": "approved",
-                "type": "core::starknet::contract_address::ContractAddress",
-                "kind": "key"
-            },
-            {
-                "name": "token_id",
-                "type": "core::integer::u256",
-                "kind": "key"
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "name": "cc_starknet::Dungeons::ApprovalForAll",
-        "kind": "struct",
-        "members": [
-            {
-                "name": "owner",
-                "type": "core::starknet::contract_address::ContractAddress",
-                "kind": "key"
-            },
-            {
-                "name": "operator",
-                "type": "core::starknet::contract_address::ContractAddress",
-                "kind": "key"
-            },
-            {
-                "name": "approved",
-                "type": "core::bool",
-                "kind": "data"
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "name": "cc_starknet::Dungeons::Event",
         "kind": "enum",
+        "name": "cc_starknet::Dungeons::Event",
+        "type": "event",
         "variants": [
             {
+                "kind": "nested",
                 "name": "Minted",
-                "type": "cc_starknet::Dungeons::Minted",
-                "kind": "nested"
+                "type": "cc_starknet::Dungeons::Minted"
             },
             {
-                "name": "Transfer",
-                "type": "cc_starknet::Dungeons::Transfer",
-                "kind": "nested"
-            },
-            {
-                "name": "Approval",
-                "type": "cc_starknet::Dungeons::Approval",
-                "kind": "nested"
-            },
-            {
-                "name": "ApprovalForAll",
-                "type": "cc_starknet::Dungeons::ApprovalForAll",
-                "kind": "nested"
+                "kind": "nested",
+                "name": "Claimed",
+                "type": "cc_starknet::Dungeons::Claimed"
             }
         ]
     }
 ];
-const address = "0x078fcf70e22f475b8ffde567f8118e5d99ded383da150e01e55fa79251c7c808";
+const address = "0x04f40722dc2ea00f32f44d73d4075be51c62ce9679db2ccf2bebbd3aba0c54c7";
 
 
 /**
@@ -941,23 +658,23 @@ const address = "0x078fcf70e22f475b8ffde567f8118e5d99ded383da150e01e55fa79251c7c
  * @description
  */
 export default function CryptsScreen({
-    explore,
-    attack,
-    flee,
-    upgrade
-}: CryptsScreenProps) {
-
-
+                                         explore,
+                                         attack,
+                                         flee,
+                                         upgrade
+                                     }: CryptsScreenProps) {
+    
+    
     const adventurer = useAdventurerStore((state) => state.adventurer);
-
+    
     const [formData, setFormData] = useState({
         name: "",
     });
-
+    
     const [step, setStep] = useState(() => {
-
+        
         const monsterIndex = (Number)(Storage.get('monsterIndex' + adventurer?.id)) || 0;
-
+        
         if (monsterIndex === 0) {
             console.log("step 1")
             return 1;
@@ -965,10 +682,10 @@ export default function CryptsScreen({
             console.log("step 3")
             return 3;
         }
-
+        
     });
-
-
+    
+    
     const decode_string = (array: any) => {
         let result = "";
         for (let i = 0; i < array.length; i++) {
@@ -978,74 +695,74 @@ export default function CryptsScreen({
         }
         return result;
     };
-
+    
     const [owner, setOwner] = useState("0x....")
     const [name, setName] = useState("loading")
     const [svg, setSvg] = useState("")
     const [loading, setLoading] = useState(false)
-
+    
     const onEnterCode = async () => {
         // alert("entercode");
         setLoading(true);
         console.log(formData);
-
-        let provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
-
+        
+        let provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
+        
         let contract = new Contract(abi, address, provider);
         let token_id = (Number)(formData.name);
-
+        
         const owner = await contract.owner_of(token_id);
         console.log("owner:", num.toHex(owner))
         setOwner(num.toHex(owner))
-
-
+        
+        
         const dungeon_data = await contract.generate_dungeon(token_id);
         console.log("dungeon_data", dungeon_data);
         const name = decode_string(dungeon_data.dungeon_name);
         setName(name);
-
+        
         const svg = await contract.get_svg(token_id);
         const svg_str = decode_string(svg);
         console.log("svg", svg_str)
         setSvg(svg_str)
-
+        
         setLoading(false);
         setStep(2);
     }
-
+    
     // const setAdventurer = useAdventurerStore((state) => state.setAdventurer);
-
-
+    
+    
     const onEnter = () => {
-
+        
         console.log('onEnter')
-
+        
         Storage.set('monsterIndex' + adventurer?.id, 1);
-
+        
         setStep(3);
-
+        
     }
-
+    
     const onBack = () => {
         console.log("onBack")
         setStep(1);
     }
-
-
+    
+    
     const onExit = () => {
         // alert("exit");
         setStep(1);
     }
-
+    
     if (step === 1) {
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer} />
+                    <Info adventurer={ adventurer }/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData}
-                        loading={loading} />
+                    <EnterCode handleBack={ onEnterCode } setFormData={ setFormData } formData={ formData }
+                               loading={ loading }/>
                 </div>
             </div>
         );
@@ -1053,10 +770,10 @@ export default function CryptsScreen({
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer} />
+                    <Info adventurer={ adventurer }/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <MapInfo handleBack={onBack} handleEnter={onEnter} name={name} owner={owner} svg={svg} />
+                    <MapInfo handleBack={ onBack } handleEnter={ onEnter } name={ name } owner={ owner } svg={ svg }/>
                 </div>
             </div>
         );
@@ -1064,11 +781,11 @@ export default function CryptsScreen({
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer} />
+                    <Info adventurer={ adventurer }/>
                 </div>
-                {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
+                {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/ }
                 <MapAction attack={ attack } exit={ onExit } flee={ flee } explore={ explore } upgrade={ upgrade }/>
-                {/*</div>*/}
+                {/*</div>*/ }
             </div>
         );
     } else {
