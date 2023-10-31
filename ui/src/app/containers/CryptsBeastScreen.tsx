@@ -565,7 +565,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
                             { currBuff.map((cb, index) => (
                                 <Button
                                     size={ "lg" }
-                                    className={ `${ selectedOption === cb.key ? '' : 'bg-gray-800 text-white'
+                                    className={ `${ selectedOption === cb.key ? 'animate-pulse' : ''
                                     } m-1 ` }
                                     onClick={ () =>
                                         handleOptionChange(cb.key, cb.value)
