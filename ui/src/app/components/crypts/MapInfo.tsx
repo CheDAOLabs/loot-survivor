@@ -19,16 +19,17 @@ export const MapInfo = ({handleBack, handleEnter, owner, name, svg, render, dung
     return (
         <>
             <div className=" text-center p-4 uppercase 2xl:flex 2xl:flex-col 2xl:gap-10 {/*2xl:h-[700px*/}]">
+                
                 <div className="2xl:text-xl">
-                    Owner: { owner }
-                    <br/>Type:{ name }
+                    <span className="text-3xl">DungeonName:{ name }</span>
+                    <br/> Owner: { owner }
                     <br/>ADMISSION FEE: 1/20
                 </div>
                 
                 <div className="hidden sm:flex flex-row justify-center 2xl:gap-10">
                     {/*<img src="https://openseauserdata.com/files/d2c0f4b0bd85871bfd3b6eea02e9059a.svg" width={200}/>*/ }
                     <div style={ {
-                        display: "flex", /*height: "500px",*/ width: "500px", justifyContent: "center",
+                        display: "flex", /*height: "500px",*/ width: "full", justifyContent: "center",
                     } }>
                         <pre style={ {} } dangerouslySetInnerHTML={ {__html: render()} }/>
                     </div>

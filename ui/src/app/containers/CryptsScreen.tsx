@@ -1087,7 +1087,7 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
         for (let y = 0; y < map.length; y++) {
             for (let x = 0; x < map.length; x++) {
                 const tile = map[y][x]
-                rowString += `${ tile } `
+                rowString += `${ tile } ` + "  "
             }
             rowString += '\n'
         }
