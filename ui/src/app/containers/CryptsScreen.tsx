@@ -12,7 +12,6 @@ import { useQueriesStore } from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
 import { constants, Contract, num, Provider, shortString, cairo, ContractInterface } from "starknet";
 import Storage from "@/app/lib/storage";
-import { parseArray } from "../../../../indexer/src/utils/parser";
 
 
 interface CryptsScreenProps {
