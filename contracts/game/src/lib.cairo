@@ -842,6 +842,11 @@ mod Game {
         fn next_global_entropy_rotation(self: @ContractState) -> felt252 {
             _next_global_entropy_rotation(self)
         }
+
+        fn enter_cc(self: @ContractState, cc_token_id: u256) -> felt252 {
+            0
+        }
+
     }
 
     // ------------------------------------------ //
@@ -3076,4 +3081,5 @@ mod Game {
         );
         fn isMinted(ref self: T, beast: u8, prefix: u8, suffix: u8) -> bool;
     }
+
 }
