@@ -67,6 +67,11 @@ mod Game {
     };
     use beasts::beast::{Beast, IBeast, ImplBeast};
 
+    use cc::resource::{
+        CryptsAndCavernsTraitDispatcher, CryptsAndCavernsTraitDispatcherTrait, DungeonSerde,
+        DungeonDojo, Name, EntityDataSerde, Pack
+    };
+
     #[storage]
     struct Storage {
         _global_entropy: u64,
@@ -843,10 +848,34 @@ mod Game {
             _next_global_entropy_rotation(self)
         }
 
-        fn enter_cc(self: @ContractState, cc_token_id: u256) -> felt252 {
-            0
-        }
 
+        fn enter_cc(self: @ContractState, cc_token_id: u256) -> u128 {
+            let dungeon: DungeonSerde = CryptsAndCavernsTraitDispatcher {
+                contract_address: contract_address_const::<
+                    0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
+                >()
+            }
+                .generate_dungeon(cc_token_id);
+
+            let entity: EntityDataSerde = dungeon.entities;
+
+            let limit = entity.entity_data.len();
+            let mut count = 0;
+            let mut i = 0;
+            loop {
+                if i == limit {
+                    break;
+                }
+
+                if *(entity.entity_data)[i] == 1 {
+                    count += 1;
+                }
+
+                i += 1;
+            };
+
+            count
+        }
     }
 
     // ------------------------------------------ //
@@ -2817,12 +2846,8 @@ mod Game {
         let discovery = Discovery { adventurer_state, amount };
 
         match discovery_type {
-            DiscoveryType::Gold => {
-                self.emit(DiscoveredGold { discovery });
-            },
-            DiscoveryType::Health => {
-                self.emit(DiscoveredHealth { discovery });
-            }
+            DiscoveryType::Gold => { self.emit(DiscoveredGold { discovery }); },
+            DiscoveryType::Health => { self.emit(DiscoveredHealth { discovery }); }
         }
     }
 
@@ -3081,5 +3106,4 @@ mod Game {
         );
         fn isMinted(ref self: T, beast: u8, prefix: u8, suffix: u8) -> bool;
     }
-
 }

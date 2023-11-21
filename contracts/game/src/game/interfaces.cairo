@@ -118,6 +118,6 @@ trait IGame<TContractState> {
     // checks ----------------------------------------------------
     fn owner_of(self: @TContractState, adventurer_id: u256) -> ContractAddress;
 
-    fn enter_cc(self: @TContractState,cc_token_id :u256) -> felt252;
+    fn enter_cc(self: @TContractState,cc_token_id :u256) -> u128;
 
 }
