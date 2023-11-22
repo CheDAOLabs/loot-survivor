@@ -327,3 +327,12 @@ export type AdventurerUpgradedEvent = {
   wisdomIncrease: u8;
   charismaIncrease: u8;
 };
+
+export type EnterCCEvent = {
+  map_id:u16,//9 bits
+  curr_beast:u16,
+  cc_points:u16,
+  beast_health:u16, // 9 bits
+  beast_amount:u16,
+  beast_id: u16, // 9 bits
+};

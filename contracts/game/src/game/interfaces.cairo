@@ -6,6 +6,7 @@ use survivor::{
 use lootitems::loot::{Loot};
 use market::market::{ItemPurchase};
 use beasts::beast::Beast;
+use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
 
 #[starknet::interface]
 trait IGame<TContractState> {
@@ -107,6 +108,15 @@ trait IGame<TContractState> {
     fn get_beast_type(self: @TContractState, beast_id: u8) -> u8;
     fn get_beast_tier(self: @TContractState, beast_id: u8) -> u8;
 
+    // cc
+    fn get_cave_cc(self: @TContractState, adventurer_id: u256) -> CcCave;
+    fn enter_cc(ref self: TContractState, adventurer_id:u256, cc_token_id :u256) -> u128;
+    fn attack_cc(ref self: TContractState, adventurer_id: u256, to_the_death: bool);
+    fn get_attacking_beast_cc(self: @TContractState, adventurer_id: u256) -> Beast;
+    fn get_beast_health_cc(self: @TContractState, adventurer_id: u256) -> u16;
+    //fn get_beast_type_cc(self: @TContractState, beast_id: u8) -> u8;
+    //fn get_beast_tier_cc(self: @TContractState, beast_id: u8) -> u8;
+
     // TODO: Game settings
     fn next_global_entropy_rotation(self: @TContractState) -> felt252;
 
@@ -118,6 +128,5 @@ trait IGame<TContractState> {
     // checks ----------------------------------------------------
     fn owner_of(self: @TContractState, adventurer_id: u256) -> ContractAddress;
 
-    fn enter_cc(self: @TContractState,cc_token_id :u256) -> u128;
 
 }

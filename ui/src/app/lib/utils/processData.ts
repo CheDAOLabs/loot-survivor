@@ -26,7 +26,7 @@ import {
   NewItemsAvailableEvent,
   IdleDeathPenaltyEvent,
   AdventurerUpgradedEvent,
-  AdventurerState,
+  AdventurerState, EnterCCEvent,
 } from "../../types/events";
 import { Adventurer } from "@/app/types";
 import { feltToString } from ".";
@@ -57,7 +57,10 @@ type EventData =
   | AdventurerLeveledUpEvent
   | NewItemsAvailableEvent
   | IdleDeathPenaltyEvent
-  | AdventurerUpgradedEvent;
+  | AdventurerUpgradedEvent
+  //
+  | EnterCCEvent
+    ;
 
 function createBaseItems(data: AdventurerState) {
   const gameData = new GameData();
@@ -959,5 +962,96 @@ export function processData(
         timestamp: new Date(),
       };
       return [penaltyAdventurerData, penaltyBattleData, penaltyDiscoveryData];
+    case "EnterCC":
+        const enterCCEvent = event as EnterCCEvent;
+      // curr_beast:u16,
+      //     cc_points:u16,
+      //   beast_health:u16, // 9 bits
+      //   beast_amount:u16,
+      //   beast_id: u16, // 9 bits
+        const enterCCData = {
+            txHash: txHash,
+            map_id: enterCCEvent.map_id,
+            curr_beast: enterCCEvent.curr_beast,
+            cc_points: enterCCEvent.cc_points,
+            beast_health: enterCCEvent.beast_health,
+            beast_amount: enterCCEvent.beast_amount,
+            beast_id: enterCCEvent.beast_id,
+        }
+      return [
+        enterCCData
+      ];
+    case "DiscoveredBeastCC":
+      console.log("processData DiscoveredBeastCC");
+      const discoveredBeastEventCC = event as DiscoveredBeastEvent;
+      const discoveredBeastAdventurerDataCC = processAdventurerState(
+          discoveredBeastEventCC,
+          currentAdventurer
+      );
+      const discoveredBeastDataCC = {
+        txHash: txHash,
+        adventurerId: discoveredBeastEventCC.adventurerState["adventurerId"].low,
+        adventurerHealth:
+            discoveredBeastEventCC.adventurerState["adventurer"]["health"],
+        discoveryType: gameData.DISCOVERY_TYPES[1],
+        subDiscoveryType: null,
+        outputAmount: 0,
+        obstacle: null,
+        obstacleLevel: null,
+        dodgedObstacle: 0,
+        damageTaken: 0,
+        damageLocation: null,
+        xpEarnedAdventurer: null,
+        xpEarnedItems: null,
+        entity: gameData.BEASTS[discoveredBeastEventCC.id],
+        entityLevel: discoveredBeastEventCC.beastSpecs["level"],
+        entityHealth:
+            discoveredBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        special1:
+            gameData.ITEM_SUFFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special1"]
+                ],
+        special2:
+            gameData.ITEM_NAME_PREFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special2"]
+                ],
+        special3:
+            gameData.ITEM_NAME_SUFFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special3"]
+                ],
+        ambushed: false,
+        seed: discoveredBeastEventCC.seed,
+        discoveryTime: new Date(),
+        timestamp: new Date(),
+      };
+      const discoveredBeastBeastDataCC = {
+        beast: gameData.BEASTS[discoveredBeastEventCC.id],
+        health:
+            discoveredBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        level: discoveredBeastEventCC.beastSpecs["level"],
+        special1:
+            gameData.ITEM_SUFFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special1"]
+                ],
+        special2:
+            gameData.ITEM_NAME_PREFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special2"]
+                ],
+        special3:
+            gameData.ITEM_NAME_SUFFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special3"]
+                ],
+        seed: discoveredBeastEventCC.seed,
+        adventurerId: discoveredBeastEventCC.adventurerState["adventurerId"].low,
+        slainOnTime: null,
+        createdTime: new Date(),
+        lastUpdatedTime: new Date(),
+        timestamp: new Date(),
+      };
+      return [
+        discoveredBeastAdventurerDataCC,
+        discoveredBeastDataCC,
+        discoveredBeastBeastDataCC,
+      ];
   }
 }

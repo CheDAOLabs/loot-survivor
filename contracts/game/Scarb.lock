@@ -11,6 +11,14 @@ dependencies = [
 [[package]]
 name = "cc"
 version = "0.1.0"
+dependencies = [
+ "beasts",
+ "combat",
+ "lootitems",
+ "market",
+ "obstacles",
+ "pack",
+]
 
 [[package]]
 name = "combat"

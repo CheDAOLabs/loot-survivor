@@ -137,6 +137,15 @@ export interface Beast {
   timestamp?: Date; // Indexer timestamp of event process
 }
 
+export interface CcCave {
+  map_id?: number;
+  curr_beast?: number;
+  cc_points?: number;
+  beast_health?: number;
+  beast_amount?: number;
+  beast_id?: number;
+}
+
 export interface Score {
   adventurerId?: number; // Adventurer ID
   owner?: string; // Hex Address of the adventurer owner
@@ -348,6 +357,15 @@ export const NullBattle: Battle = {
   txHash: undefined,
   timestamp: undefined,
 };
+
+export const NullCave:CcCave = {
+  map_id:undefined,
+  curr_beast:undefined,
+  cc_points:undefined,
+  beast_health:undefined, // 9 bits
+  beast_amount:undefined,
+  beast_id: undefined, // 9 bits
+}
 
 export const NullDiscovery: Discovery = {
   adventurerId: undefined,

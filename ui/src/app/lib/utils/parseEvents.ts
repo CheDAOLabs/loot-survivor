@@ -27,6 +27,8 @@ import {
   AdventurerLeveledUpEvent,
   NewItemsAvailableEvent,
   IdleDeathPenaltyEvent,
+  //CC
+  EnterCCEvent,
 } from "../../types/events";
 import { processData } from "./processData";
 
@@ -690,6 +692,54 @@ export async function parseEvents(
         );
         events.push({ name: eventName, data: idleDeathPenaltyEvent });
         break;
+
+      //cc
+      case "EnterCC":
+        const enterCCData: EnterCCEvent = {
+          map_id: parseInt(raw.data[0]),
+          curr_beast:parseInt(raw.data[1]),
+          cc_points:parseInt(raw.data[2]),
+          beast_health:parseInt(raw.data[3]), // 9 bits
+          beast_amount:parseInt(raw.data[4]),
+          beast_id: parseInt(raw.data[5]), // 9 bits
+        }
+        console.log("parseEvent EnterCC",enterCCData);
+        const enterCCEvent = processData(
+            enterCCData,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: enterCCEvent });
+        break;
+      case "DiscoveredBeastCC":
+        const discoveredBeastDataCC: DiscoveredBeastEvent = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+          seed: parseInt(raw.data[40]),
+          id: parseInt(raw.data[41]),
+          beastSpecs: {
+            tier: parseInt(raw.data[42]),
+            itemType: parseInt(raw.data[43]),
+            level: parseInt(raw.data[44]),
+            specials: {
+              special1: parseInt(raw.data[45]),
+              special2: parseInt(raw.data[46]),
+              special3: parseInt(raw.data[47]),
+            },
+          },
+        };
+        const discoveredBeastEventCC = processData(
+            discoveredBeastDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: discoveredBeastEventCC });
+        break;
+
+      // default:
+      //   console.error("Unknown event", eventName,raw.keys[0]);
+      //   break;
     }
   }
 

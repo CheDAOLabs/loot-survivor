@@ -8,7 +8,7 @@ mod tests {
 
 #[starknet::contract]
 mod Game {
-    // TODO: TESTING CONFIGS 
+    // TODO: TESTING CONFIGS
     // ADJUST THESE BEFORE DEPLOYMENT
     const TEST_ENTROPY: u64 = 12303548;
     const MINIMUM_SCORE_FOR_PAYOUTS: u256 = 100;
@@ -72,11 +72,14 @@ mod Game {
         DungeonDojo, Name, EntityDataSerde, Pack
     };
 
+    use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
+
     #[storage]
     struct Storage {
         _global_entropy: u64,
         _last_global_entropy_block: felt252,
         _adventurer: LegacyMap::<u256, felt252>,
+        _cc_cave: LegacyMap::<u256, felt252>,
         _owner: LegacyMap::<u256, ContractAddress>,
         _adventurer_meta: LegacyMap::<u256, felt252>,
         _loot: LegacyMap::<u256, felt252>,
@@ -118,7 +121,16 @@ mod Game {
         AdventurerDied: AdventurerDied,
         NewHighScore: NewHighScore,
         IdleDeathPenalty: IdleDeathPenalty,
-        RewardDistribution: RewardDistribution
+        RewardDistribution: RewardDistribution,
+
+        // CC
+        EnterCC:EnterCC,
+        AmbushedByBeastCC: AmbushedByBeastCC,
+        DiscoveredBeastCC: DiscoveredBeastCC,
+        AttackedBeastCC: AttackedBeastCC,
+        AttackedByBeastCC: AttackedByBeastCC,
+        SlayedBeastCC: SlayedBeastCC,
+
     }
 
     #[constructor]
@@ -318,6 +330,41 @@ mod Game {
             );
         }
 
+        //@notice 发起冒险者的攻击行动
+        //@param self 对ContractState的引用，用于更新合约
+        //@param adventurer_id 冒险者的唯一标识符
+        //@param to_the_death 一个布尔值，如果为true，将会递归攻击直到野兽或冒险者死亡
+        fn attack_cc(ref self: ContractState, adventurer_id: u256, to_the_death: bool) {
+            // 从存储中解析并应用冒险者的物品属性提升
+            let (mut adventurer, stat_boosts) = _unpack_adventurer_with_stat_boosts(
+                @self, adventurer_id
+            );
+            // 断言行动有效
+            _assert_ownership(@self, adventurer_id);
+            _assert_not_dead(adventurer);
+            _assert_in_battle(adventurer);
+
+            // 获取行动之间的区块数
+            let (exceeded_idle_threshold, num_blocks) = _idle_longer_than_penalty_threshold(
+                adventurer
+            );
+
+            // 处理攻击或应用空闲惩罚
+            if (!exceeded_idle_threshold) {
+                _attack_cc(ref self, ref adventurer, adventurer_id, to_the_death);
+            } else {
+                _apply_idle_penalty(ref self, adventurer_id, ref adventurer, num_blocks);
+            }
+
+            // 更新玩家的最后行动区块
+            adventurer.set_last_action(starknet::get_block_info().unbox().block_number);
+
+            // 打包并保存冒险者
+            _pack_adventurer_remove_stat_boost(
+                ref self, ref adventurer, adventurer_id, stat_boosts
+            );
+        }
+
         //@notice Attempt to flee from a beast
         //@param self A reference to ContractState required to update contract
         //@param adventurer_id The unique identifier of the adventurer
@@ -434,7 +481,7 @@ mod Game {
                 }
             }
 
-            // remove stats, pack, and save adventurer 
+            // remove stats, pack, and save adventurer
             _pack_adventurer_remove_stat_boost(
                 ref self, ref adventurer, adventurer_id, stat_boosts
             );
@@ -590,6 +637,10 @@ mod Game {
             let (adventurer, _) = _unpack_adventurer_with_stat_boosts(self, adventurer_id);
             adventurer
         }
+        fn get_cave_cc(self: @ContractState, adventurer_id: u256) -> CcCave {
+            let cc_cave = _unpack_cc_cave(self, adventurer_id);
+            cc_cave
+        }
         fn get_adventurer_no_boosts(self: @ContractState, adventurer_id: u256) -> Adventurer {
             _unpack_adventurer(self, adventurer_id)
         }
@@ -718,6 +769,9 @@ mod Game {
         fn get_attacking_beast(self: @ContractState, adventurer_id: u256) -> Beast {
             _get_attacking_beast(self, adventurer_id)
         }
+        fn get_attacking_beast_cc(self: @ContractState, adventurer_id: u256) -> Beast {
+            _get_attacking_beast_cc(self, adventurer_id)
+        }
         fn get_health(self: @ContractState, adventurer_id: u256) -> u16 {
             _unpack_adventurer(self, adventurer_id).health
         }
@@ -732,6 +786,9 @@ mod Game {
         }
         fn get_beast_health(self: @ContractState, adventurer_id: u256) -> u16 {
             _unpack_adventurer(self, adventurer_id).beast_health
+        }
+        fn get_beast_health_cc(self: @ContractState, adventurer_id: u256) -> u16 {
+            _unpack_cc_cave(self, adventurer_id).beast_health
         }
         fn get_stat_upgrades_available(self: @ContractState, adventurer_id: u256) -> u8 {
             _unpack_adventurer(self, adventurer_id).stat_points_available
@@ -849,7 +906,15 @@ mod Game {
         }
 
 
-        fn enter_cc(self: @ContractState, cc_token_id: u256) -> u128 {
+        fn enter_cc(ref self: ContractState,adventurer_id: u256, cc_token_id: u256) -> u128 {
+
+            let adventurer = _unpack_adventurer(@self, adventurer_id);
+
+            // get adventurer entropy
+            let adventurer_entropy: u128 = _adventurer_meta_unpacked(@self, adventurer_id)
+                .entropy
+                .into();
+
             let dungeon: DungeonSerde = CryptsAndCavernsTraitDispatcher {
                 contract_address: contract_address_const::<
                     0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
@@ -874,6 +939,24 @@ mod Game {
                 i += 1;
             };
 
+            let map_id:u16 = cc_token_id.try_into().expect('pack map_id');
+            let cc_point:u16 = count.try_into().expect('pack cc_point');
+            let mut cc_cave = ImplCcCave::new(map_id,cc_point);
+
+            // // adventurer immediately gets ambushed by a starter beast
+            // let beast_battle_details = _starter_beast_ambush(
+            //     ref new_adventurer, adventurer_id, starting_weapon, adventurer_entropy
+            // );
+            //
+            // __event_AmbushedByBeast(ref self, new_adventurer, adventurer_id, beast_battle_details);
+
+            let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+
+            cc_cave.set_beast_health(beast.starting_health);
+            _pack_cc_cave(ref self, adventurer_id, cc_cave);
+
+            __event_EnterCC(ref self,cc_cave.map_id,cc_cave.curr_beast,cc_cave.cc_points,cc_cave.beast_health,cc_cave.beast_amount,cc_cave.beast_id);
+            __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
             count
         }
     }
@@ -916,7 +999,7 @@ mod Game {
         adventurer.beast_health = 0;
 
         // give adventurer gold reward
-        // TODO Gas Optimization: beast.get_gold_reward and get_xp_reward both call the same 
+        // TODO Gas Optimization: beast.get_gold_reward and get_xp_reward both call the same
         // get_base_reward from Combat module. Should refactor this to only make that call once and have
         // get_gold_reward and get_xp_reward operator on the base reward
         let mut gold_earned = beast.get_gold_reward(beast_seed);
@@ -1163,7 +1246,7 @@ mod Game {
             entropy: adventurer_entropy
         };
 
-        // emit a StartGame event 
+        // emit a StartGame event
         __event_StartGame(ref self, new_adventurer, adventurer_id, adventurer_meta);
 
         // adventurer immediately gets ambushed by a starter beast
@@ -1417,16 +1500,16 @@ mod Game {
         }
     }
 
-    // @notice Grants XP to items currently equipped by an adventurer, and processes any level ups.// 
+    // @notice Grants XP to items currently equipped by an adventurer, and processes any level ups.//
     // @dev This function does three main things:
     //   1. Iterates through each of the equipped items for the given adventurer.
     //   2. Increases the XP for the equipped item. If the item levels up, it processes the level up and updates the item.
-    //   3. If any items have leveled up, emits an `ItemsLeveledUp` event.// 
+    //   3. If any items have leveled up, emits an `ItemsLeveledUp` event.//
     // @param self The contract's state reference.
     // @param adventurer Reference to the adventurer's state.
     // @param adventurer_id Unique identifier for the adventurer.
     // @param xp_amount Amount of XP to grant to each equipped item.
-    // @param entropy Random data used for any deterministic randomness during processing.// 
+    // @param entropy Random data used for any deterministic randomness during processing.//
     // @return Array of items that leveled up.
     fn _grant_xp_to_equipped_items(
         ref self: ContractState,
@@ -1635,6 +1718,109 @@ mod Game {
             if fight_to_the_death {
                 // attack again
                 _attack(ref self, ref adventurer, adventurer_id, true);
+            }
+        }
+    }
+
+    // @notice 模拟冒险者对野兽进行攻击。
+    // @param self 合约的状态。
+    // @param adventurer 发起攻击的冒险者。
+    // @param adventurer_id 冒险者的唯一ID。
+    // @param fight_to_the_death 指示是否战斗应持续到冒险者或野兽被击败的标志。
+    fn _attack_cc(
+        ref self: ContractState,
+        ref adventurer: Adventurer,
+        adventurer_id: u256,
+        fight_to_the_death: bool,
+    ) {
+        let cc_cave = _unpack_cc_cave(@self, adventurer_id);
+
+        // 从存储中获取冒险者的熵
+        let adventurer_entropy: u128 = _adventurer_meta_unpacked(@self, adventurer_id)
+            .entropy
+            .into();
+
+        // 从存储中获取游戏的熵
+        let global_entropy: u128 = _get_global_entropy(@self).into();
+
+        // 获取野兽和野兽种子
+        let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
+
+        // 在生成野兽时，我们需要确保熵在战斗期间保持不变
+        // 但是对于攻击，我们应该在战斗中改变熵，因此我们使用冒险者和野兽的生命值来实现这一点
+        let (attack_rnd_1, attack_rnd_2) = AdventurerUtils::get_randomness_with_health(
+            adventurer.xp,
+            adventurer.health,
+            adventurer_entropy,
+            global_entropy,
+        );
+
+        // 获取对野兽造成的伤害
+        // TODO: 考虑返回一个带有详细伤害信息的元组（total_damage，base_damage，critical_hit_damage，name_bonus_damage）
+        let weapon_combat_spec = _get_combat_spec(@self, adventurer_id, adventurer.weapon);
+        let critical_hit_damage_multiplier = adventurer.critical_hit_bonus_multiplier();
+        let name_bonus_damage_multplier = adventurer.name_match_bonus_damage_multiplier();
+        let bag = _bag_unpacked(@self, adventurer_id);
+        let adventurer_luck = adventurer.get_luck(bag);
+        let (damage_dealt, critical_hit) = beast.attack(
+            weapon_combat_spec,
+            adventurer_luck,
+            adventurer.stats.strength,
+            critical_hit_damage_multiplier,
+            name_bonus_damage_multplier,
+            attack_rnd_1,
+        );
+
+        let attacked_beast_details = BattleDetails {
+            seed: beast_seed,
+            id: beast.id,
+            beast_specs: beast.combat_spec,
+            damage: damage_dealt,
+            critical_hit: critical_hit,
+            location: ImplCombat::slot_to_u8(Slot::None(())),
+        };
+
+        // 如果对野兽造成的伤害超过了冒险者的野兽生命值
+        if damage_dealt >= adventurer.beast_health {
+            // 处理野兽死亡
+            _process_beast_death(
+                ref self,
+                ref adventurer,
+                adventurer_id,
+                beast,
+                beast_seed,
+                attack_rnd_2,
+                damage_dealt,
+                critical_hit,
+            );
+        } else {
+            // 如果野兽仍然存活
+
+            // 从它们的生命值中扣除造成的伤害
+            adventurer.beast_health -= damage_dealt;
+
+            // 野兽反击
+            let attacked_by_beast_details = _beast_counter_attack(
+                ref self,
+                ref adventurer,
+                adventurer_id,
+                beast,
+                beast_seed,
+                attack_rnd_1,
+                attack_rnd_2,
+            );
+
+            __event_AttackedBeast(ref self, adventurer, adventurer_id, attacked_beast_details);
+            __event_AttackedByBeast(ref self, adventurer, adventurer_id, attacked_by_beast_details);
+            if adventurer.health == 0 {
+                _process_adventurer_death(ref self, adventurer, adventurer_id, beast.id, 0);
+                return;
+            }
+
+            // 如果冒险者仍然存活且战斗到死
+            if fight_to_the_death {
+                // 再次攻击
+                _attack_cc(ref self, ref adventurer, adventurer_id, true);
             }
         }
     }
@@ -1934,7 +2120,7 @@ mod Game {
             // buy it and store result in our purchases array for event
             purchases.append(_buy_item(ref self, ref adventurer, ref bag, item.item_id));
 
-            // if item is being equipped as part of the purchase 
+            // if item is being equipped as part of the purchase
             if item.equip {
                 // add it to our array of items to equip
                 items_to_equip.append(item.item_id);
@@ -2057,6 +2243,11 @@ mod Game {
     fn _unpack_adventurer(self: @ContractState, adventurer_id: u256) -> Adventurer {
         Packing::unpack(self._adventurer.read(adventurer_id))
     }
+
+    fn _unpack_cc_cave(self: @ContractState, adventurer_id: u256) -> CcCave {
+        Packing::unpack(self._cc_cave.read(adventurer_id))
+    }
+
     fn _unpack_adventurer_with_stat_boosts(
         self: @ContractState, adventurer_id: u256
     ) -> (Adventurer, Stats) {
@@ -2082,6 +2273,12 @@ mod Game {
     fn _pack_adventurer(ref self: ContractState, adventurer_id: u256, adventurer: Adventurer) {
         self._adventurer.write(adventurer_id, adventurer.pack());
     }
+
+    #[inline(always)]
+    fn _pack_cc_cave(ref self: ContractState, adventurer_id: u256, cc_cave: CcCave) {
+        self._cc_cave.write(adventurer_id, cc_cave.pack());
+    }
+
     // @dev Packs and saves an adventurer after removing stat boosts.
     // @param adventurer_id The ID of the adventurer to be modified.
     // @param adventurer The adventurer to be modified.
@@ -2381,6 +2578,25 @@ mod Game {
         beast
     }
 
+    fn _get_attacking_beast_cc(self: @ContractState, adventurer_id: u256) -> Beast {
+        // get adventurer
+        // let adventurer = _unpack_adventurer(self, adventurer_id);
+        let cc_cave = _unpack_cc_cave(self, adventurer_id);
+        // assert adventurer is in battle
+        // assert(adventurer.beast_health != 0, messages::NOT_IN_BATTLE);
+
+        // get adventurer entropy
+        let adventurer_entropy: u128 = _adventurer_meta_unpacked(self, adventurer_id)
+            .entropy
+            .into();
+
+        // get beast and beast seed
+        let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
+
+        // return beast
+        beast
+    }
+
     #[inline(always)]
     fn _get_storage_index(self: @ContractState, meta_data_id: u8) -> u256 {
         if (meta_data_id <= 10) {
@@ -2648,6 +2864,67 @@ mod Game {
         gold_earned: u16,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct EnterCC{
+        map_id:u16,//9 bits
+        curr_beast:u16,
+        cc_points:u16,
+        beast_health:u16, // 9 bits
+        beast_amount:u16,
+        beast_id: u16, // 9 bits
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct DiscoveredBeastCC {
+        adventurer_state: AdventurerState,
+        seed: u128,
+        id: u8,
+        beast_specs: CombatSpec,
+    }
+
+    #[derive(Drop, Serde, starknet::Event)]
+    struct BattleDetailsCC {
+        seed: u128,
+        id: u8,
+        beast_specs: CombatSpec,
+        damage: u16,
+        critical_hit: bool,
+        location: u8,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct AmbushedByBeastCC {
+        adventurer_state: AdventurerState,
+        beast_battle_details: BattleDetails,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct AttackedBeastCC {
+        adventurer_state: AdventurerState,
+        beast_battle_details: BattleDetails,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct AttackedByBeastCC {
+        adventurer_state: AdventurerState,
+        beast_battle_details: BattleDetails,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct SlayedBeastCC {
+        adventurer_state: AdventurerState,
+        seed: u128,
+        id: u8,
+        beast_specs: CombatSpec,
+        damage_dealt: u16,
+        critical_hit: bool,
+        xp_earned_adventurer: u16,
+        xp_earned_items: u16,
+        gold_earned: u16,
+    }
+
+
+
     #[derive(Drop, Serde)]
     struct FleeEvent {
         adventurer_state: AdventurerState,
@@ -2791,6 +3068,12 @@ mod Game {
         address: ContractAddress,
     }
 
+    fn __event_EnterCC(ref self: ContractState,map_id:u16,curr_beast:u16, cc_points:u16, beast_health:u16, beast_amount:u16,beast_id: u16 ){
+        self.emit(
+                EnterCC {map_id,curr_beast,cc_points, beast_health, beast_amount,beast_id}
+            );
+    }
+
     fn __event_RewardDistribution(ref self: ContractState, event: RewardDistribution) {
         self.emit(event);
     }
@@ -2883,6 +3166,23 @@ mod Game {
         };
 
         let discovered_beast_event = DiscoveredBeast {
+            adventurer_state, seed, id: beast.id, beast_specs: beast.combat_spec
+        };
+        self.emit(discovered_beast_event);
+    }
+
+    fn __event_DiscoveredBeastCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: u256,
+        seed: u128,
+        beast: Beast
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+
+        let discovered_beast_event = DiscoveredBeastCC {
             adventurer_state, seed, id: beast.id, beast_specs: beast.combat_spec
         };
         self.emit(discovered_beast_event);

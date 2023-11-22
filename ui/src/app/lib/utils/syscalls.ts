@@ -117,6 +117,77 @@ export function syscalls({
   setMintAdventurer,
   setStartOption,
 }: SyscallsProps) {
+
+  const enterCC = async (adventureId:number, tokenId:number)=>{
+    const Tx = {
+        contractAddress: gameContract?.address ?? "",
+        entrypoint: "enter_cc",
+        calldata: [adventureId.toString(),"0",tokenId.toString(), "0"]
+    };
+
+      addToCalls(Tx);
+
+    startLoading(
+        "Enter CC",
+        "",
+        "",
+        adventurer?.id
+    );
+
+      // try {
+          const tx = await handleSubmitCalls(writeAsync);
+          console.log(tx);
+      // }catch (e){
+      //   console.error(e);
+      // }
+
+    const receipt = await account?.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 2000,
+    });
+
+    console.log("receipt", receipt);
+
+    const events = await parseEvents(
+        receipt as InvokeTransactionReceiptResponse,
+        queryData.adventurerByIdQuery?.adventurers[0] ?? NullAdventurer
+    );
+
+    console.log("events", events);
+
+    const filteredBeastDiscoveries = events.filter(
+        (event) => event.name === "DiscoveredBeastCC"
+    );
+    if (filteredBeastDiscoveries.length > 0) {
+      for (let discovery of filteredBeastDiscoveries) {
+        setData("battlesByBeastQueryCC", {
+          battles: null,
+        });
+        setData("adventurerByIdQuery", {
+          adventurers: [discovery.data[0]],
+        });
+        setAdventurer(discovery.data[0]);
+        // discoveries.unshift(discovery.data[1]);
+        setData("beastQueryCC", { beasts: [discovery.data[2]] });
+      }
+    }
+
+    const filteredEnterCCs = events.filter(
+        (event) => event.name === "EnterCC"
+    );
+
+    console.log("filteredEnterCCs", filteredEnterCCs);
+
+    if (filteredEnterCCs.length > 0) {
+      for (let enterCC of filteredEnterCCs) {
+        setData("enterCC", enterCC);
+      }
+
+    }
+
+
+
+    };
+
   const gameData = new GameData();
 
   const formatAddress = account ? account.address : "0x0";
@@ -551,7 +622,7 @@ export function syscalls({
       const receipt = await account?.waitForTransaction(tx.transaction_hash, {
         retryInterval: 2000,
       });
-      
+
       console.log("receipt", receipt);
 
       // reset battles by tx hash
@@ -568,7 +639,7 @@ export function syscalls({
         receipt as InvokeTransactionReceiptResponse,
         queryData.adventurerByIdQuery?.adventurers[0] ?? NullAdventurer
       );
-      
+
       console.log("events", events);
 
       // If there are any equip or drops, do them first
@@ -1229,5 +1300,5 @@ export function syscalls({
     }
   };
 
-  return { spawn, explore, attack, flee, upgrade, multicall, };
+  return { spawn, explore, attack, flee, upgrade, multicall,enterCC };
 }

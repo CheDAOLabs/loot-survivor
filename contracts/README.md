@@ -1,10 +1,16 @@
+scarb --release build
+
+
 export STARKNET_KEYSTORE="./key.json"
+export STARKNET_ACCOUNT="./account.json"
 
 
-starkli declare --account ./account.json ./target/release/game_Game.sierra.json
-WARNING: no valid provider option found. Falling back to using the sequencer gateway for the goerli-1 network. Doing this is discouraged. See https://book.starkli.rs/providers for more details.
-Enter keystore password:
-Not declaring class as it's already declared. Class hash:
-0x04421b3816360a8d1618221eea415c100498c498dbdb94d504715d807536395d
 
-star deploy --class_hash 0x04421b3816360a8d1618221eea415c100498c498dbdb94d504715d807536395d --max_fee 100000000000000000 --input $LORDS_ADDRESS $DAO_ADDRESS --account $ACCOUNT_NAME
+starkli declare  ./target/release/game_Game.contract_class.json
+
+
+export LORDS_ADDRESS=0x059dac5df32cbce17b081399e97d90be5fba726f97f00638f838613d088e5a47;
+export DAO_ADDRESS=0x020b96923a9e60f63a1829d440a03cf680768cadbc8fe737f71380258817d85b;
+export ARG=0x000f4dbfe5d15792aa91025e42ee1d74c22bdeb1eef0b9bc19a37216377290c1;
+export CLASS_HASH=0x01de0d91c5dab2939d54b484d91d7878085ff2eb536fb3868ebd5361067c72ef;
+starkli deploy $CLASS_HASH $LORDS_ADDRESS $DAO_ADDRESS $ARG  

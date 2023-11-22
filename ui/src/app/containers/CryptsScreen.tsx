@@ -1,17 +1,17 @@
-import React, { ChangeEvent, useState } from "react";
-import { Button } from "../components/buttons/Button";
+import React, {ChangeEvent, useState} from "react";
+import {Button} from "../components/buttons/Button";
 
 
-import { EnterCode } from "../components/crypts/EnterCode";
-import { MapInfo, MapInfoProps } from "../components/crypts/MapInfo";
-import { MapAction } from "../components/crypts/MapAction";
+import {EnterCode} from "../components/crypts/EnterCode";
+import {MapInfo, MapInfoProps} from "../components/crypts/MapInfo";
+import {MapAction} from "../components/crypts/MapAction";
 
 import Info from "../components/adventurer/Info";
-import { NullAdventurer } from "../types";
-import { useQueriesStore } from "../hooks/useQueryStore";
+import {NullAdventurer, NullBeast} from "../types";
+import {useQueriesStore} from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
-import { constants, Contract, num, Provider, shortString, cairo, ContractInterface } from "starknet";
-import Storage from "@/app/lib/storage";
+import {constants, Contract, num, Provider, shortString, cairo, ContractInterface} from "starknet";
+// import Storage from "@/app/lib/storage";
 
 
 interface CryptsScreenProps {
@@ -19,6 +19,7 @@ interface CryptsScreenProps {
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
     upgrade: (...args: any[]) => any;
+    enterCc: (...args: any[]) => any;
 }
 
 const abi = [
@@ -867,7 +868,6 @@ const abi = [
         ]
     }
 ];
-
 const address = "0x078fcf70e22f475b8ffde567f8118e5d99ded383da150e01e55fa79251c7c808";
 
 
@@ -894,44 +894,55 @@ interface DungeonData {
  * @container
  * @description
  */
-export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScreenProps) {
-    
+export default function CryptsScreen({explore, attack, flee, upgrade, enterCc}: CryptsScreenProps) {
+
     const adventurer = useAdventurerStore((state) => state.adventurer);
-    
+
     const [formData, setFormData] = useState({
         name: "",
     });
-    
+
+    const beastData = useQueriesStore(
+        (state) => state.data.beastQueryCC?.beasts[0] || NullBeast
+    );
+
     const [step, setStep] = useState(() => {
-        
-        const monsterIndex = (Number)(Storage.get('monsterIndex' + adventurer?.id)) || 0;
-        
-        if (monsterIndex === 0) {
-            console.log("step 1")
-            return 1;
-        } else {
-            console.log("step 3")
+
+        // const monsterIndex = (Number)(Storage.get('monsterIndex' + adventurer?.id)) || 0;
+
+        // if (monsterIndex === 0) {
+        //     console.log("step 1")
+        //     return 1;
+        // } else {
+        //     console.log("step 3")
+        //     return 3;
+        // }
+        console.log("beastData",beastData)
+        if(beastData.beast){
             return 3;
+        }else{
+            return 1;
         }
-        
-    });
-    
-    
+
+
+    },beastData);
+
+
     const onEnterCode = async () => {
         // alert("entercode");
         setLoading(true);
         console.log(formData);
-        
+
         let provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
-        
+
         let contract = new Contract(abi, address, provider);
         console.log(contract);
         let token_id = cairo.uint256(formData.name);
-        
+
         const owner = await contract.owner_of(token_id);
         // console.log("owner:", num.toHex(owner));
         setOwner(num.toHex(owner));
-        
+
         const dungeon_data = await contract.generate_dungeon(token_id);
         // console.log("dungeon_data", dungeon_data);
         setDungeon(
@@ -954,7 +965,7 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
                 dungeon_name: dungeon_data.dungeon_name,
             }
         )
-        
+
         const formatAnswer = {name: 'string', affinity: 'string', legendary: 'number'};
         let dungeonName = await contract.get_name(token_id, {
             parseRequest: true,
@@ -964,17 +975,16 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
         const name = decode_string(dungeonName[0]);
         console.log("name", name);
         setName(name);
-        
+
         /*        const svg = await contract.get_svg(token_id);
                 const svg_str = decode_string(svg);
                 console.log("svg", svg_str);
                 setSvg(svg_str);*/
-        
         setLoading(false);
         setStep(2);
     }
-    
-    
+
+
     const decode_string = (array: any) => {
         let result = "";
         for (let i = 0; i < array.length; i++) {
@@ -984,12 +994,12 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
         }
         return result;
     };
-    
+
     const [owner, setOwner] = useState("0x....")
     const [name, setName] = useState("loading")
     const [svg, setSvg] = useState("")
     const [loading, setLoading] = useState(false)
-    
+
     const [dungeon, setDungeon] = useState<DungeonData>({
         "size": "0x14",
         "environment": "0x04",
@@ -1027,10 +1037,10 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
             "0x50617373616765"
         ]
     });
-    
+
     const coin = "<span class='sk'>🪙</span>";
     const door = "<span class='sk'>🚪</span>"
-    
+
     const decode_map = (layout: any, size: any) => {
         // eslint-disable-next-line
         let layoutIntFirst = BigInt(layout.first).toString(2).padStart(248, '0');
@@ -1040,7 +1050,7 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
         let layoutIntThird = BigInt(layout.third).toString(2);
         let bits = layoutIntFirst + layoutIntSecond + layoutIntThird;
         // console.log("bits", bits);
-        
+
         // Store dungeon in 2D array
         let dungeon = [];
         // let grid = []
@@ -1060,15 +1070,15 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
         }
         return dungeon;
     }
-    
+
     const render = () => {
         let rowString = ""
-        
+
         let entities = dungeon.entities;
         // console.log("entities", entities);
         let map = decode_map(dungeon.layout, dungeon.size);
         // console.log("map", map);
-        
+
         if (entities != null) {
             if (entities.entity_data.length > 0) {
                 for (let i = 0; i < entities.entity_data.length; i++) {
@@ -1083,44 +1093,50 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
                 }
             }
         }
-        
+
         for (let y = 0; y < map.length; y++) {
             for (let x = 0; x < map.length; x++) {
                 const tile = map[y][x]
-                rowString += `${ tile } ` + "  "
+                rowString += `${tile} ` + "  "
             }
             rowString += '\n'
         }
         return (rowString)
     };
-    
+
     // const setAdventurer = useAdventurerStore((state) => state.setAdventurer);
-    
-    const onEnter = () => {
+
+    const onEnter = async() => {
         console.log('onEnter')
-        Storage.set('monsterIndex' + adventurer?.id, 1);
-        setStep(3);
+        try {
+            console.log("adventurer", adventurer)
+            await enterCc(adventurer.id,1);
+            // Storage.set('monsterIndex' + adventurer?.id, 1);
+            setStep(3);
+        }catch (e) {
+            console.error(e)
+        }
     }
-    
+
     const onBack = () => {
         console.log("onBack")
         setStep(1);
     }
-    
+
     const onExit = () => {
         // alert("exit");
         setStep(1);
     }
-    
+
     if (step === 1) {
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={ adventurer }/>
+                    <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <EnterCode handleBack={ onEnterCode } setFormData={ setFormData } formData={ formData }
-                               loading={ loading }/>
+                    <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData}
+                               loading={loading}/>
                 </div>
                 net </div>
         );
@@ -1128,11 +1144,11 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={ adventurer }/>
+                    <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
-                    <MapInfo handleBack={ onBack } handleEnter={ onEnter } name={ name } owner={ owner } svg={ svg }
-                             render={ render } dungeon={ dungeon }/>
+                    <MapInfo handleBack={onBack} handleEnter={onEnter} name={name} owner={owner} svg={svg}
+                             render={render} dungeon={dungeon}/>
                 </div>
             </div>
         );
@@ -1140,11 +1156,11 @@ export default function CryptsScreen({explore, attack, flee, upgrade}: CryptsScr
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={ adventurer }/>
+                    <Info adventurer={adventurer}/>
                 </div>
-                {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/ }
-                <MapAction attack={ attack } exit={ onExit } flee={ flee } explore={ explore } upgrade={ upgrade }/>
-                {/*</div>*/ }
+                {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
+                <MapAction attack={attack} exit={onExit} flee={flee} explore={explore} upgrade={upgrade}/>
+                {/*</div>*/}
             </div>
         );
     } else {

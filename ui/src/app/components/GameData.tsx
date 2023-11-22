@@ -1158,6 +1158,14 @@ export class GameData {
       AdventurerLeveledUp: hash.getSelectorFromName("AdventurerLeveledUp"),
       NewItemsAvailable: hash.getSelectorFromName("UpgradesAvailable"),
       IdleDeathPenalty: hash.getSelectorFromName("IdleDeathPenalty"),
+
+      //cc
+      EnterCC: hash.getSelectorFromName("EnterCC"),
+      DiscoveredBeastCC: hash.getSelectorFromName("DiscoveredBeastCC"),
+      AmbushedByBeastCC: hash.getSelectorFromName("AmbushedByBeastCC"),
+      AttackedBeastCC: hash.getSelectorFromName("AttackedBeastCC"),
+      AttackedByBeastCC: hash.getSelectorFromName("AttackedByBeastCC"),
+      SlayedBeastCC: hash.getSelectorFromName("SlayedBeastCC"),
     };
 
     this.QUERY_KEYS = {
