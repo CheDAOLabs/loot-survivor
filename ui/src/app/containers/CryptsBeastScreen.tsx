@@ -136,93 +136,10 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     const setPotionAmount = useUIStore((state) => state.setPotionAmount);
 
 
-    // const [isVictory, setIsVictory] = useState(() => {
-    //     if ((window as any).isVictory) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    //
-    // })
-
 
     const [buttonText, setButtonText] = useState("Flee!");
     const [selected, setSelected] = useState("");
 
-
-    const handleMouseEnter = () => {
-        setButtonText("you coward!");
-    };
-
-    const handleMouseLeave = () => {
-        setButtonText("Flee!");
-    };
-
-    const attackButtonsData: ButtonData[] = [
-        {
-            id: 1,
-            label: "SINGLE",
-            action: async () => {
-                resetNotification();
-                await attack(false, beastData);
-            },
-            disabled:
-                adventurer?.beastHealth == undefined ||
-                adventurer?.beastHealth == 0 ||
-                loading,
-            loading: loading,
-        },
-        {
-            id: 2,
-            label: "TILL DEATH",
-            mouseEnter: handleMouseEnter,
-            mouseLeave: handleMouseLeave,
-            action: async () => {
-                resetNotification();
-                await attack(true, beastData);
-            },
-            disabled:
-                adventurer?.beastHealth == undefined ||
-                adventurer?.beastHealth == 0 ||
-                loading,
-            loading: loading,
-        },
-    ];
-
-    const fleeButtonsData: ButtonData[] = [
-        {
-            id: 1,
-            label: adventurer?.dexterity === 0 ? "DEX TOO LOW" : "SINGLE",
-            action: async () => {
-                resetNotification();
-                await flee(false, beastData);
-            },
-            disabled:
-                adventurer?.beastHealth == undefined ||
-                adventurer?.beastHealth == 0 ||
-                loading ||
-                adventurer?.level == 1 ||
-                adventurer.dexterity === 0,
-            loading: loading,
-        },
-        {
-            id: 2,
-            label: adventurer?.dexterity === 0 ? "DEX TOO LOW" : "TILL DEATH",
-            mouseEnter: handleMouseEnter,
-            mouseLeave: handleMouseLeave,
-            action: async () => {
-                resetNotification();
-                await flee(true, beastData);
-            },
-            disabled:
-                adventurer?.beastHealth == undefined ||
-                adventurer?.beastHealth == 0 ||
-                loading ||
-                adventurer?.level == 1 ||
-                adventurer.dexterity === 0,
-            loading: loading,
-        },
-    ];
 
     const beastName = processBeastName(
         beastData?.beast ?? "",
@@ -380,7 +297,8 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     const onAttack = async (index: any) => {
 
 
-        console.log("onAttack")
+        console.log("onAttack",beastData)
+
         if (!hasBeast || beastData.health == 0) {
             await explore(true);
             return;

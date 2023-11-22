@@ -28,7 +28,7 @@ import {
   NewItemsAvailableEvent,
   IdleDeathPenaltyEvent,
   //CC
-  EnterCCEvent,
+  EnterCCEvent, DiscoveredBeastEventCC,
 } from "../../types/events";
 import { processData } from "./processData";
 
@@ -713,7 +713,7 @@ export async function parseEvents(
         events.push({ name: eventName, data: enterCCEvent });
         break;
       case "DiscoveredBeastCC":
-        const discoveredBeastDataCC: DiscoveredBeastEvent = {
+        const discoveredBeastDataCC: DiscoveredBeastEventCC = {
           adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
           seed: parseInt(raw.data[40]),
           id: parseInt(raw.data[41]),
@@ -727,6 +727,7 @@ export async function parseEvents(
               special3: parseInt(raw.data[47]),
             },
           },
+          beastHealth: parseInt(raw.data[48]),
         };
         const discoveredBeastEventCC = processData(
             discoveredBeastDataCC,

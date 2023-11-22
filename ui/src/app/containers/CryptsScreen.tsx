@@ -11,6 +11,7 @@ import {NullAdventurer, NullBeast} from "../types";
 import {useQueriesStore} from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
 import {constants, Contract, num, Provider, shortString, cairo, ContractInterface} from "starknet";
+
 // import Storage from "@/app/lib/storage";
 
 
@@ -917,15 +918,15 @@ export default function CryptsScreen({explore, attack, flee, upgrade, enterCc}: 
         //     console.log("step 3")
         //     return 3;
         // }
-        console.log("beastData",beastData)
-        if(beastData.beast){
+        console.log("beastData", beastData)
+        if (beastData.beast) {
             return 3;
-        }else{
+        } else {
             return 1;
         }
 
 
-    },beastData);
+    }, beastData);
 
 
     const onEnterCode = async () => {
@@ -1106,14 +1107,15 @@ export default function CryptsScreen({explore, attack, flee, upgrade, enterCc}: 
 
     // const setAdventurer = useAdventurerStore((state) => state.setAdventurer);
 
-    const onEnter = async() => {
-        console.log('onEnter')
+    const onEnter = async () => {
+        console.log("onEnter: formData=",formData);
+        // return;
         try {
             console.log("adventurer", adventurer)
-            await enterCc(adventurer.id,1);
+            await enterCc(adventurer.id, formData.name);
             // Storage.set('monsterIndex' + adventurer?.id, 1);
             setStep(3);
-        }catch (e) {
+        } catch (e) {
             console.error(e)
         }
     }

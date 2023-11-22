@@ -198,6 +198,14 @@ export type DiscoveredBeastEvent = {
   beastSpecs: CombatSpec;
 };
 
+export type DiscoveredBeastEventCC = {
+  adventurerState: AdventurerState;
+  seed: u128;
+  id: u8;
+  beastSpecs: CombatSpec;
+  beastHealth: u16;
+};
+
 export type AttackedBeastEvent = {
   adventurerState: AdventurerState;
   seed: u128;

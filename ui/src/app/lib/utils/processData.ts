@@ -26,7 +26,10 @@ import {
   NewItemsAvailableEvent,
   IdleDeathPenaltyEvent,
   AdventurerUpgradedEvent,
-  AdventurerState, EnterCCEvent,
+  AdventurerState,
+  //CC
+  EnterCCEvent,
+  DiscoveredBeastEventCC,
 } from "../../types/events";
 import { Adventurer } from "@/app/types";
 import { feltToString } from ".";
@@ -58,8 +61,9 @@ type EventData =
   | NewItemsAvailableEvent
   | IdleDeathPenaltyEvent
   | AdventurerUpgradedEvent
-  //
+  //CC
   | EnterCCEvent
+  | DiscoveredBeastEventCC
     ;
 
 function createBaseItems(data: AdventurerState) {
@@ -983,7 +987,7 @@ export function processData(
       ];
     case "DiscoveredBeastCC":
       console.log("processData DiscoveredBeastCC");
-      const discoveredBeastEventCC = event as DiscoveredBeastEvent;
+      const discoveredBeastEventCC = event as DiscoveredBeastEventCC;
       const discoveredBeastAdventurerDataCC = processAdventurerState(
           discoveredBeastEventCC,
           currentAdventurer
@@ -1026,8 +1030,7 @@ export function processData(
       };
       const discoveredBeastBeastDataCC = {
         beast: gameData.BEASTS[discoveredBeastEventCC.id],
-        health:
-            discoveredBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        health:discoveredBeastEventCC.beastHealth,
         level: discoveredBeastEventCC.beastSpecs["level"],
         special1:
             gameData.ITEM_SUFFIXES[

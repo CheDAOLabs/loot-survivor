@@ -2880,6 +2880,7 @@ mod Game {
         seed: u128,
         id: u8,
         beast_specs: CombatSpec,
+        beast_heath:u16
     }
 
     #[derive(Drop, Serde, starknet::Event)]
@@ -3183,7 +3184,7 @@ mod Game {
         };
 
         let discovered_beast_event = DiscoveredBeastCC {
-            adventurer_state, seed, id: beast.id, beast_specs: beast.combat_spec
+            adventurer_state, seed, id: beast.id, beast_specs: beast.combat_spec,beast_heath:beast.starting_health
         };
         self.emit(discovered_beast_event);
     }
