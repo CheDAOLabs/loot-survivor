@@ -1065,17 +1065,16 @@ mod Game {
         }
 
         if cc_cave.curr_beast == cc_cave.beast_amount {
-            let item_awards_number:u8 = cc_cave.get_item_amount(adventurer_entropy);
+            let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
             let mut index:u8 = 0;
             loop {
                 if(index >= item_awards_number) {
                     break;
                 }
-                let item_reward_level:u8 = cc_cave.get_item_level(adventurer_entropy);
-                if item_reward_level == 1 {
-                    let item_reward_id = cc_cave.get_item_id_t1(adventurer_entropy);
-
-                }
+                let reward_seed:u128 = cc_cave.get_reward_seed(adventurer_entropy,index);
+                let item_reward_level:u8 = cc_cave.get_item_level(reward_seed);
+                let item_reward_id:u8 = cc_cave.get_item_id(item_reward_level,reward_seed);
+                //todo
 
                 index = index + 1;
             }

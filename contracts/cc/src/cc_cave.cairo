@@ -141,6 +141,25 @@ impl ImplCcCave of ICcCave {
         return 0;
     }
 
+    fn get_item_id(self:CcCave, level:u8 , seed:u128)->u8{
+        if level == 1 {
+            return self.get_item_id_t1(seed);
+        }
+        if level == 2 {
+            return self.get_item_id_t2(seed);
+        }
+        if level == 3 {
+           return self.get_item_id_t3(seed);
+        }
+        if level == 4 {
+           return self.get_item_id_t4(seed);
+        }
+        if level == 5 {
+           return self.get_item_id_t5(seed);
+        }
+        return 0;
+    }
+
     fn get_item_id_t1(self:CcCave, seed:u128)->u8{
         // 1,2,3,6,7,8,9,13,17,27,32,37,42,47,52,57,62,67,72,77,82,87,92,97 => 25
         let selected=seed % 25;
@@ -420,6 +439,17 @@ impl ImplCcCave of ICcCave {
                 0
             }
         }
+
+    fn get_reward_seed(self: CcCave, adventurer_entropy: u128,index:u8) -> u128 {
+            let mut hash_span = ArrayTrait::new();
+            hash_span.append(self.map_id.into());
+            hash_span.append(self.curr_beast.into());
+            hash_span.append(adventurer_entropy.into());
+            hash_span.append(index.into());
+            let poseidon = poseidon_hash_span(hash_span.span());
+            let (d, r) = rshift_split(poseidon.into(), 340282366920938463463374607431768211455);
+            r.try_into().unwrap()
+    }
 
     fn get_beast(self: CcCave,adventurer_entropy: u128) -> (Beast, u128) {
         let beast_seed = self.get_beast_seed(adventurer_entropy);
