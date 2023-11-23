@@ -759,6 +759,7 @@ export async function parseEvents(
           damage: parseInt(raw.data[48]),
           criticalHit: convertToBoolean(parseInt(raw.data[49])),
           location: parseInt(raw.data[50]),
+          beastHealth: parseInt(raw.data[51]),
         };
         const attackedBeastEventCC = processData(
             attackedBeastDataCC,
@@ -827,9 +828,9 @@ export async function parseEvents(
         events.push({ name: eventName, data: slayedBeastEventCC });
         break
 
-      default:
-       console.error("Unknown event", eventName,raw.keys[0]);
-       break;
+      // default:
+      //  console.error("Unknown event", eventName,raw.keys[0]);
+      //  break;
     }
   }
 

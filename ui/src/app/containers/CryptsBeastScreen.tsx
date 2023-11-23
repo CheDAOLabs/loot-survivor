@@ -299,13 +299,13 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
         console.log("onAttack",beastData)
 
-        if (!hasBeast || beastData.health == 0) {
-            await explore(true);
-            return;
-        }
+        // if (!hasBeast || beastData.health == 0) {
+        //     await explore(true);
+        //     return;
+        // }
 
         try {
-            let res = await attack(true, beastData);
+            let res = await attack(false, beastData);
             console.log("attack succ", res);
             // Storage.set('victory' + adventurer?.id, JSON.stringify(true));
             // (window as any).monsterIndex += 1;
@@ -425,7 +425,11 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
                 monsters[i ].status = "dead";
             }
         }
-        monsters[monsterIndex].status = "attack"
+        if( monsters[monsterIndex])
+        {
+            monsters[monsterIndex].status = "attack"
+        }
+
 
         for (let i = monsterIndex+1; i <= monsters.length; i++) {
             if (monsters[i]) {
@@ -569,16 +573,16 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
                 {/*)}*/}
 
 
-                <div className="hidden sm:block xl:h-[500px] 2xl:h-full">
-                    {(hasBeast || formatBattles.length > 0) && <BattleLog/>}
-                </div>
+                {/*<div className="hidden sm:block xl:h-[500px] 2xl:h-full">*/}
+                {/*    {(hasBeast || formatBattles.length > 0) && <BattleLog/>}*/}
+                {/*</div>*/}
 
-                <Button
-                    className="sm:hidden uppercase"
-                    onClick={() => setShowBattleLog(true)}
-                >
-                    Battle log with {beastData?.beast}
-                </Button>
+                {/*<Button*/}
+                {/*    className="sm:hidden uppercase"*/}
+                {/*    onClick={() => setShowBattleLog(true)}*/}
+                {/*>*/}
+                {/*    Battle log with {beastData?.beast}*/}
+                {/*</Button>*/}
             </div>
         </div>
     );

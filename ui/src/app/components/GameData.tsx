@@ -1191,6 +1191,9 @@ export class GameData {
       topScoresQuery: "scores",
       latestMarketItemsQuery: "items",
       adventurerToSlayQuery: "adventurers",
+      //CC
+
+      beastQueryCC: "beasts",
     };
   }
 }

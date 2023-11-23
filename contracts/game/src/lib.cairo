@@ -351,7 +351,7 @@ mod Game {
             // 断言行动有效
             _assert_ownership(@self, adventurer_id);
             _assert_not_dead(adventurer);
-            _assert_in_battle(adventurer);
+            //_assert_in_battle(adventurer);
 
             // 获取行动之间的区块数
             let (exceeded_idle_threshold, num_blocks) = _idle_longer_than_penalty_threshold(
@@ -1860,7 +1860,7 @@ mod Game {
         };
 
         // 如果对野兽造成的伤害超过了冒险者的野兽生命值
-        if damage_dealt >= adventurer.beast_health {
+        if damage_dealt >= cc_cave.beast_health {
             // 处理野兽死亡
             _process_beast_deathCC(
                 ref self,
@@ -1890,7 +1890,7 @@ mod Game {
                 attack_rnd_2,
             );
 
-            __event_AttackedBeastCC(ref self, adventurer, adventurer_id, attacked_beast_details);
+            __event_AttackedBeastCC(ref self, adventurer, adventurer_id, attacked_beast_details, cc_cave.beast_health);
             __event_AttackedByBeastCC(ref self, adventurer, adventurer_id, attacked_by_beast_details);
             if adventurer.health == 0 {
                 _process_adventurer_death(ref self, adventurer, adventurer_id, beast.id, 0);
@@ -2983,6 +2983,7 @@ mod Game {
     struct AttackedBeastCC {
         adventurer_state: AdventurerState,
         beast_battle_details: BattleDetails,
+        beast_health:u16
     }
 
     #[derive(Drop, starknet::Event)]
@@ -3285,12 +3286,13 @@ mod Game {
         ref self: ContractState,
         adventurer: Adventurer,
         adventurer_id: u256,
-        beast_battle_details: BattleDetails
+        beast_battle_details: BattleDetails,
+        beast_health: u16
     ) {
         let adventurer_state = AdventurerState {
             owner: get_caller_address(), adventurer_id, adventurer
         };
-        self.emit(AttackedBeastCC { adventurer_state, beast_battle_details });
+        self.emit(AttackedBeastCC { adventurer_state, beast_battle_details, beast_health });
     }
 
     fn __event_AttackedByBeast(

@@ -1062,7 +1062,7 @@ export function processData(
         discoveredBeastDataCC,
         discoveredBeastBeastDataCC,
       ];
-    case "AttackedBeastEventCC":
+    case "AttackedBeastCC":
       const attackedBeastEventCC = event as AttackedBeastEventCC;
       const attackedBeastAdventurerDataCC = processAdventurerState(
           attackedBeastEventCC,
@@ -1071,8 +1071,8 @@ export function processData(
       const attackedBeastDataCC = {
         txHash: txHash,
         beast: gameData.BEASTS[attackedBeastEventCC.id],
-        beastHealth:
-            attackedBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        beastHealth:attackedBeastEventCC.beastHealth,
+            //attackedBeastEventCC.adventurerState["adventurer"]["beastHealth"],
         beastLevel: attackedBeastEventCC.beastSpecs["level"],
         special1:
             gameData.ITEM_NAME_PREFIXES[
@@ -1104,7 +1104,7 @@ export function processData(
         timestamp: new Date(),
       };
       return [attackedBeastAdventurerDataCC, attackedBeastDataCC];
-    case "AttackedByBeastEventCC":
+    case "AttackedByBeastCC":
       const attackedByBeastEventCC = event as AttackedByBeastEventCC;
       const attackedByBeastAdventurerDataCC = processAdventurerState(
           attackedByBeastEventCC,
@@ -1146,7 +1146,7 @@ export function processData(
         timestamp: new Date(),
       };
       return [attackedByBeastAdventurerDataCC, attackedByBeastDataCC];
-    case "SlayedBeastEventCC":
+    case "SlayedBeastCC":
       const slayedBeastEventCC = event as SlayedBeastEventCC;
       const slayedBeastAdventurerDataCC = processAdventurerState(
           slayedBeastEventCC,

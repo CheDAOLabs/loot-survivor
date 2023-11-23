@@ -200,9 +200,13 @@ export function syscalls({
                 tillDeath ? "1" : "0"
             ],
         });
-        startLoading("Attack", "Attacking", "battlesByTxHashQuery", adventurer?.id);
+        // startLoading("Attack", "Attacking", "battlesByTxHashQuery", adventurer?.id);
         // try {
-        const tx = await handleSubmitCalls(writeAsync);
+        let tx = await handleSubmitCalls(writeAsync);
+        if(typeof tx === "undefined"){
+            console.log("tx undefined")
+            return;
+        }
         setTxHash(tx.transaction_hash);
         addTransaction({
             hash: tx.transaction_hash,
@@ -230,8 +234,8 @@ export function syscalls({
         console.log("events", events);
 
         // If there are any equip or drops, do them first
-        handleEquip(events, setData, setAdventurer, queryData);
-        handleDrop(events, setData, setAdventurer, queryData);
+        // handleEquip(events, setData, setAdventurer, queryData);
+        // handleDrop(events, setData, setAdventurer, queryData);
 
         const battles = [];
 
@@ -245,8 +249,9 @@ export function syscalls({
             });
             setAdventurer(attackedBeastEvent.data[0]);
             battles.unshift(attackedBeastEvent.data[1]);
+
             setData(
-                "beastQuery",
+                "beastQueryCC",
                 attackedBeastEvent.data[0].beastHealth,
                 "health",
                 0
@@ -256,6 +261,10 @@ export function syscalls({
         const slayedBeastEvents = events.filter(
             (event) => event.name === "SlayedBeastCC"
         );
+        if(slayedBeastEvents.length>0){
+
+        }
+
         for (let slayedBeastEvent of slayedBeastEvents) {
             setData("adventurerByIdQuery", {
                 adventurers: [slayedBeastEvent.data[0]],
@@ -264,7 +273,7 @@ export function syscalls({
             battles.unshift(slayedBeastEvent.data[1]);
             updateItemsXP(slayedBeastEvent.data[0], slayedBeastEvent.data[2]);
             setData(
-                "beastQuery",
+                "beastQueryCC",
                 slayedBeastEvent.data[0].beastHealth,
                 "health",
                 0
@@ -380,26 +389,26 @@ export function syscalls({
                     items: itemData,
                 });
             }
-            setScreen("upgrade");
+            //setScreen("upgrade");
         }
 
-        setData("battlesByBeastQuery", {
-            battles: [
-                ...battles,
-                ...(queryData.battlesByBeastQuery?.battles ?? []),
-            ],
-        });
-        setData("battlesByAdventurerQuery", {
-            battles: [
-                ...battles,
-                ...(queryData.battlesByAdventurerQuery?.battles ?? []),
-            ],
-        });
-        setData("battlesByTxHashQuery", {
-            battles: reversedBattles,
-        });
+        // setData("battlesByBeastQuery", {
+        //     battles: [
+        //         ...battles,
+        //         ...(queryData.battlesByBeastQuery?.battles ?? []),
+        //     ],
+        // });
+        // setData("battlesByAdventurerQuery", {
+        //     battles: [
+        //         ...battles,
+        //         ...(queryData.battlesByAdventurerQuery?.battles ?? []),
+        //     ],
+        // });
+        // setData("battlesByTxHashQuery", {
+        //     battles: reversedBattles,
+        // });
 
-        stopLoading(reversedBattles);
+        // stopLoading(reversedBattles);
         setEquipItems([]);
         setDropItems([]);
         setMintAdventurer(false);
