@@ -374,14 +374,7 @@ mod Game {
             );
 
             // 保存CC
-            let adventurer_entropy: u128 = _adventurer_meta_unpacked(@self, adventurer_id)
-                .entropy
-                .into();
-            let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
-            cc_cave.curr_beast = cc_cave.curr_beast + 1;
-            cc_cave.set_beast_health(beast.starting_health);
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
-            __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
         }
 
         //@notice Attempt to flee from a beast
@@ -1014,7 +1007,8 @@ mod Game {
         beast_seed: u128,
         attack_rnd_2: u128,
         damage_dealt: u16,
-        critical_hit: bool
+        critical_hit: bool,
+        ref cc_cave: CcCave
     ) {
         // zero out beast health
         adventurer.beast_health = 0;
@@ -1059,6 +1053,14 @@ mod Game {
         if beast.combat_spec.level >= BEAST_SPECIAL_NAME_LEVEL_UNLOCK {
             _mint_beast(@self, beast);
         }
+
+        let adventurer_entropy: u128 = _adventurer_meta_unpacked(@self, adventurer_id)
+                        .entropy
+                        .into();
+        let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+        cc_cave.curr_beast = cc_cave.curr_beast + 1;
+        cc_cave.set_beast_health(beast.starting_health);
+        __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
     }
 
 
@@ -1869,6 +1871,7 @@ mod Game {
                 attack_rnd_2,
                 damage_dealt,
                 critical_hit,
+                ref cc_cave
             );
         } else {
             // 如果野兽仍然存活
