@@ -330,11 +330,20 @@ mod Game {
             );
         }
 
+        fn set_beast_heath_cc(ref self: ContractState, adventurer_id: u256, health: u16) {
+            let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
+            cc_cave.set_beast_health(health);
+            _pack_cc_cave(ref self, adventurer_id, cc_cave);
+        }
+
         //@notice 发起冒险者的攻击行动
         //@param self 对ContractState的引用，用于更新合约
         //@param adventurer_id 冒险者的唯一标识符
         //@param to_the_death 一个布尔值，如果为true，将会递归攻击直到野兽或冒险者死亡
         fn attack_cc(ref self: ContractState, adventurer_id: u256, to_the_death: bool) {
+
+            let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
+
             // 从存储中解析并应用冒险者的物品属性提升
             let (mut adventurer, stat_boosts) = _unpack_adventurer_with_stat_boosts(
                 @self, adventurer_id
@@ -351,7 +360,7 @@ mod Game {
 
             // 处理攻击或应用空闲惩罚
             if (!exceeded_idle_threshold) {
-                _attack_cc(ref self, ref adventurer, adventurer_id, to_the_death);
+                _attack_cc(ref self, ref adventurer, adventurer_id, to_the_death, ref cc_cave);
             } else {
                 _apply_idle_penalty(ref self, adventurer_id, ref adventurer, num_blocks);
             }
@@ -363,6 +372,16 @@ mod Game {
             _pack_adventurer_remove_stat_boost(
                 ref self, ref adventurer, adventurer_id, stat_boosts
             );
+
+            // 保存CC
+            let adventurer_entropy: u128 = _adventurer_meta_unpacked(@self, adventurer_id)
+                .entropy
+                .into();
+            let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+            cc_cave.curr_beast = cc_cave.curr_beast + 1;
+            cc_cave.set_beast_health(beast.starting_health);
+            _pack_cc_cave(ref self, adventurer_id, cc_cave);
+            __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
         }
 
         //@notice Attempt to flee from a beast
@@ -908,6 +927,8 @@ mod Game {
 
         fn enter_cc(ref self: ContractState,adventurer_id: u256, cc_token_id: u256) -> u128 {
 
+            _assert_ownership(@self, adventurer_id);
+
             let adventurer = _unpack_adventurer(@self, adventurer_id);
 
             // get adventurer entropy
@@ -984,6 +1005,62 @@ mod Game {
         // save adventurer (gg)
         _pack_adventurer(ref self, adventurer_id, adventurer);
     }
+
+    fn _process_beast_deathCC(
+        ref self: ContractState,
+        ref adventurer: Adventurer,
+        adventurer_id: u256,
+        beast: Beast,
+        beast_seed: u128,
+        attack_rnd_2: u128,
+        damage_dealt: u16,
+        critical_hit: bool
+    ) {
+        // zero out beast health
+        adventurer.beast_health = 0;
+
+        // give adventurer gold reward
+        // TODO Gas Optimization: beast.get_gold_reward and get_xp_reward both call the same
+        // get_base_reward from Combat module. Should refactor this to only make that call once and have
+        // get_gold_reward and get_xp_reward operator on the base reward
+        let mut gold_earned = beast.get_gold_reward(beast_seed);
+        let bag = _bag_unpacked(@self, adventurer_id);
+        adventurer.increase_gold(gold_earned * adventurer.beast_gold_reward_multiplier().into());
+
+        // grant adventuer xp
+        let xp_earned_adventurer = beast.get_xp_reward();
+        let (previous_level, new_level) = adventurer.increase_adventurer_xp(xp_earned_adventurer);
+
+        // grant equipped items xp, items level faster than Adventurers
+        let xp_earned_items = xp_earned_adventurer * ITEM_XP_MULTIPLIER_BEASTS;
+        _grant_xp_to_equipped_items(
+            ref self, ref adventurer, adventurer_id, xp_earned_items, attack_rnd_2
+        );
+
+        // emit slayed beast event
+        __event_SlayedBeastCC(
+            ref self,
+            adventurer,
+            adventurer_id,
+            beast_seed,
+            beast,
+            damage_dealt,
+            critical_hit,
+            xp_earned_adventurer,
+            xp_earned_items,
+            gold_earned
+        );
+
+        // if adventurers new level is greater than previous level
+        if (adventurer.stat_points_available != 0) {
+            _emit_level_up_events(ref self, adventurer, adventurer_id, previous_level, new_level);
+        }
+
+        if beast.combat_spec.level >= BEAST_SPECIAL_NAME_LEVEL_UNLOCK {
+            _mint_beast(@self, beast);
+        }
+    }
+
 
     fn _process_beast_death(
         ref self: ContractState,
@@ -1732,8 +1809,8 @@ mod Game {
         ref adventurer: Adventurer,
         adventurer_id: u256,
         fight_to_the_death: bool,
+        ref cc_cave: CcCave,
     ) {
-        let cc_cave = _unpack_cc_cave(@self, adventurer_id);
 
         // 从存储中获取冒险者的熵
         let adventurer_entropy: u128 = _adventurer_meta_unpacked(@self, adventurer_id)
@@ -1783,7 +1860,7 @@ mod Game {
         // 如果对野兽造成的伤害超过了冒险者的野兽生命值
         if damage_dealt >= adventurer.beast_health {
             // 处理野兽死亡
-            _process_beast_death(
+            _process_beast_deathCC(
                 ref self,
                 ref adventurer,
                 adventurer_id,
@@ -1797,7 +1874,7 @@ mod Game {
             // 如果野兽仍然存活
 
             // 从它们的生命值中扣除造成的伤害
-            adventurer.beast_health -= damage_dealt;
+            cc_cave.beast_health -= damage_dealt;
 
             // 野兽反击
             let attacked_by_beast_details = _beast_counter_attack(
@@ -1810,8 +1887,8 @@ mod Game {
                 attack_rnd_2,
             );
 
-            __event_AttackedBeast(ref self, adventurer, adventurer_id, attacked_beast_details);
-            __event_AttackedByBeast(ref self, adventurer, adventurer_id, attacked_by_beast_details);
+            __event_AttackedBeastCC(ref self, adventurer, adventurer_id, attacked_beast_details);
+            __event_AttackedByBeastCC(ref self, adventurer, adventurer_id, attacked_by_beast_details);
             if adventurer.health == 0 {
                 _process_adventurer_death(ref self, adventurer, adventurer_id, beast.id, 0);
                 return;
@@ -1820,7 +1897,7 @@ mod Game {
             // 如果冒险者仍然存活且战斗到死
             if fight_to_the_death {
                 // 再次攻击
-                _attack_cc(ref self, ref adventurer, adventurer_id, true);
+                _attack_cc(ref self, ref adventurer, adventurer_id, true, ref cc_cave);
             }
         }
     }
@@ -3201,6 +3278,18 @@ mod Game {
         self.emit(AttackedBeast { adventurer_state, beast_battle_details });
     }
 
+    fn __event_AttackedBeastCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: u256,
+        beast_battle_details: BattleDetails
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        self.emit(AttackedBeastCC { adventurer_state, beast_battle_details });
+    }
+
     fn __event_AttackedByBeast(
         ref self: ContractState,
         adventurer: Adventurer,
@@ -3211,6 +3300,18 @@ mod Game {
             owner: get_caller_address(), adventurer_id, adventurer
         };
         self.emit(AttackedByBeast { adventurer_state, beast_battle_details });
+    }
+
+    fn __event_AttackedByBeastCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: u256,
+        beast_battle_details: BattleDetails
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        self.emit(AttackedByBeastCC { adventurer_state, beast_battle_details });
     }
 
     fn __event_AmbushedByBeast(
@@ -3241,6 +3342,35 @@ mod Game {
             owner: get_caller_address(), adventurer_id, adventurer
         };
         let slayed_beast_event = SlayedBeast {
+            adventurer_state,
+            seed,
+            id: beast.id,
+            beast_specs: beast.combat_spec,
+            damage_dealt,
+            critical_hit,
+            xp_earned_adventurer,
+            xp_earned_items,
+            gold_earned,
+        };
+        self.emit(slayed_beast_event);
+    }
+
+    fn __event_SlayedBeastCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: u256,
+        seed: u128,
+        beast: Beast,
+        damage_dealt: u16,
+        critical_hit: bool,
+        xp_earned_adventurer: u16,
+        xp_earned_items: u16,
+        gold_earned: u16
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        let slayed_beast_event = SlayedBeastCC {
             adventurer_state,
             seed,
             id: beast.id,

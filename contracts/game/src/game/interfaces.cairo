@@ -112,10 +112,9 @@ trait IGame<TContractState> {
     fn get_cave_cc(self: @TContractState, adventurer_id: u256) -> CcCave;
     fn enter_cc(ref self: TContractState, adventurer_id:u256, cc_token_id :u256) -> u128;
     fn attack_cc(ref self: TContractState, adventurer_id: u256, to_the_death: bool);
+    fn set_beast_heath_cc(ref self: TContractState, adventurer_id: u256, health: u16);
     fn get_attacking_beast_cc(self: @TContractState, adventurer_id: u256) -> Beast;
     fn get_beast_health_cc(self: @TContractState, adventurer_id: u256) -> u16;
-    //fn get_beast_type_cc(self: @TContractState, beast_id: u8) -> u8;
-    //fn get_beast_tier_cc(self: @TContractState, beast_id: u8) -> u8;
 
     // TODO: Game settings
     fn next_global_entropy_rotation(self: @TContractState) -> felt252;

@@ -30,6 +30,9 @@ import {
   //CC
   EnterCCEvent,
   DiscoveredBeastEventCC,
+  AttackedBeastEventCC,
+  AttackedByBeastEventCC,
+  SlayedBeastEventCC,
 } from "../../types/events";
 import { Adventurer } from "@/app/types";
 import { feltToString } from ".";
@@ -64,6 +67,9 @@ type EventData =
   //CC
   | EnterCCEvent
   | DiscoveredBeastEventCC
+  | AttackedBeastEventCC
+  | AttackedByBeastEventCC
+  | SlayedBeastEventCC
     ;
 
 function createBaseItems(data: AdventurerState) {

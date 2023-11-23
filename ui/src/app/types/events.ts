@@ -216,6 +216,16 @@ export type AttackedBeastEvent = {
   location: u8;
 };
 
+export type AttackedBeastEventCC = {
+  adventurerState: AdventurerState;
+  seed: u128;
+  id: u8;
+  beastSpecs: CombatSpec;
+  damage: u16;
+  criticalHit: boolean;
+  location: u8;
+};
+
 export type AttackedByBeastEvent = {
   adventurerState: AdventurerState;
   seed: u128;
@@ -226,7 +236,29 @@ export type AttackedByBeastEvent = {
   location: u8;
 };
 
+export type AttackedByBeastEventCC = {
+  adventurerState: AdventurerState;
+  seed: u128;
+  id: u8;
+  beastSpecs: CombatSpec;
+  damage: u16;
+  criticalHit: boolean;
+  location: u8;
+};
+
 export type SlayedBeastEvent = {
+  adventurerState: AdventurerState;
+  seed: u128;
+  id: u8;
+  beastSpecs: CombatSpec;
+  damageDealt: u16;
+  criticalHit: boolean;
+  xpEarnedAdventurer: u16;
+  xpEarnedItems: u16;
+  goldEarned: u16;
+};
+
+export type SlayedBeastEventCC = {
   adventurerState: AdventurerState;
   seed: u128;
   id: u8;

@@ -28,7 +28,11 @@ import {
   NewItemsAvailableEvent,
   IdleDeathPenaltyEvent,
   //CC
-  EnterCCEvent, DiscoveredBeastEventCC,
+  EnterCCEvent,
+  DiscoveredBeastEventCC,
+  AttackedBeastEventCC,
+  AttackedByBeastEventCC,
+  SlayedBeastEventCC,
 } from "../../types/events";
 import { processData } from "./processData";
 

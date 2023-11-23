@@ -100,6 +100,292 @@ impl ImplCcCave of ICcCave {
         }
     }
 
+    fn get_item_amount(self:CcCave,points:u16,seed:u128)->u8{
+        // 装备数量
+        // 当points（0|3），randomNumber=0|2
+        // 当points（3|5），randomNumber=1|2
+        // 当points（5|8），randomNumber=1|3
+        // 当points（8|11），randomNumber=2|3
+        // 当points（12），randomNumber=3|5
+        if points < 3 {
+            return (seed % 3).try_into().unwrap();
+        } else if points < 5 {
+            return 1 + (seed % 2).try_into().unwrap();
+        } else if points < 8 {
+            return 1 + (seed % 3).try_into().unwrap();
+        } else if points < 11 {
+            return 2 + (seed % 2).try_into().unwrap();
+        } else {
+            return 3 + (seed % 3).try_into().unwrap();
+        }
+    }
+
+    fn get_item_level(self:CcCave,points:u16,seed:u128)->u8{
+        // points（0|3），randomNumber=5|4
+        // 当points（3|5），randomNumber=5|3
+        // 当points（5|8），randomNumber=4|2
+        // 当points（8|11），randomNumber=4|1
+        // 当points（12），randomNumber=3|1
+        if points < 3 {
+            return 5 - (seed % 2).try_into().unwrap();
+        } else if points < 5 {
+            return 5 - (seed % 3).try_into().unwrap();
+        } else if points < 8 {
+            return 4 - (seed % 3).try_into().unwrap();
+        } else if points < 11 {
+            return 4 - (seed % 2).try_into().unwrap();
+        } else if points < 12{
+            return 3 - (seed % 2).try_into().unwrap();
+        }
+
+        return 0;
+    }
+
+    fn get_item_id_t1(self:CcCave, seed:u128)->u8{
+        // 1,2,3,6,7,8,9,13,17,27,32,37,42,47,52,57,62,67,72,77,82,87,92,97 => 25
+        let selected=seed % 25;
+        if selected == 0 {
+            return 1;
+        }else if selected == 2{
+            return 2;
+        }else if selected == 3{
+            return 3;
+        }else if selected == 6{
+            return 6;
+        }else if selected == 7{
+            return 7;
+        }else if selected == 8{
+            return 8;
+        } else if selected == 9 {
+            return 9;
+        } else if selected == 10{
+            return 13;
+        } else if selected == 11{
+            return 17;
+        } else if selected == 12{
+            return 27;
+        } else if selected == 13{
+            return 32;
+        } else if selected == 14{
+            return 37;
+        } else if selected == 15{
+            return 42;
+        } else if selected == 16{
+            return 47;
+        } else if selected == 17{
+            return 52;
+        } else if selected == 18{
+            return 57;
+        } else if selected == 19{
+            return 62;
+        } else if selected == 20{
+            return 67;
+        } else if selected == 21{
+            return 72;
+        } else if selected == 22{
+            return 77;
+        } else if selected == 23{
+            return 82;
+        } else if selected == 24{
+            return 87;
+        } else if selected == 25{
+            return 92;
+        } else if selected == 26{
+            return 97;
+        }
+
+        return 0;
+    }
+
+    fn get_item_id_t2(self:CcCave, seed:u128)->u8{
+        // 4,10,14,18,23,28,33,38,43,48,53,58,63,68,73,78,83,88,93,98 => 20
+
+        let selected=seed % 20;
+        if selected == 0 {
+            return 4;
+        }else if selected == 2{
+            return 10;
+        }else if selected == 3{
+            return 14;
+        }else if selected == 6{
+            return 18;
+        }else if selected == 7{
+            return 23;
+        }else if selected == 8{
+            return 28;
+        } else if selected == 9 {
+            return 33;
+        } else if selected == 10{
+            return 38;
+        } else if selected == 11{
+            return 43;
+        } else if selected == 12{
+            return 48;
+        } else if selected == 13{
+            return 53;
+        } else if selected == 14{
+            return 58;
+        } else if selected == 15{
+            return 63;
+        } else if selected == 16{
+            return 68;
+        } else if selected == 17{
+            return 73;
+        } else if selected == 18{
+            return 78;
+        } else if selected == 19{
+            return 83;
+        } else if selected == 20{
+            return 88;
+        } else if selected == 21{
+            return 93;
+        } else if selected == 22{
+            return 98;
+        }
+
+        return 0;
+    }
+
+    fn get_item_id_t3(self:CcCave, seed:u128)->u8{
+        // 5,11,15,19,24,29,34,39,44,49,54,59,64,69,74,79,84,89,94,99 => 20
+
+        let selected=seed % 20;
+        if selected == 0 {
+            return 5;
+        }else if selected == 2{
+            return 11;
+        }else if selected == 3{
+            return 15;
+        }else if selected == 6{
+            return 19;
+        }else if selected == 7{
+            return 24;
+        }else if selected == 8{
+            return 29;
+        } else if selected == 9 {
+            return 34;
+        } else if selected == 10{
+            return 39;
+        } else if selected == 11{
+            return 44;
+        } else if selected == 12{
+            return 49;
+        } else if selected == 13{
+            return 54;
+        } else if selected == 14{
+            return 59;
+        } else if selected == 15{
+            return 64;
+        } else if selected == 16{
+            return 69;
+        } else if selected == 17{
+            return 74;
+        } else if selected == 18{
+            return 79;
+        } else if selected == 19{
+            return 84;
+        } else if selected == 20{
+            return 89;
+        } else if selected == 21{
+            return 94;
+        } else if selected == 22{
+            return 99;
+        }
+
+        return 0;
+    }
+
+    fn get_item_id_t4(self:CcCave, seed:u128)->u8{
+        // 20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100 => 17
+
+        let selected=seed % 17;
+        if selected == 0 {
+            return 20;
+        }else if selected == 2{
+            return 25;
+        }else if selected == 3{
+            return 30;
+        }else if selected == 6{
+            return 35;
+        }else if selected == 7{
+            return 40;
+        }else if selected == 8{
+            return 45;
+        } else if selected == 9 {
+            return 50;
+        } else if selected == 10{
+            return 55;
+        } else if selected == 11{
+            return 60;
+        } else if selected == 12{
+            return 65;
+        } else if selected == 13{
+            return 70;
+        } else if selected == 14{
+            return 75;
+        } else if selected == 15{
+            return 80;
+        } else if selected == 16{
+            return 85;
+        } else if selected == 17{
+            return 90;
+        } else if selected == 18{
+            return 95;
+        } else if selected == 19{
+            return 100;
+        }
+
+        return 0;
+    }
+
+    fn get_item_id_t5(self:CcCave, seed:u128)->u8{
+        // 12,16,21,26,31,36,41,46,51,56,61,66,71,76,81,86,91,96,101 => 19
+
+        let selected=seed % 19;
+        if selected == 0 {
+            return 12;
+        }else if selected == 2{
+            return 16;
+        }else if selected == 3{
+            return 21;
+        }else if selected == 6{
+            return 26;
+        }else if selected == 7{
+            return 31;
+        }else if selected == 8{
+            return 36;
+        } else if selected == 9 {
+            return 41;
+        } else if selected == 10{
+            return 46;
+        } else if selected == 11{
+            return 51;
+        } else if selected == 12{
+            return 56;
+        } else if selected == 13{
+            return 61;
+        } else if selected == 14{
+            return 66;
+        } else if selected == 15{
+            return 71;
+        } else if selected == 16{
+            return 76;
+        } else if selected == 17{
+            return 81;
+        } else if selected == 18{
+            return 86;
+        } else if selected == 19{
+            return 91;
+        } else if selected == 20{
+            return 96;
+        } else if selected == 21{
+            return 101;
+        }
+
+        return 0;
+    }
+
+
     // Sets the beast's health to a specified amount, preventing overflow.
     // @param self: Adventurer to set beast health for
     // @param amount: Amount of health to set the beast's health to
