@@ -1064,7 +1064,22 @@ mod Game {
             _mint_beast(@self, beast);
         }
 
+        if cc_cave.curr_beast == cc_cave.beast_amount {
+            let item_awards_number:u8 = cc_cave.get_item_amount(adventurer_entropy);
+            let mut index:u8 = 0;
+            loop {
+                if(index >= item_awards_number) {
+                    break;
+                }
+                let item_reward_level:u8 = cc_cave.get_item_level(adventurer_entropy);
+                if item_reward_level == 1 {
+                    let item_reward_id = cc_cave.get_item_id_t1(adventurer_entropy);
 
+                }
+
+                index = index + 1;
+            }
+        }
     }
 
 

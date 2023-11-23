@@ -85,56 +85,56 @@ impl ImplCcCave of ICcCave {
         return (points % 4) + 3;
     }
 
-    fn get_beast_level(self: CcCave, seed: u128, points: u16) -> u16 {
+    fn get_beast_level(self: CcCave, seed: u128) -> u16 {
         // 当points（0|3），randomNumber=3|5
         // 当points（3|8），randomNumber=2|5
         // 当points（8|12），randomNumber=1|4
-        if points < 3 {
+        if self.cc_points < 3 {
             return 3 + (seed % 3).try_into().unwrap();
-        } else if points < 8 {
+        } else if self.cc_points < 8 {
             return 2 + (seed % 4).try_into().unwrap();
-        } else if points < 12 {
+        } else if self.cc_points < 12 {
             return 1 + (seed % 4).try_into().unwrap();
         } else {
             return 0;
         }
     }
 
-    fn get_item_amount(self:CcCave,points:u16,seed:u128)->u8{
+    fn get_item_amount(self:CcCave, seed:u128)->u8{
         // 装备数量
         // 当points（0|3），randomNumber=0|2
         // 当points（3|5），randomNumber=1|2
         // 当points（5|8），randomNumber=1|3
         // 当points（8|11），randomNumber=2|3
         // 当points（12），randomNumber=3|5
-        if points < 3 {
+        if self.cc_points < 3 {
             return (seed % 3).try_into().unwrap();
-        } else if points < 5 {
+        } else if self.cc_points < 5 {
             return 1 + (seed % 2).try_into().unwrap();
-        } else if points < 8 {
+        } else if self.cc_points < 8 {
             return 1 + (seed % 3).try_into().unwrap();
-        } else if points < 11 {
+        } else if self.cc_points < 11 {
             return 2 + (seed % 2).try_into().unwrap();
         } else {
             return 3 + (seed % 3).try_into().unwrap();
         }
     }
 
-    fn get_item_level(self:CcCave,points:u16,seed:u128)->u8{
+    fn get_item_level(self:CcCave,seed:u128)->u8{
         // points（0|3），randomNumber=5|4
         // 当points（3|5），randomNumber=5|3
         // 当points（5|8），randomNumber=4|2
         // 当points（8|11），randomNumber=4|1
         // 当points（12），randomNumber=3|1
-        if points < 3 {
+        if self.cc_points < 3 {
             return 5 - (seed % 2).try_into().unwrap();
-        } else if points < 5 {
+        } else if self.cc_points < 5 {
             return 5 - (seed % 3).try_into().unwrap();
-        } else if points < 8 {
+        } else if self.cc_points < 8 {
             return 4 - (seed % 3).try_into().unwrap();
-        } else if points < 11 {
+        } else if self.cc_points < 11 {
             return 4 - (seed % 2).try_into().unwrap();
-        } else if points < 12{
+        } else if self.cc_points < 12{
             return 3 - (seed % 2).try_into().unwrap();
         }
 
@@ -431,7 +431,7 @@ impl ImplCcCave of ICcCave {
         let starting_health = 1;//ImplBeast::get_starting_health(adventurer_level, beast_seed);
         let beast_tier = ImplBeast::get_tier(beast_id);
         let beast_type = ImplBeast::get_type(beast_id);
-        let beast_level = self.get_beast_level(beast_seed, self.cc_points);
+        let beast_level = self.get_beast_level(beast_seed);
         let mut special_names = SpecialPowers { special1: 0, special2: 0, special3: 0 };
 
         // if (beast_level >= BEAST_SPECIAL_NAME_LEVEL_UNLOCK) {
