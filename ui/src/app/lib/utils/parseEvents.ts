@@ -741,10 +741,95 @@ export async function parseEvents(
         );
         events.push({ name: eventName, data: discoveredBeastEventCC });
         break;
+      case "AttackedBeastCC":
+        const attackedBeastDataCC: AttackedBeastEventCC = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+          seed: parseInt(raw.data[40]),
+          id: parseInt(raw.data[41]),
+          beastSpecs: {
+            tier: parseInt(raw.data[42]),
+            itemType: parseInt(raw.data[43]),
+            level: parseInt(raw.data[44]),
+            specials: {
+              special1: parseInt(raw.data[45]),
+              special2: parseInt(raw.data[46]),
+              special3: parseInt(raw.data[47]),
+            },
+          },
+          damage: parseInt(raw.data[48]),
+          criticalHit: convertToBoolean(parseInt(raw.data[49])),
+          location: parseInt(raw.data[50]),
+        };
+        const attackedBeastEventCC = processData(
+            attackedBeastDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: attackedBeastEventCC });
+        break;
+      case "AttackedByBeastCC":
+        console.log("parseEvent AttackedByBeastEventCC");
+        const attackedByBeastDataCC: AttackedByBeastEventCC = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+          seed: parseInt(raw.data[40]),
+          id: parseInt(raw.data[41]),
+          beastSpecs: {
+            tier: parseInt(raw.data[42]),
+            itemType: parseInt(raw.data[43]),
+            level: parseInt(raw.data[44]),
+            specials: {
+              special1: parseInt(raw.data[45]),
+              special2: parseInt(raw.data[46]),
+              special3: parseInt(raw.data[47]),
+            },
+          },
+          damage: parseInt(raw.data[48]),
+          criticalHit: convertToBoolean(parseInt(raw.data[49])),
+          location: parseInt(raw.data[50]),
+        };
+        const attackedByBeastEventCC = processData(
+            attackedByBeastDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: attackedByBeastEventCC });
+        break;
+      case "SlayedBeastCC":
+        console.log("parseEvent SlayedBeastEventCC");
+        const slayedBeastDataCC: SlayedBeastEventCC = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+          seed: parseInt(raw.data[40]),
+          id: parseInt(raw.data[41]),
+          beastSpecs: {
+            tier: parseInt(raw.data[42]),
+            itemType: parseInt(raw.data[43]),
+            level: parseInt(raw.data[44]),
+            specials: {
+              special1: parseInt(raw.data[45]),
+              special2: parseInt(raw.data[46]),
+              special3: parseInt(raw.data[47]),
+            },
+          },
+          damageDealt: parseInt(raw.data[48]),
+          criticalHit: convertToBoolean(parseInt(raw.data[49])),
+          xpEarnedAdventurer: parseInt(raw.data[50]),
+          xpEarnedItems: parseInt(raw.data[51]),
+          goldEarned: parseInt(raw.data[52]),
+        };
+        const slayedBeastEventCC = processData(
+            slayedBeastDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: slayedBeastEventCC });
+        break
 
-      // default:
-      //   console.error("Unknown event", eventName,raw.keys[0]);
-      //   break;
+      default:
+       console.error("Unknown event", eventName,raw.keys[0]);
+       break;
     }
   }
 

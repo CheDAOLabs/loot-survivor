@@ -195,7 +195,10 @@ export function syscalls({
         addToCalls({
             contractAddress: gameContract?.address ?? "",
             entrypoint: "attack_cc",
-            calldata: [adventurer?.id?.toString() ?? "", "0", tillDeath ? "1" : "0"],
+            calldata: [
+                adventurer?.id?.toString() ?? "", "0",
+                tillDeath ? "1" : "0"
+            ],
         });
         startLoading("Attack", "Attacking", "battlesByTxHashQuery", adventurer?.id);
         // try {
