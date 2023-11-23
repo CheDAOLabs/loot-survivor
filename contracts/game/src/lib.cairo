@@ -1031,6 +1031,15 @@ mod Game {
             ref self, ref adventurer, adventurer_id, xp_earned_items, attack_rnd_2
         );
 
+
+        let adventurer_entropy: u128 = _adventurer_meta_unpacked(@self, adventurer_id)
+                        .entropy
+                        .into();
+        let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+        cc_cave.curr_beast = cc_cave.curr_beast + 1;
+        cc_cave.set_beast_health(beast.starting_health);
+        __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
+
         // emit slayed beast event
         __event_SlayedBeastCC(
             ref self,
@@ -1042,7 +1051,8 @@ mod Game {
             critical_hit,
             xp_earned_adventurer,
             xp_earned_items,
-            gold_earned
+            gold_earned,
+            cc_cave.curr_beast
         );
 
         // if adventurers new level is greater than previous level
@@ -1054,13 +1064,7 @@ mod Game {
             _mint_beast(@self, beast);
         }
 
-        let adventurer_entropy: u128 = _adventurer_meta_unpacked(@self, adventurer_id)
-                        .entropy
-                        .into();
-        let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
-        cc_cave.curr_beast = cc_cave.curr_beast + 1;
-        cc_cave.set_beast_health(beast.starting_health);
-        __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
+
     }
 
 
@@ -3003,6 +3007,7 @@ mod Game {
         xp_earned_adventurer: u16,
         xp_earned_items: u16,
         gold_earned: u16,
+        curr_beast: u16,
     }
 
 
@@ -3370,7 +3375,8 @@ mod Game {
         critical_hit: bool,
         xp_earned_adventurer: u16,
         xp_earned_items: u16,
-        gold_earned: u16
+        gold_earned: u16,
+        curr_beast: u16,
     ) {
         let adventurer_state = AdventurerState {
             owner: get_caller_address(), adventurer_id, adventurer
@@ -3385,6 +3391,7 @@ mod Game {
             xp_earned_adventurer,
             xp_earned_items,
             gold_earned,
+            curr_beast,
         };
         self.emit(slayed_beast_event);
     }

@@ -269,6 +269,7 @@ export type SlayedBeastEventCC = {
   xpEarnedAdventurer: u16;
   xpEarnedItems: u16;
   goldEarned: u16;
+  curr_beast: u16;
 };
 
 export type FleeFailedEvent = {

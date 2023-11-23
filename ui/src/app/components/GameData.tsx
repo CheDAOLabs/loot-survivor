@@ -1192,7 +1192,7 @@ export class GameData {
       latestMarketItemsQuery: "items",
       adventurerToSlayQuery: "adventurers",
       //CC
-
+      enterCC:"cc_cave",
       beastQueryCC: "beasts",
     };
   }

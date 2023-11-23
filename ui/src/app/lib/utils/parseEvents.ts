@@ -818,6 +818,7 @@ export async function parseEvents(
           xpEarnedAdventurer: parseInt(raw.data[50]),
           xpEarnedItems: parseInt(raw.data[51]),
           goldEarned: parseInt(raw.data[52]),
+          curr_beast: parseInt(raw.data[53])
         };
         const slayedBeastEventCC = processData(
             slayedBeastDataCC,

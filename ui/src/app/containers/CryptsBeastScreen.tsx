@@ -108,7 +108,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     const resetNotification = useLoadingStore((state) => state.resetNotification);
     const [showBattleLog, setShowBattleLog] = useState(false);
 
-    const hasBeast = useAdventurerStore((state) => state.computed.hasBeast);
+    const [hasBeast,setHasBeast] = useState(true);//useAdventurerStore((state) => state.computed.hasBeast);
     const isAlive = useAdventurerStore((state) => state.computed.isAlive);
     const lastBeast = useQueriesStore(
         (state) => state.data.lastBeastQuery?.discoveries[0] || NullDiscovery
@@ -118,7 +118,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     );
 
     const ccCaveData = useQueriesStore(
-        (state) => state.data.enterCC ? state.data.enterCC.data[0] : NullCave
+        (state) => state.data.enterCC?.cc_cave[0] || NullCave
     );
 
     const formatBattles = useQueriesStore(
@@ -402,6 +402,9 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         //     setMyBuff(buff);
         // }
         console.log("asdasda", ccCaveData)
+
+        setHasBeast(ccCaveData.curr_beast < ccCaveData.beast_amount);
+        setIsClearance(ccCaveData.curr_beast == ccCaveData.beast_amount);
 
         let monsters = [
             // {

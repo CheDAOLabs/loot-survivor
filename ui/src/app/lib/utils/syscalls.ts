@@ -180,7 +180,7 @@ export function syscalls({
 
         if (filteredEnterCCs.length > 0) {
             for (let enterCC of filteredEnterCCs) {
-                setData("enterCC", enterCC);
+                setData("enterCC", {cc_cave: [enterCC.data[0]]});
             }
 
         }
@@ -203,7 +203,7 @@ export function syscalls({
         // startLoading("Attack", "Attacking", "battlesByTxHashQuery", adventurer?.id);
         // try {
         let tx = await handleSubmitCalls(writeAsync);
-        if(typeof tx === "undefined"){
+        if (typeof tx === "undefined") {
             console.log("tx undefined")
             return;
         }
@@ -261,7 +261,7 @@ export function syscalls({
         const slayedBeastEvents = events.filter(
             (event) => event.name === "SlayedBeastCC"
         );
-        if(slayedBeastEvents.length>0){
+        if (slayedBeastEvents.length > 0) {
 
         }
 
@@ -272,10 +272,16 @@ export function syscalls({
             setAdventurer(slayedBeastEvent.data[0]);
             battles.unshift(slayedBeastEvent.data[1]);
             updateItemsXP(slayedBeastEvent.data[0], slayedBeastEvent.data[2]);
+            // setData(
+            //     "beastQueryCC",
+            //     slayedBeastEvent.data[0].beastHealth,
+            //     "health",
+            //     0
+            // );
             setData(
-                "beastQueryCC",
-                slayedBeastEvent.data[0].beastHealth,
-                "health",
+                "enterCC",
+                slayedBeastEvent.data[1].curr_beast,
+                "curr_beast",
                 0
             );
             const itemsLeveledUpEvents = events.filter(
@@ -312,6 +318,24 @@ export function syscalls({
                 }
             }
         }
+
+        const filteredBeastDiscoveries = events.filter(
+            (event) => event.name === "DiscoveredBeastCC"
+        );
+        if (filteredBeastDiscoveries.length > 0) {
+            for (let discovery of filteredBeastDiscoveries) {
+                setData("battlesByBeastQueryCC", {
+                    battles: null,
+                });
+                setData("adventurerByIdQuery", {
+                    adventurers: [discovery.data[0]],
+                });
+                setAdventurer(discovery.data[0]);
+                // discoveries.unshift(discovery.data[1]);
+                setData("beastQueryCC", {beasts: [discovery.data[2]]});
+            }
+        }
+
 
         const idleDeathPenaltyEvents = events.filter(
             (event) => event.name === "IdleDeathPenalty"
