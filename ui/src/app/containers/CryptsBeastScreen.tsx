@@ -137,8 +137,8 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
 
 
-    const [buttonText, setButtonText] = useState("Flee!");
-    const [selected, setSelected] = useState("");
+    // const [buttonText, setButtonText] = useState("Flee!");
+    // const [selected, setSelected] = useState("");
 
 
     const beastName = processBeastName(
@@ -147,11 +147,14 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         beastData?.special3 ?? ""
     );
 
+    const [victory,setVictory] = useState(false);
+
     const [selectedOption, setSelectedOption] = useState('option1');
     const [selectedValue, setSelectedValue] = useState(0);
 
     const handleOptionChange = (option: any, value: any) => {
-        removeEntrypointFromCalls("upgrade_adventurer");
+        console.log("handleOptionChange", option, value);
+        // removeEntrypointFromCalls("upgrade_adventurer");
         // alert("handleOptionChange: " + option);
         if (selectedOption != option) {
             setSelectedOption(option);
@@ -305,8 +308,13 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         // }
 
         try {
-            let res = await attack(false, beastData);
-            console.log("attack succ", res);
+            let beastDead = await attack(false, beastData);
+            console.log("attack succ", beastDead);
+
+            if(beastDead){
+                setVictory(true);
+            }
+
             // Storage.set('victory' + adventurer?.id, JSON.stringify(true));
             // (window as any).monsterIndex += 1;
 
@@ -445,15 +453,15 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
     }, [ccCaveData]);
 
-    const isVictory = () => {
-        // let res = Storage.get('victory' + adventurer?.id);
-        // if (res) {
-        //     console.log("isVictory", JSON.parse(res));
-        //     return JSON.parse(res);
-        // }
-        console.log("isVictory", false);
-        return false;
-    }
+    // const isVictory = () => {
+    //     // let res = Storage.get('victory' + adventurer?.id);
+    //     // if (res) {
+    //     //     console.log("isVictory", JSON.parse(res));
+    //     //     return JSON.parse(res);
+    //     // }
+    //     console.log("isVictory", false);
+    //     return false;
+    // }
 
     return (
         <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row">
@@ -474,7 +482,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
             </div>
 
             <div className="flex flex-col gap-1 sm:gap-0 items-center sm:w-1/2 sm:p-4 order-1 text-lg">
-                {isAlive && !isVictory() && !isClearance && (
+                {isAlive && !victory && !isClearance && (
                     <>
                         <div className="flex flex-row gap-2 sm:flex-col items-center justify-center">
                             <h3>BUFF</h3>
@@ -517,7 +525,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
                     </>
                 )}
 
-                {isAlive && isVictory() && !isClearance && (
+                {isAlive && victory && !isClearance && (
                     <>
                         <h3>VICTORY</h3>
                         <h4>CHOOSE A BUFF EFFECT</h4>

@@ -214,6 +214,7 @@ export function syscalls({
                 method: `Attack CC ${beastData.beast}`,
             },
         });
+        let beastDead = false;
         const receipt = await account?.waitForTransaction(tx.transaction_hash, {
             retryInterval: 2000,
         });
@@ -262,7 +263,7 @@ export function syscalls({
             (event) => event.name === "SlayedBeastCC"
         );
         if (slayedBeastEvents.length > 0) {
-
+            beastDead = true;
         }
 
         for (let slayedBeastEvent of slayedBeastEvents) {
@@ -436,6 +437,8 @@ export function syscalls({
         setEquipItems([]);
         setDropItems([]);
         setMintAdventurer(false);
+
+        return beastDead;
     }
 
     const gameData = new GameData();
