@@ -157,10 +157,13 @@ mod Game {
     fn buff_adventurer(
         ref self: ContractState, adventurer_id: u256, potions: u8, stat_upgrades: Stats,
     ) {
+
         // get adventurer from storage and apply stat boosts
         let (mut adventurer, stat_boosts) = _unpack_adventurer_with_stat_boosts(
             @self, adventurer_id
         );
+
+        let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
 
         if potions == 0 {
             adventurer.increase_stat_points_available(1);
@@ -188,6 +191,7 @@ mod Game {
         // upgrade adventurer's stats
         if stat_upgrades.strength != 0 {
             adventurer.stats.increase_strength(stat_upgrades.strength);
+            cc_cave.increase_strength(stat_upgrades.strength);
         }
         if stat_upgrades.dexterity != 0 {
             adventurer.stats.increase_dexterity(stat_upgrades.dexterity);

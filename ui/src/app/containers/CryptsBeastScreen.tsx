@@ -364,6 +364,8 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         // (window as any).isVictory = false;
 
         await handleSubmitUpgradeTx();
+
+        setVictory(false)
     }
 
 

@@ -111,6 +111,36 @@ impl ImplCcCave of ICcCave {
         }
     }
 
+    fn increase_strength(ref self: CcCave,amount:u8) -> u16{
+        self.strength_increase = self.strength_increase + amount.into();
+        self.strength_increase
+    }
+
+    fn increase_dexterity(ref self: CcCave,amount:u8) -> u16{
+        self.dexterity_increase = self.dexterity_increase + amount.into();
+        self.dexterity_increase
+    }
+
+    fn increase_vitality(ref self: CcCave,amount:u8) -> u16{
+        self.vitality_increase = self.vitality_increase + amount.into();
+        self.vitality_increase
+    }
+
+    fn increase_intelligence(ref self: CcCave,amount:u8) -> u16{
+        self.intelligence_increase = self.intelligence_increase + amount.into();
+        self.intelligence_increase
+    }
+
+    fn increase_wisdom(ref self: CcCave,amount:u8) -> u16{
+        self.wisdom_increase = self.wisdom_increase + amount.into();
+        self.wisdom_increase
+    }
+
+    fn increase_charisma(ref self: CcCave,amount:u8) -> u16{
+        self.charisma_increase = self.charisma_increase + amount.into();
+        self.charisma_increase
+    }
+
     fn get_beast_amount(points: u16) -> u16 {
         // 怪物数量=(point点数 mod 4) + 3
         return (points % 4) + 3;
