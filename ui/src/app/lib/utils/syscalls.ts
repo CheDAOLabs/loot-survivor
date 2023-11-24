@@ -120,6 +120,15 @@ export function syscalls({
                          }: SyscallsProps) {
 
     const enterCC = async (adventureId: number, tokenId: number) => {
+
+        const approveLordsTx = {
+            contractAddress: lordsContract?.address ?? "",
+            entrypoint: "approve",
+            calldata: [gameContract?.address ?? "", (100 * 10 ** 18).toString(), "0"],
+        };
+        addToCalls(approveLordsTx);
+
+
         const Tx = {
             contractAddress: gameContract?.address ?? "",
             entrypoint: "enter_cc",

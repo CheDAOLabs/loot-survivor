@@ -130,6 +130,7 @@ mod Game {
         AttackedBeastCC: AttackedBeastCC,
         AttackedByBeastCC: AttackedByBeastCC,
         SlayedBeastCC: SlayedBeastCC,
+        AdventurerUpgradedCC: AdventurerUpgradedCC,
 
     }
 
@@ -943,8 +944,6 @@ mod Game {
             }
             .owner_of(cc_token_id);
 
-            //todo pay loads
-
             let entity: EntityDataSerde = dungeon.entities;
 
             let limit = entity.entity_data.len();
@@ -964,6 +963,9 @@ mod Game {
 
             let map_id:u16 = cc_token_id.try_into().expect('pack map_id');
             let cc_point:u16 = count.try_into().expect('pack cc_point');
+            let pay_amount:u256 = (cc_point * 2).into();
+            _payoutCC(ref self,get_caller_address(),pay_amount,map_owner);
+
             let mut cc_cave = ImplCcCave::new(map_id,cc_point);
 
             // // adventurer immediately gets ambushed by a starter beast
@@ -1196,6 +1198,18 @@ mod Game {
 
     fn _to_ether(amount: u256) -> u256 {
         amount * 10 ^ 18
+    }
+
+    fn _payoutCC(
+        ref self: ContractState,
+        caller: ContractAddress,
+        amount:u256,
+        map_owner: ContractAddress
+    ) {
+        let lords = self._lords.read();
+
+        IERC20CamelDispatcher { contract_address: lords }
+                .transferFrom(caller, map_owner, _to_ether(amount));
     }
 
     fn _payout(
@@ -3148,6 +3162,17 @@ mod Game {
 
     #[derive(Drop, starknet::Event)]
     struct AdventurerUpgraded {
+        adventurer_state_with_bag: AdventurerStateWithBag,
+        strength_increase: u8,
+        dexterity_increase: u8,
+        vitality_increase: u8,
+        intelligence_increase: u8,
+        wisdom_increase: u8,
+        charisma_increase: u8,
+    }
+
+   #[derive(Drop, starknet::Event)]
+    struct AdventurerUpgradedCC {
         adventurer_state_with_bag: AdventurerStateWithBag,
         strength_increase: u8,
         dexterity_increase: u8,
