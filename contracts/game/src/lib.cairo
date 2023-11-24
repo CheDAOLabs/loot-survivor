@@ -936,6 +936,15 @@ mod Game {
             }
                 .generate_dungeon(cc_token_id);
 
+            let map_owner:ContractAddress = CryptsAndCavernsTraitDispatcher {
+                        contract_address: contract_address_const::<
+                            0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
+                        >()
+            }
+            .owner_of(cc_token_id);
+
+            //todo pay loads
+
             let entity: EntityDataSerde = dungeon.entities;
 
             let limit = entity.entity_data.len();
@@ -1064,6 +1073,8 @@ mod Game {
             _mint_beast(@self, beast);
         }
 
+        let mut bag = _bag_unpacked(@self, adventurer_id);
+
         if cc_cave.curr_beast == cc_cave.beast_amount {
             let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
             let mut index:u8 = 0;
@@ -1075,7 +1086,7 @@ mod Game {
                 let item_reward_level:u8 = cc_cave.get_item_level(reward_seed);
                 let item_reward_id:u8 = cc_cave.get_item_id(item_reward_level,reward_seed);
                 //todo
-
+                bag.add_new_item(adventurer, item_reward_id);
                 index = index + 1;
             }
         }
