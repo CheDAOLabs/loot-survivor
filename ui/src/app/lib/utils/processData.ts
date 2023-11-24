@@ -986,7 +986,13 @@ export function processData(
             cc_points: enterCCEvent.cc_points,
             beast_health: enterCCEvent.beast_health,
             beast_amount: enterCCEvent.beast_amount,
-            beast_id: enterCCEvent.beast_id,
+            has_reward:false,
+            strength_increase: 0, // 9 bits
+            dexterity_increase: 0, // 9 bits
+            vitality_increase: 0, // 9 bits
+            intelligence_increase: 0, // 9 bits
+            wisdom_increase: 0, // 9 bits
+            charisma_increase: 0, // 9 bit
         }
       return [
         enterCCData

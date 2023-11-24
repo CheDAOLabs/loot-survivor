@@ -6,7 +6,7 @@ import useAdventurerStore from "../hooks/useAdventurerStore";
 import {useQueriesStore} from "../hooks/useQueryStore";
 import React, {useEffect, useState} from "react";
 import {processBeastName} from "../lib/utils";
-import {Battle, NullDiscovery, NullBeast, UpgradeStats, ZeroUpgrade, NullCave} from "../types";
+import {Battle, NullDiscovery, NullBeast, UpgradeStats, ZeroUpgrade, NullCave, CcCave,Monster} from "../types";
 import {Button} from "../components/buttons/Button";
 // import Neck from "../../../public/icons/loot/neck.svg";
 // import Heart from "../../../public/icons/heart.svg";
@@ -108,7 +108,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     const resetNotification = useLoadingStore((state) => state.resetNotification);
     const [showBattleLog, setShowBattleLog] = useState(false);
 
-    const [hasBeast,setHasBeast] = useState(true);//useAdventurerStore((state) => state.computed.hasBeast);
+    const [hasBeast, setHasBeast] = useState(true);//useAdventurerStore((state) => state.computed.hasBeast);
     const isAlive = useAdventurerStore((state) => state.computed.isAlive);
     const lastBeast = useQueriesStore(
         (state) => state.data.lastBeastQuery?.discoveries[0] || NullDiscovery
@@ -118,7 +118,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     );
 
     const ccCaveData = useQueriesStore(
-        (state) => state.data.enterCC?.cc_cave[0] || NullCave
+        (state) => state.data.enterCC?.cc_cave[0] as CcCave || NullCave
     );
 
     const formatBattles = useQueriesStore(
@@ -136,7 +136,6 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     const setPotionAmount = useUIStore((state) => state.setPotionAmount);
 
 
-
     // const [buttonText, setButtonText] = useState("Flee!");
     // const [selected, setSelected] = useState("");
 
@@ -147,7 +146,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         beastData?.special3 ?? ""
     );
 
-    const [victory,setVictory] = useState(false);
+    const [victory, setVictory] = useState(false);
 
     const [selectedOption, setSelectedOption] = useState('option1');
     const [selectedValue, setSelectedValue] = useState(0);
@@ -300,7 +299,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     const onAttack = async (index: any) => {
 
 
-        console.log("onAttack",beastData)
+        console.log("onAttack", beastData)
 
         // if (!hasBeast || beastData.health == 0) {
         //     await explore(true);
@@ -311,7 +310,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
             let beastDead = await attack(false, beastData);
             console.log("attack succ", beastDead);
 
-            if(beastDead){
+            if (beastDead) {
                 setVictory(true);
             }
 
@@ -400,7 +399,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
     }, [(window) as any]);
 
-    const [monsters, setMonsters] = useState([]);
+    const [monsters, setMonsters] = useState([] as Monster[])
 
     useEffect(() => {
 
@@ -411,15 +410,11 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         // }
         console.log("asdasda", ccCaveData)
 
+
         setHasBeast(ccCaveData.curr_beast < ccCaveData.beast_amount);
         setIsClearance(ccCaveData.curr_beast == ccCaveData.beast_amount);
 
-        let monsters = [
-            // {
-            //     name: "MONSTER 1",
-            //     status: "attack",
-            // }
-        ];
+        let monsters: Monster[] = [];
 
         for (let i = 0; i < ccCaveData.beast_amount; i++) {
             monsters.push({
@@ -432,17 +427,16 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
 
         for (let i = 0; i <= monsterIndex; i++) {
-            if (monsters[i ]) {
-                monsters[i ].status = "dead";
+            if (monsters[i]) {
+                monsters[i].status = "dead";
             }
         }
-        if( monsters[monsterIndex])
-        {
+        if (monsters[monsterIndex]) {
             monsters[monsterIndex].status = "attack"
         }
 
 
-        for (let i = monsterIndex+1; i <= monsters.length; i++) {
+        for (let i = monsterIndex + 1; i <= monsters.length; i++) {
             if (monsters[i]) {
                 monsters[i].status = "alive";
             }
@@ -503,7 +497,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
                         </div>
                         <div className="flex flex-col mt-3">
-                            {monsters.map((monster, index) => (
+                            {monsters.map((monster:Monster, index) => (
                                 <Button
                                     size={"lg"}
                                     disabled={monster.status == 'dead'}

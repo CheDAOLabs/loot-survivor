@@ -212,7 +212,7 @@ mod Game {
         adventurer.set_last_action(starknet::get_block_info().unbox().block_number);
 
         // emit adventurer upgraded event
-        __event_AdventurerUpgraded(ref self, adventurer, adventurer_id, bag, stat_upgrades);
+        __event_AdventurerUpgradedCC(ref self, adventurer, adventurer_id, bag, stat_upgrades);
 
         // remove stat boosts, pack, and save adventurer
         _pack_adventurer_remove_stat_boost(ref self, ref adventurer, adventurer_id, stat_boosts);
@@ -980,7 +980,7 @@ mod Game {
             cc_cave.set_beast_health(beast.starting_health);
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
 
-            __event_EnterCC(ref self,cc_cave.map_id,cc_cave.curr_beast,cc_cave.cc_points,cc_cave.beast_health,cc_cave.beast_amount,cc_cave.beast_id);
+            __event_EnterCC(ref self,cc_cave.map_id,cc_cave.curr_beast,cc_cave.cc_points,cc_cave.beast_health,cc_cave.beast_amount);
             __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
             count
         }
@@ -2994,7 +2994,6 @@ mod Game {
         cc_points:u16,
         beast_health:u16, // 9 bits
         beast_amount:u16,
-        beast_id: u16, // 9 bits
     }
 
     #[derive(Drop, starknet::Event)]
@@ -3205,14 +3204,39 @@ mod Game {
         address: ContractAddress,
     }
 
-    fn __event_EnterCC(ref self: ContractState,map_id:u16,curr_beast:u16, cc_points:u16, beast_health:u16, beast_amount:u16,beast_id: u16 ){
+    fn __event_EnterCC(ref self: ContractState,map_id:u16,curr_beast:u16, cc_points:u16, beast_health:u16, beast_amount:u16 ){
         self.emit(
-                EnterCC {map_id,curr_beast,cc_points, beast_health, beast_amount,beast_id}
+                EnterCC {map_id,curr_beast,cc_points, beast_health, beast_amount}
             );
     }
 
     fn __event_RewardDistribution(ref self: ContractState, event: RewardDistribution) {
         self.emit(event);
+    }
+
+    fn __event_AdventurerUpgradedCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: u256,
+        bag: Bag,
+        stat_upgrades: Stats
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        let adventurer_state_with_bag = AdventurerStateWithBag { adventurer_state, bag };
+        self
+            .emit(
+                AdventurerUpgradedCC {
+                    adventurer_state_with_bag,
+                    strength_increase: stat_upgrades.strength,
+                    dexterity_increase: stat_upgrades.dexterity,
+                    vitality_increase: stat_upgrades.vitality,
+                    intelligence_increase: stat_upgrades.intelligence,
+                    wisdom_increase: stat_upgrades.wisdom,
+                    charisma_increase: stat_upgrades.charisma,
+                }
+            );
     }
 
     fn __event_AdventurerUpgraded(

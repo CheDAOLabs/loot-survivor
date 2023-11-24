@@ -138,12 +138,17 @@ export interface Beast {
 }
 
 export interface CcCave {
-  map_id?: number;
-  curr_beast?: number;
-  cc_points?: number;
-  beast_health?: number;
-  beast_amount?: number;
-  beast_id?: number;
+  map_id: number;
+  curr_beast: number;
+  cc_points: number;
+  beast_health: number;
+  beast_amount: number;
+  beast_id: number;
+}
+
+export interface Monster {
+  name: string;
+  status: string;
 }
 
 export interface Score {
@@ -359,13 +364,14 @@ export const NullBattle: Battle = {
 };
 
 export const NullCave:CcCave = {
-  map_id:undefined,
-  curr_beast:undefined,
-  cc_points:undefined,
-  beast_health:undefined, // 9 bits
-  beast_amount:undefined,
-  beast_id: undefined, // 9 bits
+  map_id:0,
+  curr_beast:0,
+  cc_points:0,
+  beast_health:0, // 9 bits
+  beast_amount:0,
+  beast_id: 0, // 9 bits
 }
+
 
 export const NullDiscovery: Discovery = {
   adventurerId: undefined,

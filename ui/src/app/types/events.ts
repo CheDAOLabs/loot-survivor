@@ -376,5 +376,4 @@ export type EnterCCEvent = {
   cc_points:u16,
   beast_health:u16, // 9 bits
   beast_amount:u16,
-  beast_id: u16, // 9 bits
 };

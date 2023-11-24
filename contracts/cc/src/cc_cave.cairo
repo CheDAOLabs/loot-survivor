@@ -30,7 +30,13 @@ struct CcCave {
     cc_points:u16,
     beast_health:u16, // 9 bits
     beast_amount:u16,
-    beast_id: u16, // 9 bits
+    has_reward: u16, // 9 bits
+    strength_increase: u16, // 9 bits
+    dexterity_increase: u16, // 9 bits
+    vitality_increase: u16, // 9 bits
+    intelligence_increase: u16, // 9 bits
+    wisdom_increase: u16, // 9 bits
+    charisma_increase: u16, // 9 bits
 }
 
 impl CcCavePacking of Packing<CcCave> {
@@ -40,7 +46,13 @@ impl CcCavePacking of Packing<CcCave> {
             + self.cc_points.into() * pow::TWO_POW_18
             + self.beast_health.into() * pow::TWO_POW_27
             + self.beast_amount.into() * pow::TWO_POW_36
-            + self.beast_id.into() * pow::TWO_POW_45
+            + self.has_reward.into() * pow::TWO_POW_45
+            + self.strength_increase.into() * pow::TWO_POW_54
+            + self.dexterity_increase.into() * pow::TWO_POW_63
+            + self.vitality_increase.into() * pow::TWO_POW_72
+            + self.intelligence_increase.into() * pow::TWO_POW_81
+            + self.wisdom_increase.into() * pow::TWO_POW_90
+            + self.charisma_increase.into() * pow::TWO_POW_99
         ).try_into().expect('pack cc_cave')
     }
     fn unpack(packed: felt252) -> CcCave {
@@ -50,7 +62,13 @@ impl CcCavePacking of Packing<CcCave> {
         let (packed, cc_points) = rshift_split(packed, pow::TWO_POW_9);
         let (packed, beast_health) = rshift_split(packed, pow::TWO_POW_9);
         let (packed, beast_amount) = rshift_split(packed, pow::TWO_POW_9);
-        let (packed, beast_id) = rshift_split(packed, pow::TWO_POW_9);
+        let (packed, has_reward) = rshift_split(packed, pow::TWO_POW_9);
+        let (packed, strength_increase) = rshift_split(packed, pow::TWO_POW_9);
+        let (packed, dexterity_increase) = rshift_split(packed, pow::TWO_POW_9);
+        let (packed, vitality_increase) = rshift_split(packed, pow::TWO_POW_9);
+        let (packed, intelligence_increase) = rshift_split(packed, pow::TWO_POW_9);
+        let (packed, wisdom_increase) = rshift_split(packed, pow::TWO_POW_9);
+        let (packed, charisma_increase) = rshift_split(packed, pow::TWO_POW_9);
 
         CcCave {
             map_id: map_id.try_into().expect('unpack cc_cave map_id'),
@@ -58,9 +76,16 @@ impl CcCavePacking of Packing<CcCave> {
             cc_points: cc_points.try_into().expect('unpack cc_cave cc_points'),
             beast_health: beast_health.try_into().expect('unpack cc_cave beast_health'),
             beast_amount: beast_amount.try_into().expect('unpack cc_cave beast_amount'),
-            beast_id: beast_id.try_into().expect('unpack cc_cave beast_id'),
+            has_reward: has_reward.try_into().expect('unpack cc_cave has_reward'),
+            strength_increase: strength_increase.try_into().expect('unpack cc_cave strength'),
+            dexterity_increase: dexterity_increase.try_into().expect('unpack cc_cave dexterity'),
+            vitality_increase: vitality_increase.try_into().expect('unpack cc_cave vitality'),
+            intelligence_increase: intelligence_increase.try_into().expect('unpack cc_cave intelligence'),
+            wisdom_increase: wisdom_increase.try_into().expect('unpack cc_cave wisdom'),
+            charisma_increase: charisma_increase.try_into().expect('unpack cc_cave charisma'),
         }
     }
+
     // TODO: add overflow pack protection
     fn overflow_pack_protection(self: CcCave) -> CcCave {
         self
@@ -76,7 +101,13 @@ impl ImplCcCave of ICcCave {
             cc_points: cc_points,
             beast_health: 0,
             beast_amount: ImplCcCave::get_beast_amount(cc_points),
-            beast_id: 0,
+            has_reward: 0,
+            strength_increase: 0,
+            dexterity_increase: 0,
+            vitality_increase: 0,
+            intelligence_increase: 0,
+            wisdom_increase: 0,
+            charisma_increase: 0,
         }
     }
 

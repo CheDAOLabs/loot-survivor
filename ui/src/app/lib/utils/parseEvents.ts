@@ -705,7 +705,6 @@ export async function parseEvents(
           cc_points:parseInt(raw.data[2]),
           beast_health:parseInt(raw.data[3]), // 9 bits
           beast_amount:parseInt(raw.data[4]),
-          beast_id: parseInt(raw.data[5]), // 9 bits
         }
         console.log("parseEvent EnterCC",enterCCData);
         const enterCCEvent = processData(
