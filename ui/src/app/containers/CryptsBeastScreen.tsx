@@ -328,6 +328,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
 
                             {currBuff.map((cb, index) => (
                                 <Button
+                                    disabled={loading}
                                     key={index}
                                     size={"lg"}
                                     className={`${selectedOption === cb.key ? 'animate-pulse' : ''

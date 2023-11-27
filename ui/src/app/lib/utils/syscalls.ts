@@ -10,6 +10,7 @@ import {QueryKey} from "@/app/hooks/useQueryStore";
 import {getKeyFromValue, stringToFelt, getRandomNumber} from ".";
 import {parseEvents} from "./parseEvents";
 import {processNotifications} from "@/app/components/notifications/NotificationHandler";
+import {RewardItemsEventCC} from "@/app/types/events";
 
 // import Storage from "@/app/lib/storage";
 
@@ -449,6 +450,23 @@ export function syscalls({
         // setData("battlesByTxHashQuery", {
         //     battles: reversedBattles,
         // });
+
+
+        // setData("adventurerByIdQuery", {
+        //     adventurers: [rewardItemsEvent.data[0]],
+        // });
+
+        const rewardItemsEvents = events.filter(
+            (event) => event.name === "RewardItemsCC"
+        );
+        if (rewardItemsEvents.length > 0) {
+            for (let rewardItemsEvent of rewardItemsEvents) {
+                console.log("rewardItemsEvent",rewardItemsEvent)
+
+            }
+        }
+
+
 
         console.log("reversedBattles", reversedBattles)
         stopLoading([]);

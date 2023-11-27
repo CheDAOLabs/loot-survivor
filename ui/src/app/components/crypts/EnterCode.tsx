@@ -58,7 +58,8 @@ export const EnterCode = ({
                     )}
                 </div>
                 <div className="hidden sm:flex flex-row justify-center">
-                    <Button size={"lg"} onClick={handleBack}>INQUIRE</Button>
+                    <Button disabled={loading}
+                            size={"lg"} onClick={handleBack}>INQUIRE</Button>
                 </div>
 
                 {loading ? (

@@ -923,7 +923,10 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         setLoading(true);
         console.log(formData);
 
-        let provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
+        //let provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
+        let provider = new Provider({rpc: {
+                        nodeUrl:"https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a",
+        }});
 
         let contract = new Contract(abi, address, provider);
         console.log(contract);
@@ -1142,7 +1145,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
                     <MapInfo handleBack={onBack} handleEnter={onEnter} name={name} owner={owner} svg={svg}
-                             render={render} dungeon={dungeon}/>
+                             render={render} dungeon={dungeon} loading={loading}/>
                 </div>
             </div>
         );
