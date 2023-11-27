@@ -124,6 +124,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
         (state) => state.data.battlesByBeastQuery?.battles || []
     );
 
+    const [rewardItems,setRewardItems] = useState([] as string[])
     const [hasRewardBuff, setHasRewardBuff] = useState(false);
     const [selectedOption, setSelectedOption] = useState('option1');
     const [selectedValue, setSelectedValue] = useState(0);
@@ -203,7 +204,11 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
     const onAttack = async (index: any) => {
         console.log("onAttack", beastData)
         try {
-            await attack(false, beastData);
+           let reward_items =  await attack(false, beastData);
+           if(reward_items.length>0) {
+               console.log("setRewardItems",reward_items);
+               setRewardItems(reward_items);
+           }
         } catch (e) {
             console.error(e);
         }
@@ -221,7 +226,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
     useEffect(() => {
         setHasBeast(ccCaveData.curr_beast < ccCaveData.beast_amount);
         setIsClearance(ccCaveData.curr_beast == ccCaveData.beast_amount);
-
+        // setIsClearance(true);
         let monsters: Monster[] = [];
 
         for (let i = 0; i < ccCaveData.beast_amount; i++) {
@@ -354,10 +359,9 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
                         <h3>FULL CLEARANCE</h3>
                         <h4>YOU WON ALL THE BATTLES</h4>
                         <div className="flex flex-col ">
-                            <div className="flex flex-row bg-terminal-green text-black mb-1 px-9">XP:55</div>
-                            <div className="flex flex-row bg-terminal-green text-black mb-1 px-9">
-                                <HeartVitalityIcon className=""/>:+55
-                            </div>
+                            {rewardItems.map((item_name, index) => (
+                                <div key={index} className="flex flex-row bg-terminal-green text-black mb-1 px-9">{item_name}</div>
+                            ))}
                         </div>
                         <Button size={"lg"} onClick={exit}>EXIT</Button>
                     </>

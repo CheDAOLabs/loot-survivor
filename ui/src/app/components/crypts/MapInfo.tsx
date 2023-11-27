@@ -32,7 +32,7 @@ export const MapInfo = ({handleBack, handleEnter, owner, name, svg, render, dung
                     <div style={{
                         display: "flex", /*height: "500px",*/ width: "full", justifyContent: "center",
                     }}>
-                        <pre style={{}} dangerouslySetInnerHTML={{__html: render()}}/>
+                        <pre style={{fontSize:"14px"}} dangerouslySetInnerHTML={{__html: render()}}/>
                     </div>
                 </div>
 

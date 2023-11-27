@@ -140,7 +140,7 @@ export function syscalls({
 
         startLoading(
             "Enter CC",
-            "",
+            "Enter CC Map",
             "",
             adventurer?.id
         );
@@ -226,7 +226,6 @@ export function syscalls({
                 method: `Attack CC ${beastData.beast}`,
             },
         });
-        let beastDead = false;
         const receipt = await account?.waitForTransaction(tx.transaction_hash, {
             retryInterval: 2000,
         });
@@ -275,7 +274,7 @@ export function syscalls({
             (event) => event.name === "SlayedBeastCC"
         );
         if (slayedBeastEvents.length > 0) {
-            beastDead = true;
+            // beastDead = true;
         }
 
         for (let slayedBeastEvent of slayedBeastEvents) {
@@ -459,10 +458,12 @@ export function syscalls({
         const rewardItemsEvents = events.filter(
             (event) => event.name === "RewardItemsCC"
         );
+        let reward_items = [];
+
         if (rewardItemsEvents.length > 0) {
             for (let rewardItemsEvent of rewardItemsEvents) {
                 console.log("rewardItemsEvent",rewardItemsEvent)
-
+                reward_items = rewardItemsEvent[1];
             }
         }
 
@@ -474,7 +475,7 @@ export function syscalls({
         setDropItems([]);
         setMintAdventurer(false);
 
-        return beastDead;
+        return reward_items;
     }
 
     const gameData = new GameData();

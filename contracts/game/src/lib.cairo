@@ -1097,6 +1097,11 @@ mod Game {
                     items.append(item_reward_id);
                     index = index + 1;
                 };
+                // if the bag was mutated
+                if bag.mutated {
+                    // pack and save it
+                    _pack_bag(ref self, adventurer_id, bag);
+                }
                 __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
             }
         //}
