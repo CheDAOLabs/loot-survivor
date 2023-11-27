@@ -200,273 +200,283 @@ export function syscalls({
 
     const attackCC = async (tillDeath: boolean, beastData: any) => {
 
-        addToCalls({
-            contractAddress: gameContract?.address ?? "",
-            entrypoint: "attack_cc",
-            calldata: [
-                adventurer?.id?.toString() ?? "", "0",
-                tillDeath ? "1" : "0"
-            ],
-        });
-        startLoading("Attack", "Attacking", "", adventurer?.id);
+       try{
+           addToCalls({
+               contractAddress: gameContract?.address ?? "",
+               entrypoint: "attack_cc",
+               calldata: [
+                   adventurer?.id?.toString() ?? "", "0",
+                   tillDeath ? "1" : "0"
+               ],
+           });
+           startLoading("Attack", "Attacking", "", adventurer?.id);
 
-        // startLoading("Attack", "Attacking", "battlesByTxHashQuery", adventurer?.id);
-        // try {
-        let tx = await handleSubmitCalls(writeAsync);
-        if (typeof tx === "undefined") {
-            console.log("tx undefined")
-            return;
-        }
-        setTxHash(tx.transaction_hash);
-        addTransaction({
-            hash: tx.transaction_hash,
-            metadata: {
-                method: `Attack CC ${beastData.beast}`,
-            },
-        });
-        const receipt = await account?.waitForTransaction(tx.transaction_hash, {
-            retryInterval: 2000,
-        });
+           // startLoading("Attack", "Attacking", "battlesByTxHashQuery", adventurer?.id);
+           // try {
+           let tx = await handleSubmitCalls(writeAsync);
+           if (typeof tx === "undefined") {
+               console.log("tx undefined")
+               return;
+           }
+           setTxHash(tx.transaction_hash);
+           addTransaction({
+               hash: tx.transaction_hash,
+               metadata: {
+                   method: `Attack CC ${beastData.beast}`,
+               },
+           });
+           const receipt = await account?.waitForTransaction(tx.transaction_hash, {
+               retryInterval: 2000,
+           });
 
-        console.log("receipt", receipt);
+           console.log("receipt", receipt);
 
-        // reset battles by tx hash
-        setData("battlesByTxHashQuery", {
-            battles: null,
-        });
-
-
-        const events = await parseEvents(
-            receipt as InvokeTransactionReceiptResponse,
-            queryData.adventurerByIdQuery?.adventurers[0] ?? NullAdventurer
-        );
-
-        console.log("events", events);
-
-        // If there are any equip or drops, do them first
-        // handleEquip(events, setData, setAdventurer, queryData);
-        // handleDrop(events, setData, setAdventurer, queryData);
-
-        const battles = [];
-
-        const attackedBeastEvents = events.filter(
-            (event) =>
-                event.name === "AttackedBeastCC" || event.name === "AttackedByBeastCC"
-        );
-        for (let attackedBeastEvent of attackedBeastEvents) {
-            setData("adventurerByIdQuery", {
-                adventurers: [attackedBeastEvent.data[0]],
-            });
-            setAdventurer(attackedBeastEvent.data[0]);
-            battles.unshift(attackedBeastEvent.data[1]);
-
-            setData(
-                "beastQueryCC",
-                attackedBeastEvent.data[0].beastHealth,
-                "health",
-                0
-            );
-        }
-
-        const slayedBeastEvents = events.filter(
-            (event) => event.name === "SlayedBeastCC"
-        );
-        if (slayedBeastEvents.length > 0) {
-            // beastDead = true;
-        }
-
-        for (let slayedBeastEvent of slayedBeastEvents) {
-            setData(
-                "enterCC",
-                1,
-                "has_reward",
-                0
-            );
-            setData("adventurerByIdQuery", {
-                adventurers: [slayedBeastEvent.data[0]],
-            });
-            setAdventurer(slayedBeastEvent.data[0]);
-            battles.unshift(slayedBeastEvent.data[1]);
-            updateItemsXP(slayedBeastEvent.data[0], slayedBeastEvent.data[2]);
-            // setData(
-            //     "beastQueryCC",
-            //     slayedBeastEvent.data[0].beastHealth,
-            //     "health",
-            //     0
-            // );
-            setData(
-                "enterCC",
-                slayedBeastEvent.data[1].curr_beast,
-                "curr_beast",
-                0
-            );
-            const itemsLeveledUpEvents = events.filter(
-                (event) => event.name === "ItemsLeveledUp"
-            );
-            for (let itemsLeveledUpEvent of itemsLeveledUpEvents) {
-                for (let itemLeveled of itemsLeveledUpEvent.data[1]) {
-                    const ownedItemIndex =
-                        queryData.itemsByAdventurerQuery?.items.findIndex(
-                            (item: any) => item.item == itemLeveled.item
-                        );
-                    if (itemLeveled.suffixUnlocked) {
-                        setData(
-                            "itemsByAdventurerQuery",
-                            itemLeveled.special1,
-                            "special1",
-                            ownedItemIndex
-                        );
-                    }
-                    if (itemLeveled.prefixesUnlocked) {
-                        setData(
-                            "itemsByAdventurerQuery",
-                            itemLeveled.special2,
-                            "special2",
-                            ownedItemIndex
-                        );
-                        setData(
-                            "itemsByAdventurerQuery",
-                            itemLeveled.special3,
-                            "special3",
-                            ownedItemIndex
-                        );
-                    }
-                }
-            }
-        }
-
-        const filteredBeastDiscoveries = events.filter(
-            (event) => event.name === "DiscoveredBeastCC"
-        );
-        if (filteredBeastDiscoveries.length > 0) {
-            for (let discovery of filteredBeastDiscoveries) {
-                setData("battlesByBeastQueryCC", {
-                    battles: null,
-                });
-                setData("adventurerByIdQuery", {
-                    adventurers: [discovery.data[0]],
-                });
-                setAdventurer(discovery.data[0]);
-                // discoveries.unshift(discovery.data[1]);
-                setData("beastQueryCC", {beasts: [discovery.data[2]]});
-            }
-        }
+           // reset battles by tx hash
+           // setData("battlesByTxHashQuery", {
+           //     battles: null,
+           // });
 
 
-        const idleDeathPenaltyEvents = events.filter(
-            (event) => event.name === "IdleDeathPenalty"
-        );
-        if (idleDeathPenaltyEvents.length > 0) {
-            for (let idleDeathPenaltyEvent of idleDeathPenaltyEvents) {
-                setData("adventurerByIdQuery", {
-                    adventurers: [idleDeathPenaltyEvent.data[0]],
-                });
-                setAdventurer(idleDeathPenaltyEvent.data[0]);
-                battles.unshift(idleDeathPenaltyEvent.data[1]);
-            }
-        }
+           const events = await parseEvents(
+               receipt as InvokeTransactionReceiptResponse,
+               queryData.adventurerByIdQuery?.adventurers[0] ?? NullAdventurer
+           );
 
-        const reversedBattles = battles.slice().reverse();
+           console.log("events", events);
 
-        const adventurerDiedEvents = events.filter(
-            (event) => event.name === "AdventurerDied"
-        );
-        for (let adventurerDiedEvent of adventurerDiedEvents) {
-            setData("adventurerByIdQuery", {
-                adventurers: [adventurerDiedEvent.data[0]],
-            });
-            const deadAdventurerIndex =
-                queryData.adventurersByOwnerQuery?.adventurers.findIndex(
-                    (adventurer: any) => adventurer.id == adventurerDiedEvent.data[0].id
-                );
-            setData("adventurersByOwnerQuery", 0, "health", deadAdventurerIndex);
-            setAdventurer(adventurerDiedEvent.data[0]);
-            const killedByBeast = battles.some(
-                (battle) => battle.attacker == "Beast" && battle.adventurerHealth == 0
-            );
-            const killedByPenalty = battles.some(
-                (battle) => !battle.attacker && battle.adventurerHealth == 0
-            );
-            if (killedByBeast || killedByPenalty) {
-                setDeathNotification(
-                    "Attack",
-                    reversedBattles,
-                    adventurerDiedEvent.data[0]
-                );
-            }
-            setScreen("start");
-            setStartOption("create adventurer");
-        }
+           // If there are any equip or drops, do them first
+           // handleEquip(events, setData, setAdventurer, queryData);
+           // handleDrop(events, setData, setAdventurer, queryData);
 
-        const newItemsAvailableEvents = events.filter(
-            (event) => event.name === "NewItemsAvailable"
-        );
-        if (newItemsAvailableEvents.length > 0) {
-            for (let newItemsAvailableEvent of newItemsAvailableEvents) {
-                setData("adventurerByIdQuery", {
-                    adventurers: [newItemsAvailableEvent.data[0]],
-                });
-                setAdventurer(newItemsAvailableEvent.data[0]);
-                const newItems = newItemsAvailableEvent.data[1];
-                const itemData = [];
-                for (let newItem of newItems) {
-                    itemData.unshift({
-                        item: newItem,
-                        adventurerId: newItemsAvailableEvent.data[0]["id"],
-                        owner: false,
-                        equipped: false,
-                        ownerAddress: newItemsAvailableEvent.data[0]["owner"],
-                        xp: 0,
-                        special1: null,
-                        special2: null,
-                        special3: null,
-                        isAvailable: false,
-                        purchasedTime: null,
-                        timestamp: new Date(),
-                    });
-                }
-                setData("latestMarketItemsQuery", {
-                    items: itemData,
-                });
-            }
-            //setScreen("upgrade");
-        }
+           const battles = [];
 
-        setData("battlesByBeastQuery", {
-            battles: [
-                ...battles,
-                ...(queryData.battlesByBeastQuery?.battles ?? []),
-            ],
-        });
-        setData("battlesByAdventurerQuery", {
-            battles: [
-                ...battles,
-                ...(queryData.battlesByAdventurerQuery?.battles ?? []),
-            ],
-        });
-        setData("battlesByTxHashQuery", {
-            battles: reversedBattles,
-        });
+           const attackedBeastEvents = events.filter(
+               (event) =>
+                   event.name === "AttackedBeastCC" || event.name === "AttackedByBeastCC"
+           );
+           for (let attackedBeastEvent of attackedBeastEvents) {
+               setData("adventurerByIdQuery", {
+                   adventurers: [attackedBeastEvent.data[0]],
+               });
+               setAdventurer(attackedBeastEvent.data[0]);
+               //todo
+               //battles.unshift(attackedBeastEvent.data[1]);
 
-        const rewardItemsEvents = events.filter(
-            (event) => event.name === "RewardItemsCC"
-        );
-        let reward_items = [];
+               setData(
+                   "beastQueryCC",
+                   attackedBeastEvent.data[0].beastHealth,
+                   "health",
+                   0
+               );
+           }
 
-        if (rewardItemsEvents.length > 0) {
-            for (let rewardItemsEvent of rewardItemsEvents) {
-                console.log("rewardItemsEvent",rewardItemsEvent)
-                reward_items = rewardItemsEvent.data[1];
-            }
-        }
+           const slayedBeastEvents = events.filter(
+               (event) => event.name === "SlayedBeastCC"
+           );
+           if (slayedBeastEvents.length > 0) {
+               // beastDead = true;
+           }
 
-        console.log("reversedBattles", reversedBattles)
-        stopLoading(reversedBattles);
-        setEquipItems([]);
-        setDropItems([]);
-        setMintAdventurer(false);
+           for (let slayedBeastEvent of slayedBeastEvents) {
+               setData(
+                   "enterCC",
+                   1,
+                   "has_reward",
+                   0
+               );
+               setData("adventurerByIdQuery", {
+                   adventurers: [slayedBeastEvent.data[0]],
+               });
+               setAdventurer(slayedBeastEvent.data[0]);
+               //todo bug
 
-        return reward_items;
+               let battle = slayedBeastEvent.data[1]
+               //delete battle.curr_beast;
+
+               battles.unshift([battle]);
+               updateItemsXP(slayedBeastEvent.data[0], slayedBeastEvent.data[2]);
+               // setData(
+               //     "beastQueryCC",
+               //     slayedBeastEvent.data[0].beastHealth,
+               //     "health",
+               //     0
+               // );
+               setData(
+                   "enterCC",
+                   slayedBeastEvent.data[1].curr_beast,
+                   "curr_beast",
+                   0
+               );
+               const itemsLeveledUpEvents = events.filter(
+                   (event) => event.name === "ItemsLeveledUp"
+               );
+               for (let itemsLeveledUpEvent of itemsLeveledUpEvents) {
+                   for (let itemLeveled of itemsLeveledUpEvent.data[1]) {
+                       const ownedItemIndex =
+                           queryData.itemsByAdventurerQuery?.items.findIndex(
+                               (item: any) => item.item == itemLeveled.item
+                           );
+                       if (itemLeveled.suffixUnlocked) {
+                           setData(
+                               "itemsByAdventurerQuery",
+                               itemLeveled.special1,
+                               "special1",
+                               ownedItemIndex
+                           );
+                       }
+                       if (itemLeveled.prefixesUnlocked) {
+                           setData(
+                               "itemsByAdventurerQuery",
+                               itemLeveled.special2,
+                               "special2",
+                               ownedItemIndex
+                           );
+                           setData(
+                               "itemsByAdventurerQuery",
+                               itemLeveled.special3,
+                               "special3",
+                               ownedItemIndex
+                           );
+                       }
+                   }
+               }
+           }
+
+           const filteredBeastDiscoveries = events.filter(
+               (event) => event.name === "DiscoveredBeastCC"
+           );
+           if (filteredBeastDiscoveries.length > 0) {
+               for (let discovery of filteredBeastDiscoveries) {
+                   setData("battlesByBeastQueryCC", {
+                       battles: null,
+                   });
+                   setData("adventurerByIdQuery", {
+                       adventurers: [discovery.data[0]],
+                   });
+                   setAdventurer(discovery.data[0]);
+                   // discoveries.unshift(discovery.data[1]);
+                   setData("beastQueryCC", {beasts: [discovery.data[2]]});
+               }
+           }
+
+
+           const idleDeathPenaltyEvents = events.filter(
+               (event) => event.name === "IdleDeathPenalty"
+           );
+           if (idleDeathPenaltyEvents.length > 0) {
+               for (let idleDeathPenaltyEvent of idleDeathPenaltyEvents) {
+                   setData("adventurerByIdQuery", {
+                       adventurers: [idleDeathPenaltyEvent.data[0]],
+                   });
+                   setAdventurer(idleDeathPenaltyEvent.data[0]);
+                   battles.unshift(idleDeathPenaltyEvent.data[1]);
+               }
+           }
+
+           const reversedBattles = battles.slice().reverse();
+
+           const adventurerDiedEvents = events.filter(
+               (event) => event.name === "AdventurerDied"
+           );
+           for (let adventurerDiedEvent of adventurerDiedEvents) {
+               setData("adventurerByIdQuery", {
+                   adventurers: [adventurerDiedEvent.data[0]],
+               });
+               const deadAdventurerIndex =
+                   queryData.adventurersByOwnerQuery?.adventurers.findIndex(
+                       (adventurer: any) => adventurer.id == adventurerDiedEvent.data[0].id
+                   );
+               setData("adventurersByOwnerQuery", 0, "health", deadAdventurerIndex);
+               setAdventurer(adventurerDiedEvent.data[0]);
+               const killedByBeast = battles.some(
+                   (battle) => battle.attacker == "Beast" && battle.adventurerHealth == 0
+               );
+               const killedByPenalty = battles.some(
+                   (battle) => !battle.attacker && battle.adventurerHealth == 0
+               );
+               if (killedByBeast || killedByPenalty) {
+                   setDeathNotification(
+                       "Attack",
+                       reversedBattles,
+                       adventurerDiedEvent.data[0]
+                   );
+               }
+               setScreen("start");
+               setStartOption("create adventurer");
+           }
+
+           const newItemsAvailableEvents = events.filter(
+               (event) => event.name === "NewItemsAvailable"
+           );
+           if (newItemsAvailableEvents.length > 0) {
+               for (let newItemsAvailableEvent of newItemsAvailableEvents) {
+                   setData("adventurerByIdQuery", {
+                       adventurers: [newItemsAvailableEvent.data[0]],
+                   });
+                   setAdventurer(newItemsAvailableEvent.data[0]);
+                   const newItems = newItemsAvailableEvent.data[1];
+                   const itemData = [];
+                   for (let newItem of newItems) {
+                       itemData.unshift({
+                           item: newItem,
+                           adventurerId: newItemsAvailableEvent.data[0]["id"],
+                           owner: false,
+                           equipped: false,
+                           ownerAddress: newItemsAvailableEvent.data[0]["owner"],
+                           xp: 0,
+                           special1: null,
+                           special2: null,
+                           special3: null,
+                           isAvailable: false,
+                           purchasedTime: null,
+                           timestamp: new Date(),
+                       });
+                   }
+                   setData("latestMarketItemsQuery", {
+                       items: itemData,
+                   });
+               }
+               //setScreen("upgrade");
+           }
+
+           // setData("battlesByBeastQuery", {
+           //     battles: [
+           //         ...battles,
+           //         ...(queryData.battlesByBeastQuery?.battles ?? []),
+           //     ],
+           // });
+           // setData("battlesByAdventurerQuery", {
+           //     battles: [
+           //         ...battles,
+           //         ...(queryData.battlesByAdventurerQuery?.battles ?? []),
+           //     ],
+           // });
+           // setData("battlesByTxHashQuery", {
+           //     battles: reversedBattles,
+           // });
+
+           const rewardItemsEvents = events.filter(
+               (event) => event.name === "RewardItemsCC"
+           );
+           let reward_items = [];
+
+           if (rewardItemsEvents.length > 0) {
+               for (let rewardItemsEvent of rewardItemsEvents) {
+                   console.log("rewardItemsEvent",rewardItemsEvent)
+                   reward_items = rewardItemsEvent.data[1];
+               }
+           }
+
+           console.log("reversedBattles", reversedBattles)
+           stopLoading(reversedBattles);
+           setEquipItems([]);
+           setDropItems([]);
+           setMintAdventurer(false);
+
+           return reward_items;
+       }catch (e){
+           console.error(e);
+       }
     }
 
     const gameData = new GameData();
@@ -1704,7 +1714,7 @@ export function syscalls({
 
         }
 
-        stopLoading([]);
+        stopLoading("you increased adventurer buff");
     }
 
     return {spawn, explore, attack, flee, upgrade, multicall, enterCC, attackCC, buffAdventurer};

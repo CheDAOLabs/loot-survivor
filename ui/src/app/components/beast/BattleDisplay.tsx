@@ -185,6 +185,7 @@ export const NotificationBattleDisplay = ({
   const isArray = Array.isArray(battleData);
   const handleBeastInfo = () => {
     if (isArray) {
+      console.log("NotificationBattleDisplay");
       // This can be element in the array as they all contain beast details
       const beastName = processBeastName(
         battleData[0]?.beast ?? "",
@@ -250,6 +251,7 @@ export const NotificationBattleDisplay = ({
     isArray && battleData.length == 1 && !battleData[0].beast;
 
   const renderBattleNotification = () => {
+    console.log("renderBattleNotification")
     if (BeastFled) {
       return (
         <span className="flex flex-row items-center justify-between w-full">
