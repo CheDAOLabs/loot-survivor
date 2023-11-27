@@ -463,7 +463,7 @@ export function syscalls({
         if (rewardItemsEvents.length > 0) {
             for (let rewardItemsEvent of rewardItemsEvents) {
                 console.log("rewardItemsEvent",rewardItemsEvent)
-                reward_items = rewardItemsEvent[1];
+                reward_items = rewardItemsEvent.data[1];
             }
         }
 

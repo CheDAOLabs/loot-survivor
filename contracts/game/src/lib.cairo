@@ -1081,7 +1081,7 @@ mod Game {
 
         let mut bag = _bag_unpacked(@self, adventurer_id);
 
-        //if cc_cave.curr_beast == cc_cave.beast_amount {
+        if cc_cave.curr_beast == cc_cave.beast_amount {
             let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
             if item_awards_number > 0 {
                 let mut items = ArrayTrait::<u8>::new();
@@ -1104,7 +1104,7 @@ mod Game {
                 }
                 __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
             }
-        //}
+        }
     }
 
 
