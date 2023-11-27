@@ -300,7 +300,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
                             {monsters.map((monster:Monster, index) => (
                                 <Button
                                     size={"lg"}
-                                    disabled={monster.status == 'dead'}
+                                    disabled={monster.status == 'dead' || loading }
                                     key={index}
                                     onClick={() => {
                                         if (monster.status === 'attack') {
@@ -344,7 +344,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
 
                         </div>
 
-                        <Button size={"lg"} className="" onClick={onConfirm}>CONFIRM</Button>
+                        <Button disabled={loading} size={"lg"} className="" onClick={onConfirm}>CONFIRM</Button>
 
                     </>
                 )}
