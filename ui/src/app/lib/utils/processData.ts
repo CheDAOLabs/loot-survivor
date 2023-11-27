@@ -32,7 +32,9 @@ import {
   DiscoveredBeastEventCC,
   AttackedBeastEventCC,
   AttackedByBeastEventCC,
-  SlayedBeastEventCC, RewardItemsEventCC,
+  SlayedBeastEventCC,
+  RewardItemsEventCC,
+  AdventurerUpgradedEventCC,
 } from "../../types/events";
 import { Adventurer } from "@/app/types";
 import { feltToString } from ".";
@@ -70,6 +72,7 @@ type EventData =
   | AttackedBeastEventCC
   | AttackedByBeastEventCC
   | SlayedBeastEventCC
+  | AdventurerUpgradedEventCC
     ;
 
 function createBaseItems(data: AdventurerState) {
@@ -1197,8 +1200,13 @@ export function processData(
       const slayedBeastItemsXPCC = processItemsXP(slayedBeastEventCC);
       return [slayedBeastAdventurerDataCC, slayedBeastDataCC, slayedBeastItemsXPCC];
     case "AdventurerUpgradedCC":
-      const adventurerUpgradedEventCC = event as AdventurerUpgradedEvent;
-      return processAdventurerState(adventurerUpgradedEventCC, currentAdventurer);
+      const adventurerUpgradedEventCC = event as AdventurerUpgradedEventCC;
+      const upgreadeCCAdventurerData=  processAdventurerState(adventurerUpgradedEventCC, currentAdventurer);
+      return [upgreadeCCAdventurerData,
+        {
+          strengthIncrease:adventurerUpgradedEventCC.strengthIncrease
+        }
+      ];
     case "RewardItemsCC":
       const rewardItemsEvent = event as RewardItemsEventCC;
       const rewardItemsAdventurerData = processAdventurerState(

@@ -32,7 +32,9 @@ import {
   DiscoveredBeastEventCC,
   AttackedBeastEventCC,
   AttackedByBeastEventCC,
-  SlayedBeastEventCC, RewardItemsEventCC,
+  SlayedBeastEventCC,
+  RewardItemsEventCC,
+  AdventurerUpgradedEventCC,
 } from "../../types/events";
 import { processData } from "./processData";
 
@@ -828,9 +830,19 @@ export async function parseEvents(
         events.push({ name: eventName, data: slayedBeastEventCC });
         break
       case "AdventurerUpgradedCC":
-        const upgradeAvailableDataCC: UpgradeAvailableEvent = {
-          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+        const upgradeAvailableDataCC: AdventurerUpgradedEventCC = {
+          adventurerStateWithBag: {
+            adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+            bag: parseBag(raw.data.slice(40, 73)),
+          },
+          strengthIncrease: parseInt(raw.data[74]),
+          dexterityIncrease: parseInt(raw.data[75]),
+          vitalityIncrease: parseInt(raw.data[76]),
+          intelligenceIncrease: parseInt(raw.data[77]),
+          wisdomIncrease: parseInt(raw.data[78]),
+          charismaIncrease: parseInt(raw.data[79]),
         };
+        console.log("upgradeAvailableDataCC",upgradeAvailableDataCC)
         const upgradeAvailableEventCC = processData(
             upgradeAvailableDataCC,
             eventName,

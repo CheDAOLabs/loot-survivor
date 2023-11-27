@@ -146,6 +146,16 @@ export type UpgradeAvailableEvent = {
   adventurerState: AdventurerState;
 };
 
+export type AdventurerUpgradedEventCC = {
+  adventurerStateWithBag: AdventurerStateWithBag;
+  strengthIncrease: u8;
+  dexterityIncrease: u8;
+  vitalityIncrease: u8;
+  intelligenceIncrease: u8;
+  wisdomIncrease: u8;
+  charismaIncrease: u8;
+};
+
 export type DiscoveredHealthEvent = {
   adventurerState: AdventurerState;
   healthAmount: u16;
