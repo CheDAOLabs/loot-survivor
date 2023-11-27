@@ -309,6 +309,12 @@ export type DroppedItemsEvent = {
   itemIds: u8[];
 };
 
+
+export type RewardItemsEventCC = {
+  adventurerStateWithBag: AdventurerStateWithBag;
+  itemIds: u8[];
+};
+
 export type GreatnessIncreasedEvent = {
   adventurerState: AdventurerState;
   itemId: u8;

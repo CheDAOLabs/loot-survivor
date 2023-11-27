@@ -131,7 +131,7 @@ mod Game {
         AttackedByBeastCC: AttackedByBeastCC,
         SlayedBeastCC: SlayedBeastCC,
         AdventurerUpgradedCC: AdventurerUpgradedCC,
-
+        RewardItemsCC: RewardItemsCC,
     }
 
     #[constructor]
@@ -1081,7 +1081,8 @@ mod Game {
 
         let mut bag = _bag_unpacked(@self, adventurer_id);
 
-        if cc_cave.curr_beast == cc_cave.beast_amount {
+        //if cc_cave.curr_beast == cc_cave.beast_amount {
+            let mut items = ArrayTrait::<u8>::new();
             let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
             let mut index:u8 = 0;
             loop {
@@ -1091,11 +1092,12 @@ mod Game {
                 let reward_seed:u128 = cc_cave.get_reward_seed(adventurer_entropy,index);
                 let item_reward_level:u8 = cc_cave.get_item_level(reward_seed);
                 let item_reward_id:u8 = cc_cave.get_item_id(item_reward_level,reward_seed);
-                //todo
                 bag.add_new_item(adventurer, item_reward_id);
+                items.append(item_reward_id);
                 index = index + 1;
-            }
-        }
+             };
+            __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
+        //}
     }
 
 
@@ -3099,6 +3101,12 @@ mod Game {
         item_ids: Array<u8>,
     }
 
+    #[derive(Clone, Drop, starknet::Event)]
+    struct RewardItemsCC {
+        adventurer_state_with_bag: AdventurerStateWithBag,
+        item_ids: Array<u8>,
+    }
+
     #[derive(Drop, Serde)]
     struct ItemLeveledUp {
         item_id: u8,
@@ -3536,6 +3544,20 @@ mod Game {
         };
         let adventurer_state_with_bag = AdventurerStateWithBag { adventurer_state, bag };
         self.emit(DroppedItems { adventurer_state_with_bag, item_ids });
+    }
+
+    fn __event_RewardItemsCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: u256,
+        bag: Bag,
+        item_ids: Array<u8>,
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        let adventurer_state_with_bag = AdventurerStateWithBag { adventurer_state, bag };
+        self.emit(RewardItemsCC { adventurer_state_with_bag, item_ids });
     }
 
     fn __event_ItemsLeveledUp(

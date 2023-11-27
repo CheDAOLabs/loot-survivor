@@ -32,7 +32,7 @@ import {
   DiscoveredBeastEventCC,
   AttackedBeastEventCC,
   AttackedByBeastEventCC,
-  SlayedBeastEventCC,
+  SlayedBeastEventCC, RewardItemsEventCC,
 } from "../../types/events";
 import { processData } from "./processData";
 
@@ -838,6 +838,28 @@ export async function parseEvents(
             currentAdventurer
         );
         events.push({ name: eventName, data: upgradeAvailableEventCC });
+        break;
+      case "RewardItemsCC":
+        const rewardItemIds = [];
+        // Skip array length
+        const rewardItemsData = raw.data.slice(75);
+        for (let i = 0; i < rewardItemsData.length; i++) {
+          rewardItemIds.push(parseInt(rewardItemsData[i]));
+        }
+        const ItemsData: RewardItemsEventCC = {
+          adventurerStateWithBag: {
+            adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+            bag: parseBag(raw.data.slice(40, 73)),
+          },
+          itemIds: rewardItemIds,
+        };
+        const rewardItemsEvent = processData(
+            ItemsData,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: rewardItemsEvent });
         break;
       // default:
       //  console.error("Unknown event", eventName,raw.keys[0]);

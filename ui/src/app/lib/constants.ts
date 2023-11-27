@@ -33,7 +33,7 @@ export const contracts = {
       "0x067e87cea28bfd9314a1d3c41fb26a58ca1346ff0ea2452e59b9eeb2828692dc",
   },
   goerli: {
-    game: "0x009a61f916180592d51d987b17e0fdd7550431a8bdd88930bda6d1a7ab9ee0eb",
+    game: "0x0730c7c7743f4bb72c64782dc15d0b309a347beea8a6396b3b4d919209afb0b7",
     lords_erc20_mintable:
       "0x059dac5df32cbce17b081399e97d90be5fba726f97f00638f838613d088e5a47",
   },
