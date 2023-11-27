@@ -1166,6 +1166,7 @@ export class GameData {
       AttackedBeastCC: hash.getSelectorFromName("AttackedBeastCC"),
       AttackedByBeastCC: hash.getSelectorFromName("AttackedByBeastCC"),
       SlayedBeastCC: hash.getSelectorFromName("SlayedBeastCC"),
+      AdventurerUpgradedCC: hash.getSelectorFromName("AdventurerUpgradedCC"),
     };
 
     this.QUERY_KEYS = {

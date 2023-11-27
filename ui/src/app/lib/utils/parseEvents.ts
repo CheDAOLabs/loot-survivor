@@ -827,7 +827,18 @@ export async function parseEvents(
         );
         events.push({ name: eventName, data: slayedBeastEventCC });
         break
-
+      case "AdventurerUpgradedCC":
+        const upgradeAvailableDataCC: UpgradeAvailableEvent = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+        };
+        const upgradeAvailableEventCC = processData(
+            upgradeAvailableDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: upgradeAvailableEventCC });
+        break;
       // default:
       //  console.error("Unknown event", eventName,raw.keys[0]);
       //  break;

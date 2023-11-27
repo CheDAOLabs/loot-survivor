@@ -444,7 +444,7 @@ export function syscalls({
         //     battles: reversedBattles,
         // });
 
-        console.log("reversedBattles",reversedBattles)
+        console.log("reversedBattles", reversedBattles)
         stopLoading([]);
         setEquipItems([]);
         setDropItems([]);
@@ -1565,7 +1565,7 @@ export function syscalls({
         }
     };
 
-    const buffAdventurer = async(option:string ,value:number)=>{
+    const buffAdventurer = async (option: string, value: number) => {
 
         option = option.toLowerCase();
         console.log("option", option);
@@ -1630,9 +1630,14 @@ export function syscalls({
 
         console.log("events", events);
 
+        const filteredAdventurerUpgradedCC = events.filter(
+            (event) => event.name === "AdventurerUpgradedCC"
+        );
+
+        console.log("filteredAdventurerUpgradedCC", filteredAdventurerUpgradedCC)
 
         stopLoading([]);
     }
 
-    return {spawn, explore, attack, flee, upgrade, multicall, enterCC, attackCC ,buffAdventurer};
+    return {spawn, explore, attack, flee, upgrade, multicall, enterCC, attackCC, buffAdventurer};
 }

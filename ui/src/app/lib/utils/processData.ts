@@ -1196,5 +1196,8 @@ export function processData(
       };
       const slayedBeastItemsXPCC = processItemsXP(slayedBeastEventCC);
       return [slayedBeastAdventurerDataCC, slayedBeastDataCC, slayedBeastItemsXPCC];
+    case "AdventurerUpgradedCC":
+      const adventurerUpgradedEventCC = event as AdventurerUpgradedEvent;
+      return processAdventurerState(adventurerUpgradedEventCC, currentAdventurer);
   }
 }
