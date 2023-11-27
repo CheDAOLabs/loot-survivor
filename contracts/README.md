@@ -7,5 +7,5 @@ scarb --release build  && starkli declare  ./target/release/game_Game.contract_c
 export LORDS_ADDRESS=0x059dac5df32cbce17b081399e97d90be5fba726f97f00638f838613d088e5a47;
 export DAO_ADDRESS=0x020b96923a9e60f63a1829d440a03cf680768cadbc8fe737f71380258817d85b;
 export ARG=0x000f4dbfe5d15792aa91025e42ee1d74c22bdeb1eef0b9bc19a37216377290c1;
-export CLASS_HASH=0x022ef27b5e7dbc06a039d9265e8436dd8a22c52b1a2ad7ed9a33068dd345330f;
+export CLASS_HASH=0x0193e98f61bbfc2c5ef79ce38372ea072fb76eafbc96afe7c77c7c7b8ac3a009;
 starkli deploy $CLASS_HASH $LORDS_ADDRESS $DAO_ADDRESS $ARG  

@@ -32,7 +32,7 @@ import {
   DiscoveredBeastEventCC,
   AttackedBeastEventCC,
   AttackedByBeastEventCC,
-  SlayedBeastEventCC,
+  SlayedBeastEventCC, RewardItemsEventCC,
 } from "../../types/events";
 import { Adventurer } from "@/app/types";
 import { feltToString } from ".";
@@ -1199,5 +1199,18 @@ export function processData(
     case "AdventurerUpgradedCC":
       const adventurerUpgradedEventCC = event as AdventurerUpgradedEvent;
       return processAdventurerState(adventurerUpgradedEventCC, currentAdventurer);
+    case "RewardItemsCC":
+      const rewardItemsEvent = event as RewardItemsEventCC;
+      const rewardItemsAdventurerData = processAdventurerState(
+          rewardItemsEvent.adventurerStateWithBag,
+          currentAdventurer
+      );
+      const formattedRewardItems = [];
+      for (let i = 0; i < rewardItemsEvent.itemIds.length; i++) {
+        formattedRewardItems.push(
+            gameData.ITEMS[rewardItemsEvent.itemIds[i]]
+        );
+      }
+      return [rewardItemsAdventurerData, formattedRewardItems];
   }
 }

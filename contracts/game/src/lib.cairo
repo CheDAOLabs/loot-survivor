@@ -1082,21 +1082,23 @@ mod Game {
         let mut bag = _bag_unpacked(@self, adventurer_id);
 
         //if cc_cave.curr_beast == cc_cave.beast_amount {
-            let mut items = ArrayTrait::<u8>::new();
             let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
-            let mut index:u8 = 0;
-            loop {
-                if(index >= item_awards_number) {
-                    break;
-                }
-                let reward_seed:u128 = cc_cave.get_reward_seed(adventurer_entropy,index);
-                let item_reward_level:u8 = cc_cave.get_item_level(reward_seed);
-                let item_reward_id:u8 = cc_cave.get_item_id(item_reward_level,reward_seed);
-                bag.add_new_item(adventurer, item_reward_id);
-                items.append(item_reward_id);
-                index = index + 1;
-             };
-            __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
+            if item_awards_number > 0 {
+                let mut items = ArrayTrait::<u8>::new();
+                let mut index: u8 = 0;
+                loop {
+                    if (index >= item_awards_number) {
+                        break;
+                    }
+                    let reward_seed: u128 = cc_cave.get_reward_seed(adventurer_entropy, index);
+                    let item_reward_level: u8 = cc_cave.get_item_level(reward_seed);
+                    let item_reward_id: u8 = cc_cave.get_item_id(item_reward_level, reward_seed);
+                    bag.add_new_item(adventurer, item_reward_id);
+                    items.append(item_reward_id);
+                    index = index + 1;
+                };
+                __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
+            }
         //}
     }
 

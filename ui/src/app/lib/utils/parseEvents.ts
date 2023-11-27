@@ -840,6 +840,7 @@ export async function parseEvents(
         events.push({ name: eventName, data: upgradeAvailableEventCC });
         break;
       case "RewardItemsCC":
+        console.log("parseEvent RewardItemsCC");
         const rewardItemIds = [];
         // Skip array length
         const rewardItemsData = raw.data.slice(75);
