@@ -145,17 +145,6 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
         return result;
     });
 
-    const [MyBuff, setMyBuff] = useState({
-        strength: 0,
-        dexterity: 0,
-        vitality: 0,
-        intelligence: 0,
-        wisdom: 0,
-        charisma: 0,
-        luck: 0,
-        hp: 0
-    });
-
     const beastName = processBeastName(
         beastData?.beast ?? "",
         beastData?.special2 ?? "",
@@ -263,10 +252,8 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
 
 
     return (
-        <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row">
-
+        <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row" style={{height:"600px"}}>
             <div className="sm:w-1/2 order-1 sm:order-2">
-
                 {hasBeast ? (
                     <>
                         <BeastDisplay beastData={beastData}/>
@@ -286,18 +273,18 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
                         <div className="flex flex-row gap-2 sm:flex-col items-center justify-center">
                             <h3>BUFF</h3>
                             <div className="flex gap-2 ">
-                                <p>STRENGTH:{MyBuff.strength}</p>
-                                <p>DEXTERITY:{MyBuff.dexterity}</p>
-                                <p>VITALITY:{MyBuff.vitality}</p>
+                                <p>STRENGTH:{ccCaveData.strength_increase}</p>
+                                <p>DEXTERITY:{ccCaveData.dexterity_increase}</p>
+                                <p>VITALITY:{ccCaveData.vitality_increase}</p>
                             </div>
                             <div className="flex  gap-2 border-b border-terminal-green">
-                                <p>INTELLIGENCE:{MyBuff.intelligence}</p>
-                                <p>WISDOM:{MyBuff.wisdom}</p>
-                                <p>CHARISMA:{MyBuff.charisma}</p>
+                                <p>INTELLIGENCE:{ccCaveData.intelligence_increase}</p>
+                                <p>WISDOM:{ccCaveData.wisdom_increase}</p>
+                                <p>CHARISMA:{ccCaveData.charisma_increase}</p>
                             </div>
                             <div className="flex  gap-2 border-b border-terminal-green">
-                                <p>LUCK:{MyBuff.luck}</p>
-                                <p>HP:{MyBuff.hp}</p>
+                                <p>LUCK:0</p>
+                                <p>HP:0</p>
                             </div>
 
                         </div>

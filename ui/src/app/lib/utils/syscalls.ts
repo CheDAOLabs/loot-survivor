@@ -1655,20 +1655,59 @@ export function syscalls({
 
         console.log("events", events);
 
-        const filteredAdventurerUpgradedCC = events.filter(
+        const filteredAdventurerUpgradedCCEvents = events.filter(
             (event) => event.name === "AdventurerUpgradedCC"
         );
 
-        console.log("filteredAdventurerUpgradedCC", filteredAdventurerUpgradedCC)
+        console.log("filteredAdventurerUpgradedCC", filteredAdventurerUpgradedCCEvents)
 
-        if (filteredAdventurerUpgradedCC.length > 0) {
+        if (filteredAdventurerUpgradedCCEvents.length > 0) {
 
-            setData(
-                "enterCC",
-                0,
-                "has_reward",
-                0
-            );
+            for(let adventurerUpgradedCCEvent of filteredAdventurerUpgradedCCEvents) {
+                setData(
+                    "enterCC",
+                    0,
+                    "has_reward",
+                    0
+                );
+
+                setData(
+                    "enterCC",
+                    adventurerUpgradedCCEvent.data[1].strengthIncrease,
+                    "strength_increase",
+                    0
+                );
+                setData(
+                    "enterCC",
+                    adventurerUpgradedCCEvent.data[1].dexterityIncrease,
+                    "dexterity_increase",
+                    0
+                );
+                setData(
+                    "enterCC",
+                    adventurerUpgradedCCEvent.data[1].vitalityIncrease,
+                    "vitality_increase",
+                    0
+                );
+                setData(
+                    "enterCC",
+                    adventurerUpgradedCCEvent.data[1].intelligenceIncrease,
+                    "intelligence_increase",
+                    0
+                );
+                setData(
+                    "enterCC",
+                    adventurerUpgradedCCEvent.data[1].wisdomIncrease,
+                    "wisdom_increase",
+                    0
+                );
+                setData(
+                    "enterCC",
+                    adventurerUpgradedCCEvent.data[1].charismaIncrease,
+                    "charisma_increase",
+                    0
+                );
+            }
 
         }
 

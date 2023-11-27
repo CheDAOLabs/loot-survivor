@@ -3,14 +3,14 @@ import {Button} from "../components/buttons/Button";
 
 
 import {EnterCode} from "../components/crypts/EnterCode";
-import {MapInfo, MapInfoProps} from "../components/crypts/MapInfo";
-import {MapAction} from "../components/crypts/MapAction";
+import {MapInfo} from "../components/crypts/MapInfo";
 
 import Info from "../components/adventurer/Info";
 import {NullAdventurer, NullBeast} from "../types";
 import {useQueriesStore} from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
 import {constants, Contract, num, Provider, shortString, cairo, ContractInterface} from "starknet";
+import CryptsBeastScreen from "@/app/containers/CryptsBeastScreen";
 
 // import Storage from "@/app/lib/storage";
 
@@ -1153,11 +1153,10 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer}/>
+                    <Info adventurer={adventurer} />
                 </div>
-                {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
-                <MapAction attack={attack} exit={onExit} flee={flee} buffAdventurer={buffAdventurer}/>
-                {/*</div>*/}
+                <CryptsBeastScreen
+                    attack={attack} flee={flee} exit={onExit} buffAdventurer={buffAdventurer}/>
             </div>
         );
     } else {

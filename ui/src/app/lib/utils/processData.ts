@@ -1201,10 +1201,18 @@ export function processData(
       return [slayedBeastAdventurerDataCC, slayedBeastDataCC, slayedBeastItemsXPCC];
     case "AdventurerUpgradedCC":
       const adventurerUpgradedEventCC = event as AdventurerUpgradedEventCC;
-      const upgreadeCCAdventurerData=  processAdventurerState(adventurerUpgradedEventCC, currentAdventurer);
+      const upgreadeCCAdventurerData=  processAdventurerState(
+          adventurerUpgradedEventCC.adventurerStateWithBag,
+          currentAdventurer
+      );
       return [upgreadeCCAdventurerData,
         {
-          strengthIncrease:adventurerUpgradedEventCC.strengthIncrease
+            strengthIncrease:adventurerUpgradedEventCC.strengthIncrease,
+            dexterityIncrease:adventurerUpgradedEventCC.dexterityIncrease,
+            vitalityIncrease:adventurerUpgradedEventCC.vitalityIncrease,
+            intelligenceIncrease:adventurerUpgradedEventCC.intelligenceIncrease,
+            wisdomIncrease:adventurerUpgradedEventCC.wisdomIncrease,
+            charismaIncrease:adventurerUpgradedEventCC.charismaIncrease,
         }
       ];
     case "RewardItemsCC":
