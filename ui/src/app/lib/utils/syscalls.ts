@@ -278,6 +278,12 @@ export function syscalls({
         }
 
         for (let slayedBeastEvent of slayedBeastEvents) {
+            setData(
+                "enterCC",
+                1,
+                "has_reward",
+                0
+            );
             setData("adventurerByIdQuery", {
                 adventurers: [slayedBeastEvent.data[0]],
             });
@@ -1635,6 +1641,17 @@ export function syscalls({
         );
 
         console.log("filteredAdventurerUpgradedCC", filteredAdventurerUpgradedCC)
+
+        if (filteredAdventurerUpgradedCC.length > 0) {
+
+            setData(
+                "enterCC",
+                0,
+                "has_reward",
+                0
+            );
+
+        }
 
         stopLoading([]);
     }

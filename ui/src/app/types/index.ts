@@ -144,6 +144,13 @@ export interface CcCave {
   beast_health: number;
   beast_amount: number;
   beast_id: number;
+  has_reward:number;
+  strength_increase: number, // 9 bits
+  dexterity_increase: number, // 9 bits
+  vitality_increase: number, // 9 bits
+  intelligence_increase: number, // 9 bits
+  wisdom_increase: number, // 9 bits
+  charisma_increase: number, // 9 bits
 }
 
 export interface Monster {
@@ -370,6 +377,13 @@ export const NullCave:CcCave = {
   beast_health:0, // 9 bits
   beast_amount:0,
   beast_id: 0, // 9 bits
+  has_reward:0,
+    strength_increase: 0, // 9 bits
+    dexterity_increase: 0, // 9 bits
+    vitality_increase: 0, // 9 bits
+    intelligence_increase: 0, // 9 bits
+    wisdom_increase: 0, // 9 bits
+    charisma_increase: 0, // 9 bits
 }
 
 

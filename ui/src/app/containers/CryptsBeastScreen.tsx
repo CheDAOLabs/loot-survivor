@@ -124,20 +124,36 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
         (state) => state.data.battlesByBeastQuery?.battles || []
     );
 
-    const addToCalls = useTransactionCartStore((state) => state.addToCalls);
-    const removeEntrypointFromCalls = useTransactionCartStore(
-        (state) => state.removeEntrypointFromCalls
-    );
-    const {gameContract, lordsContract} = useContracts();
-    const upgrades = useUIStore((state) => state.upgrades);
-    const setUpgrades = useUIStore((state) => state.setUpgrades);
-    const potionAmount = useUIStore((state) => state.potionAmount);
-    const setPotionAmount = useUIStore((state) => state.setPotionAmount);
+    const [hasRewardBuff, setHasRewardBuff] = useState(false);
+    const [selectedOption, setSelectedOption] = useState('option1');
+    const [selectedValue, setSelectedValue] = useState(0);
+    const [isClearance, setIsClearance] = useState(false);
+    const [monsters, setMonsters] = useState([] as Monster[])
+    const [currBuff, setCurrBuff] = useState(() => {
+        let result = [];
+        const buff1 = getRandomBuff();
+        for (const [key, value] of Object.entries(buff1)) {
+            if (key != "id" && value > 0) {
+                result.push({
+                    key: key.toUpperCase(),
+                    value: value
+                });
+            }
+        }
 
+        return result;
+    });
 
-    // const [buttonText, setButtonText] = useState("Flee!");
-    // const [selected, setSelected] = useState("");
-
+    const [MyBuff, setMyBuff] = useState({
+        strength: 0,
+        dexterity: 0,
+        vitality: 0,
+        intelligence: 0,
+        wisdom: 0,
+        charisma: 0,
+        luck: 0,
+        hp: 0
+    });
 
     const beastName = processBeastName(
         beastData?.beast ?? "",
@@ -145,15 +161,8 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
         beastData?.special3 ?? ""
     );
 
-    const [victory, setVictory] = useState(false);
-
-    const [selectedOption, setSelectedOption] = useState('option1');
-    const [selectedValue, setSelectedValue] = useState(0);
-
     const handleOptionChange = (option: any, value: any) => {
         console.log("handleOptionChange", option, value);
-        // removeEntrypointFromCalls("upgrade_adventurer");
-        // alert("handleOptionChange: " + option);
         if (selectedOption != option) {
             setSelectedOption(option);
             setSelectedValue(value);
@@ -189,138 +198,25 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
         return <BattleLog/>;
     }
 
-    // const monsters = () => {
-    //     let monsters = [
-    //         {
-    //             name: "MONSTER 1",
-    //             status: "attack",
-    //         }
-    //     ]
-    //
-    //     console.log("asdasdasdasdadasd")
-    //
-    //     // for(let i = 0; i < ccCaveData.beast_amount; i++) {
-    //     //     monsters.push({
-    //     //         name: "MONSTER " + (i + 1),
-    //     //         status: "alive"
-    //     //     })
-    //     // }
-    //
-    //     const monsterIndex=  0;//ccCaveData.curr_beast;
-    //     // const monsterIndex = (Number)(Storage.get('monsterIndex' + adventurer?.id)) || 0;
-    //
-    //     if (monsterIndex) {
-    //         for (let i = 0; i <= monsterIndex; i++) {
-    //             if (monsters[i - 1]) {
-    //                 monsters[i - 1].status = "dead";
-    //             }
-    //         }
-    //         monsters[monsterIndex - 1].status = "attack"
-    //
-    //         for (let i = monsterIndex; i <= monsters.length; i++) {
-    //             if (monsters[i]) {
-    //                 monsters[i].status = "alive";
-    //             }
-    //         }
-    //     }
-    //
-    //     console.log("monsters", monsters);
-    //     return monsters;
-    // };
-
-    const [MyBuff, setMyBuff] = useState({
-        strength: 0,
-        dexterity: 0,
-        vitality: 0,
-        intelligence: 0,
-        wisdom: 0,
-        charisma: 0,
-        luck: 0,
-        hp: 0
-    });
-
-
-    // const [monsterIndex, setMonsterIndex] = useState(4)
-
+    
 
     const onAttack = async (index: any) => {
         console.log("onAttack", beastData)
         try {
-            let beastDead = await attack(false, beastData);
-            console.log("attack succ", beastDead);
-
-            if (beastDead) {
-                setVictory(true);
-            }
-
+            await attack(false, beastData);
         } catch (e) {
             console.error(e);
         }
     }
 
-    const [isClearance, setIsClearance] = useState(false);
-
-
     const onConfirm = async () => {
-
-        // let myBuff = JSON.parse(JSON.stringify(MyBuff));
-        // switch (selectedOption.toLowerCase()) {
-        //     case 'strength':
-        //         myBuff.strength += selectedValue;
-        //         break
-        //     case 'dexterity':
-        //         myBuff.dexterity += selectedValue;
-        //         break
-        //     case 'vitality':
-        //         myBuff.vitality += selectedValue;
-        //         break
-        //     case 'intelligence':
-        //         myBuff.intelligence += selectedValue;
-        //         break
-        //     case 'wisdom':
-        //         myBuff.wisdom += selectedValue;
-        //         break
-        //     case 'charisma':
-        //         myBuff.charisma += selectedValue;
-        //         break
-        //     case 'hp':
-        //         myBuff.hp += selectedValue;
-        //         break
-        // }
-
-        // setMyBuff(myBuff);
-        // await upgrade();
-
         await buffAdventurer(selectedOption,selectedValue);
-
-        //todo
-        // setVictory(false)
     }
-
-
+    
     const onExit = async () => {
         exit();
     }
 
-
-    const randBuff = () => {
-
-        let result = [];
-        const buff1 = getRandomBuff();
-        for (const [key, value] of Object.entries(buff1)) {
-            if (key != "id" && value > 0) {
-                result.push({
-                    key: key.toUpperCase(),
-                    value: value
-                });
-            }
-        }
-
-        return result;
-    };
-    const [currBuff, setCurrBuff] = useState(randBuff());
-
-    const [monsters, setMonsters] = useState([] as Monster[])
 
     useEffect(() => {
         setHasBeast(ccCaveData.curr_beast < ccCaveData.beast_amount);
@@ -356,6 +252,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
 
 
         setMonsters(monsters);
+        setHasRewardBuff(ccCaveData.has_reward>0)
 
     }, [ccCaveData]);
 
@@ -379,7 +276,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
             </div>
 
             <div className="flex flex-col gap-1 sm:gap-0 items-center sm:w-1/2 sm:p-4 order-1 text-lg">
-                {isAlive && !victory && !isClearance && (
+                {isAlive && !hasRewardBuff && !isClearance && (
                     <>
                         <div className="flex flex-row gap-2 sm:flex-col items-center justify-center">
                             <h3>BUFF</h3>
@@ -422,7 +319,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
                     </>
                 )}
 
-                {isAlive && victory && !isClearance && (
+                {isAlive && hasRewardBuff && !isClearance && (
                     <>
                         <h3>VICTORY</h3>
                         <h4>CHOOSE A BUFF EFFECT</h4>
