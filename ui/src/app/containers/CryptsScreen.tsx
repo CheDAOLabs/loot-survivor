@@ -16,11 +16,10 @@ import {constants, Contract, num, Provider, shortString, cairo, ContractInterfac
 
 
 interface CryptsScreenProps {
-    explore: (...args: any[]) => any;
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
-    upgrade: (...args: any[]) => any;
     enterCc: (...args: any[]) => any;
+    buffAdventurer: (...args: any[]) => any;
 }
 
 const abi = [
@@ -895,7 +894,7 @@ interface DungeonData {
  * @container
  * @description
  */
-export default function CryptsScreen({explore, attack, flee, upgrade, enterCc}: CryptsScreenProps) {
+export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: CryptsScreenProps) {
 
     const adventurer = useAdventurerStore((state) => state.adventurer);
 
@@ -908,16 +907,6 @@ export default function CryptsScreen({explore, attack, flee, upgrade, enterCc}: 
     );
 
     const [step, setStep] = useState(() => {
-
-        // const monsterIndex = (Number)(Storage.get('monsterIndex' + adventurer?.id)) || 0;
-
-        // if (monsterIndex === 0) {
-        //     console.log("step 1")
-        //     return 1;
-        // } else {
-        //     console.log("step 3")
-        //     return 3;
-        // }
         console.log("beastData", beastData)
         if (beastData.beast) {
             return 3;
@@ -926,7 +915,7 @@ export default function CryptsScreen({explore, attack, flee, upgrade, enterCc}: 
         }
 
 
-    }, beastData);
+    });
 
 
     const onEnterCode = async () => {
@@ -1108,10 +1097,13 @@ export default function CryptsScreen({explore, attack, flee, upgrade, enterCc}: 
     // const setAdventurer = useAdventurerStore((state) => state.setAdventurer);
 
     const onEnter = async () => {
-        console.log("onEnter: formData=",formData);
+        console.log("onEnter: formData=", formData);
         // return;
         try {
             console.log("adventurer", adventurer)
+            if(!adventurer){
+                return;
+            }
             await enterCc(adventurer.id, formData.name);
             // Storage.set('monsterIndex' + adventurer?.id, 1);
             setStep(3);
@@ -1161,7 +1153,7 @@ export default function CryptsScreen({explore, attack, flee, upgrade, enterCc}: 
                     <Info adventurer={adventurer}/>
                 </div>
                 {/*<div className="hidden sm:block sm:w-1/2 lg:w-2/3">*/}
-                <MapAction attack={attack} exit={onExit} flee={flee} explore={explore} upgrade={upgrade}/>
+                <MapAction attack={attack} exit={onExit} flee={flee} buffAdventurer={buffAdventurer}/>
                 {/*</div>*/}
             </div>
         );

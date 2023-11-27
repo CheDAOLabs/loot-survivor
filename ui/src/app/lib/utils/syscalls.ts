@@ -209,6 +209,8 @@ export function syscalls({
                 tillDeath ? "1" : "0"
             ],
         });
+        startLoading("Attack", "Attacking", "", adventurer?.id);
+
         // startLoading("Attack", "Attacking", "battlesByTxHashQuery", adventurer?.id);
         // try {
         let tx = await handleSubmitCalls(writeAsync);
@@ -442,7 +444,8 @@ export function syscalls({
         //     battles: reversedBattles,
         // });
 
-        // stopLoading(reversedBattles);
+        console.log("reversedBattles",reversedBattles)
+        stopLoading([]);
         setEquipItems([]);
         setDropItems([]);
         setMintAdventurer(false);
@@ -1562,5 +1565,74 @@ export function syscalls({
         }
     };
 
-    return {spawn, explore, attack, flee, upgrade, multicall, enterCC, attackCC};
+    const buffAdventurer = async(option:string ,value:number)=>{
+
+        option = option.toLowerCase();
+        console.log("option", option);
+        console.log("value", value);
+
+        const upgradeTx = {
+            contractAddress: gameContract?.address ?? "",
+            entrypoint: "buff_adventurer",
+            calldata: [
+                // adventurerId
+                adventurer?.id?.toString() ?? "",
+                "0",
+                // potion
+                option === "hp" ? value.toString() : "0",
+                // statUpgrades
+                option === "strength"
+                    ? value.toString()
+                    : "0",
+                option === "dexterity"
+                    ? value.toString()
+                    : "0",
+                option === "vitality"
+                    ? value.toString()
+                    : "0",
+                option === "intelligence"
+                    ? value.toString()
+                    : "0",
+                option === "wisdom"
+                    ? value.toString()
+                    : "0",
+                option === "charisma"
+                    ? value.toString()
+                    : "0",
+            ],
+        };
+        addToCalls(upgradeTx);
+
+        startLoading(
+            "Add Buff",
+            "",
+            "",
+            adventurer?.id
+        );
+
+        // try {
+        const tx = await handleSubmitCalls(writeAsync);
+        console.log(tx);
+        // }catch (e){
+        //   console.error(e);
+        // }
+
+        const receipt = await account?.waitForTransaction(tx.transaction_hash, {
+            retryInterval: 2000,
+        });
+
+        console.log("receipt", receipt);
+
+        const events = await parseEvents(
+            receipt as InvokeTransactionReceiptResponse,
+            queryData.adventurerByIdQuery?.adventurers[0] ?? NullAdventurer
+        );
+
+        console.log("events", events);
+
+
+        stopLoading([]);
+    }
+
+    return {spawn, explore, attack, flee, upgrade, multicall, enterCC, attackCC ,buffAdventurer};
 }

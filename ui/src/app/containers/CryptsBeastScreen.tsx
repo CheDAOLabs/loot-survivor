@@ -92,15 +92,14 @@ interface BeastScreenProps {
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
     exit: (...args: any[]) => any;
-    explore: (...args: any[]) => any;
-    upgrade: (...args: any[]) => any;
+    buffAdventurer: (...args: any[]) => any;
 }
 
 /**
  * @container
  * @description Provides the beast screen for adventurer battles.
  */
-export default function BeastScreen({attack, flee, exit, explore, upgrade}: BeastScreenProps) {
+export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastScreenProps) {
     /* eslint-disable */
 
     const adventurer = useAdventurerStore((state) => state.adventurer);
@@ -158,59 +157,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
         if (selectedOption != option) {
             setSelectedOption(option);
             setSelectedValue(value);
-
-            handleAddUpgradeTx(option, value);
         }
-    };
-
-    const handleAddUpgradeTx = (
-        option: string,
-        value: number
-    ) => {
-
-        option = option.toLowerCase();
-        console.log("option", option);
-        console.log("value", value);
-
-        removeEntrypointFromCalls("buff_adventurer");
-        const upgradeTx = {
-            contractAddress: gameContract?.address ?? "",
-            entrypoint: "buff_adventurer",
-            calldata: [
-                // adventurerId
-                adventurer?.id?.toString() ?? "",
-                "0",
-                // potion
-                option === "hp" ? value.toString() : potionAmount.toString(),
-                // statUpgrades
-                option === "strength"
-                    ? value.toString()
-                    : "0",
-                option === "dexterity"
-                    ? value.toString()
-                    : "0",
-                option === "vitality"
-                    ? value.toString()
-                    : "0",
-                option === "intelligence"
-                    ? value.toString()
-                    : "0",
-                option === "wisdom"
-                    ? value.toString()
-                    : "0",
-                option === "charisma"
-                    ? value.toString()
-                    : "0",
-            ],
-        };
-        addToCalls(upgradeTx);
-    };
-
-    const handleSubmitUpgradeTx = async () => {
-        resetNotification();
-        await upgrade(upgrades, [], 0);
-        setPotionAmount(0);
-        setUpgrades({...ZeroUpgrade});
     };
 
     const BattleLog: React.FC = () => (
@@ -297,15 +244,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
 
     const onAttack = async (index: any) => {
-
-
         console.log("onAttack", beastData)
-
-        // if (!hasBeast || beastData.health == 0) {
-        //     await explore(true);
-        //     return;
-        // }
-
         try {
             let beastDead = await attack(false, beastData);
             console.log("attack succ", beastDead);
@@ -314,18 +253,9 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
                 setVictory(true);
             }
 
-            // Storage.set('victory' + adventurer?.id, JSON.stringify(true));
-            // (window as any).monsterIndex += 1;
-
         } catch (e) {
             console.error(e);
         }
-
-
-        // setMonsterIndex(index)
-        // (window as any).monsterIndex = index
-        // setIsVictory(true)
-        // (window as any).isVictory = true;
     }
 
     const [isClearance, setIsClearance] = useState(false);
@@ -333,39 +263,38 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
     const onConfirm = async () => {
 
-        let myBuff = JSON.parse(JSON.stringify(MyBuff));
-        switch (selectedOption.toLowerCase()) {
-            case 'strength':
-                myBuff.strength += selectedValue;
-                break
-            case 'dexterity':
-                myBuff.dexterity += selectedValue;
-                break
-            case 'vitality':
-                myBuff.vitality += selectedValue;
-                break
-            case 'intelligence':
-                myBuff.intelligence += selectedValue;
-                break
-            case 'wisdom':
-                myBuff.wisdom += selectedValue;
-                break
-            case 'charisma':
-                myBuff.charisma += selectedValue;
-                break
-            case 'hp':
-                myBuff.hp += selectedValue;
-                break
-        }
+        // let myBuff = JSON.parse(JSON.stringify(MyBuff));
+        // switch (selectedOption.toLowerCase()) {
+        //     case 'strength':
+        //         myBuff.strength += selectedValue;
+        //         break
+        //     case 'dexterity':
+        //         myBuff.dexterity += selectedValue;
+        //         break
+        //     case 'vitality':
+        //         myBuff.vitality += selectedValue;
+        //         break
+        //     case 'intelligence':
+        //         myBuff.intelligence += selectedValue;
+        //         break
+        //     case 'wisdom':
+        //         myBuff.wisdom += selectedValue;
+        //         break
+        //     case 'charisma':
+        //         myBuff.charisma += selectedValue;
+        //         break
+        //     case 'hp':
+        //         myBuff.hp += selectedValue;
+        //         break
+        // }
 
-        setMyBuff(myBuff);
-        // Storage.set('buff_' + adventurer?.id, JSON.stringify(myBuff));
-        // Storage.set('victory' + adventurer?.id, JSON.stringify(false));
-        // (window as any).isVictory = false;
+        // setMyBuff(myBuff);
+        // await upgrade();
 
-        await handleSubmitUpgradeTx();
+        await buffAdventurer(selectedOption,selectedValue);
 
-        setVictory(false)
+        //todo
+        // setVictory(false)
     }
 
 
@@ -391,28 +320,9 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
     };
     const [currBuff, setCurrBuff] = useState(randBuff());
 
-    useEffect(() => {
-
-        // const bf = Storage.get('buff_' + adventurer?.id);
-        // if (bf) {
-        //     const buff = JSON.parse(bf);
-        //     setMyBuff(buff);
-        // }
-
-    }, [(window) as any]);
-
     const [monsters, setMonsters] = useState([] as Monster[])
 
     useEffect(() => {
-
-        // const bf = Storage.get('buff_' + adventurer?.id);
-        // if (bf) {
-        //     const buff = JSON.parse(bf);
-        //     setMyBuff(buff);
-        // }
-        console.log("asdasda", ccCaveData)
-
-
         setHasBeast(ccCaveData.curr_beast < ccCaveData.beast_amount);
         setIsClearance(ccCaveData.curr_beast == ccCaveData.beast_amount);
 
@@ -449,15 +359,6 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
     }, [ccCaveData]);
 
-    // const isVictory = () => {
-    //     // let res = Storage.get('victory' + adventurer?.id);
-    //     // if (res) {
-    //     //     console.log("isVictory", JSON.parse(res));
-    //     //     return JSON.parse(res);
-    //     // }
-    //     console.log("isVictory", false);
-    //     return false;
-    // }
 
     return (
         <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row">
@@ -530,6 +431,7 @@ export default function BeastScreen({attack, flee, exit, explore, upgrade}: Beas
 
                             {currBuff.map((cb, index) => (
                                 <Button
+                                    key={index}
                                     size={"lg"}
                                     className={`${selectedOption === cb.key ? 'animate-pulse' : ''
                                     } m-1 `}
