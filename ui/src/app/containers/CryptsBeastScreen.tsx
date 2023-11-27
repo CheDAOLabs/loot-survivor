@@ -8,14 +8,6 @@ import React, {useEffect, useState} from "react";
 import {processBeastName} from "../lib/utils";
 import {Battle, NullDiscovery, NullBeast, UpgradeStats, ZeroUpgrade, NullCave, CcCave,Monster} from "../types";
 import {Button} from "../components/buttons/Button";
-// import Neck from "../../../public/icons/loot/neck.svg";
-// import Heart from "../../../public/icons/heart.svg";
-import {HeartVitalityIcon} from "../components/icons/Icons";
-// import Storage from "../lib/storage";
-import useTransactionCartStore from "../hooks/useTransactionCartStore"
-import {useContracts} from "@/app/hooks/useContracts";
-import useUIStore from "@/app/hooks/useUIStore";
-import {syscalls} from "../lib/utils/syscalls"
 
 const buffs = [
     {
@@ -187,8 +179,6 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
     if (showBattleLog) {
         return <BattleLog/>;
     }
-
-    
 
     const onAttack = async (index: any) => {
         console.log("onAttack", beastData)

@@ -1103,6 +1103,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         console.log("onEnter: formData=", formData);
         // return;
         try {
+            setLoading(true);
             console.log("adventurer", adventurer)
             if(!adventurer){
                 return;
@@ -1112,6 +1113,8 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
             setStep(3);
         } catch (e) {
             console.error(e)
+        }finally {
+            setLoading(false);
         }
     }
 

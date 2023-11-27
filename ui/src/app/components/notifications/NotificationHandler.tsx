@@ -244,6 +244,7 @@ export const processNotifications = (
     return processAnimation(type, data, adventurer ?? NullAdventurer);
   };
   const isArray = Array.isArray(notificationData);
+  console.log("processNotifications",type)
   if ((type == "Attack" || type == "Flee") && isArray) {
     const battleScenarios = chunkArray(notificationData as Battle[], 2);
     for (let i = 0; i < battleScenarios.length; i++) {

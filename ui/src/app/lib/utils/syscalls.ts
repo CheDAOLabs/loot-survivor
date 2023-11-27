@@ -196,8 +196,6 @@ export function syscalls({
         }
 
         stopLoading(`You have entered the CC!`);
-
-
     };
 
     const attackCC = async (tillDeath: boolean, beastData: any) => {
@@ -434,26 +432,21 @@ export function syscalls({
             //setScreen("upgrade");
         }
 
-        // setData("battlesByBeastQuery", {
-        //     battles: [
-        //         ...battles,
-        //         ...(queryData.battlesByBeastQuery?.battles ?? []),
-        //     ],
-        // });
-        // setData("battlesByAdventurerQuery", {
-        //     battles: [
-        //         ...battles,
-        //         ...(queryData.battlesByAdventurerQuery?.battles ?? []),
-        //     ],
-        // });
-        // setData("battlesByTxHashQuery", {
-        //     battles: reversedBattles,
-        // });
-
-
-        // setData("adventurerByIdQuery", {
-        //     adventurers: [rewardItemsEvent.data[0]],
-        // });
+        setData("battlesByBeastQuery", {
+            battles: [
+                ...battles,
+                ...(queryData.battlesByBeastQuery?.battles ?? []),
+            ],
+        });
+        setData("battlesByAdventurerQuery", {
+            battles: [
+                ...battles,
+                ...(queryData.battlesByAdventurerQuery?.battles ?? []),
+            ],
+        });
+        setData("battlesByTxHashQuery", {
+            battles: reversedBattles,
+        });
 
         const rewardItemsEvents = events.filter(
             (event) => event.name === "RewardItemsCC"
@@ -467,10 +460,8 @@ export function syscalls({
             }
         }
 
-
-
         console.log("reversedBattles", reversedBattles)
-        stopLoading([]);
+        stopLoading(reversedBattles);
         setEquipItems([]);
         setDropItems([]);
         setMintAdventurer(false);
@@ -1101,6 +1092,8 @@ export function syscalls({
             setData("battlesByTxHashQuery", {
                 battles: reversedBattles,
             });
+
+            console.log("reversedBattles", reversedBattles)
 
             stopLoading(reversedBattles);
             setEquipItems([]);
