@@ -124,7 +124,7 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
 
     const [rewardItems, setRewardItems] = useState([] as string[])
     const [hasRewardBuff, setHasRewardBuff] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [selectedKey, setSelectedKey] = useState("");
     const [isClearance, setIsClearance] = useState(false);
     const [monsters, setMonsters] = useState([] as Monster[])
     const [currBuff, setCurrBuff] = useState([] as cb[]);
@@ -135,8 +135,8 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
         beastData?.special3 ?? ""
     );
 
-    const handleOptionChange = (index: number) => {
-        setSelectedIndex(index);
+    const handleOptionChange = (key: string) => {
+        setSelectedKey(key);
     };
 
     const BattleLog: React.FC = () => (
@@ -182,7 +182,28 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
     }
 
     const onConfirm = async () => {
-        await buffAdventurer(selectedIndex);
+        let selectedIndex = 0;
+        if(selectedKey === "strength"){
+            selectedIndex = 1;
+        }
+        if(selectedKey === "dexterity"){
+            selectedIndex = 2;
+        }
+        if(selectedKey === "vitality"){
+            selectedIndex = 3;
+        }
+        if(selectedKey === "intelligence"){
+            selectedIndex = 4;
+        }
+        if(selectedKey === "wisdom"){
+            selectedIndex = 5;
+        }
+        if(selectedKey === "charisma"){
+            selectedIndex = 6;
+        }
+        if(selectedIndex >0) {
+            await buffAdventurer(selectedIndex);
+        }
     }
 
     const onExit = async () => {
@@ -324,10 +345,11 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
                                     disabled={loading}
                                     key={index}
                                     size={"lg"}
-                                    className={`${selectedIndex === index ? 'animate-pulse' : ''
+                                    className={`${selectedKey === cb.key ? 'animate-pulse' : ''
                                     } m-1 `}
                                     onClick={() =>
-                                        handleOptionChange(index)
+                                        handleOptionChange(
+                                            cb.key)
                                     }
                                 >
                                     {cb.key}: +{cb.value}
