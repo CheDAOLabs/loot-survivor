@@ -37,12 +37,10 @@ fn get_buffs() -> Array<CcBuff> {
     buffs.append(CcBuff { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 0, charisma: 0, luck: 0, hp: 0 });
     buffs.append(CcBuff { id: 5, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 1, charisma: 0, luck: 0, hp: 0 });
     buffs.append(CcBuff { id: 6, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 1, luck: 0, hp: 0 });
-    buffs.append(CcBuff { id: 7, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 1, hp: 0 });
-    buffs.append(CcBuff { id: 8, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 10 });
     buffs
 }
 
-fn get_buff_by_id(buff_id: u8) -> CcBuff {
+fn get_buff_by_id(buff_id: u16) -> CcBuff {
     if buff_id == 1 {
        return CcBuff { id: 1, strength: 1, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 };
     }
@@ -60,12 +58,6 @@ fn get_buff_by_id(buff_id: u8) -> CcBuff {
     }
     if buff_id == 6 {
        return CcBuff { id: 6, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 1, luck: 0, hp: 0 };
-    }
-    if buff_id == 7 {
-       return CcBuff { id: 7, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 1, hp: 0 };
-    }
-    if buff_id == 8 {
-       return CcBuff { id: 8, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 10 };
     }
 
     CcBuff { id: 0, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 }

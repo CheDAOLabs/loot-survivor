@@ -990,13 +990,16 @@ export function processData(
             cc_points: enterCCEvent.cc_points,
             beast_health: enterCCEvent.beast_health,
             beast_amount: enterCCEvent.beast_amount,
-            has_reward:false,
-            strength_increase: 0, // 9 bits
-            dexterity_increase: 0, // 9 bits
-            vitality_increase: 0, // 9 bits
-            intelligence_increase: 0, // 9 bits
-            wisdom_increase: 0, // 9 bits
-            charisma_increase: 0, // 9 bit
+            has_reward:enterCCEvent.has_reward,
+            strength_increase: enterCCEvent.strength_increase,
+            dexterity_increase: enterCCEvent.dexterity_increase,
+            vitality_increase: enterCCEvent.vitality_increase,
+            intelligence_increase: enterCCEvent.intelligence_increase,
+            wisdom_increase: enterCCEvent.wisdom_increase,
+            charisma_increase: enterCCEvent.charisma_increase,
+          buff_1: enterCCEvent.buff_1,
+          buff_2: enterCCEvent.buff_2,
+          buff_3: enterCCEvent.buff_3,
         }
       return [
         enterCCData

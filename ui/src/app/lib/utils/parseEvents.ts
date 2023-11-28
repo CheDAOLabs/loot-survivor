@@ -707,6 +707,16 @@ export async function parseEvents(
           cc_points:parseInt(raw.data[2]),
           beast_health:parseInt(raw.data[3]), // 9 bits
           beast_amount:parseInt(raw.data[4]),
+            has_reward: parseInt(raw.data[5]), // 9 bits
+            strength_increase: parseInt(raw.data[6]), // 9 bits
+            dexterity_increase: parseInt(raw.data[7]), // 9 bits
+            vitality_increase: parseInt(raw.data[8]), // 9 bits
+            intelligence_increase: parseInt(raw.data[9]), // 9 bits
+          wisdom_increase: parseInt(raw.data[10]), // 9 bits
+            charisma_increase: parseInt(raw.data[11]), // 9 bits
+            buff_1: parseInt(raw.data[12]),
+            buff_2: parseInt(raw.data[13]),
+            buff_3: parseInt(raw.data[14])
         }
         console.log("parseEvent EnterCC",enterCCData);
         const enterCCEvent = processData(

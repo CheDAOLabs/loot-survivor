@@ -118,8 +118,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
 
     const [rewardItems,setRewardItems] = useState([] as string[])
     const [hasRewardBuff, setHasRewardBuff] = useState(false);
-    const [selectedOption, setSelectedOption] = useState('option1');
-    const [selectedValue, setSelectedValue] = useState(0);
+    const [selectedIndex, setSelectedIndex] = useState(0);
     const [isClearance, setIsClearance] = useState(false);
     const [monsters, setMonsters] = useState([] as Monster[])
     const [currBuff, setCurrBuff] = useState(() => {
@@ -143,12 +142,8 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
         beastData?.special3 ?? ""
     );
 
-    const handleOptionChange = (option: any, value: any) => {
-        console.log("handleOptionChange", option, value);
-        if (selectedOption != option) {
-            setSelectedOption(option);
-            setSelectedValue(value);
-        }
+    const handleOptionChange = (index:number) => {
+        setSelectedIndex(index);
     };
 
     const BattleLog: React.FC = () => (
@@ -194,7 +189,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
     }
 
     const onConfirm = async () => {
-        await buffAdventurer(selectedOption,selectedValue);
+        await buffAdventurer(selectedIndex);
     }
     
     const onExit = async () => {
@@ -313,10 +308,10 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
                                     disabled={loading}
                                     key={index}
                                     size={"lg"}
-                                    className={`${selectedOption === cb.key ? 'animate-pulse' : ''
+                                    className={`${selectedIndex === index ? 'animate-pulse' : ''
                                     } m-1 `}
                                     onClick={() =>
-                                        handleOptionChange(cb.key, cb.value)
+                                        handleOptionChange(index)
                                     }
                                 >
                                     {cb.key}: +{cb.value}

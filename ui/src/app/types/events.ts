@@ -392,4 +392,14 @@ export type EnterCCEvent = {
   cc_points:u16,
   beast_health:u16, // 9 bits
   beast_amount:u16,
+  has_reward: u16, // 9 bits
+  strength_increase: u16, // 9 bits
+  dexterity_increase: u16, // 9 bits
+  vitality_increase: u16, // 9 bits
+  intelligence_increase: u16, // 9 bits
+  wisdom_increase: u16, // 9 bits
+  charisma_increase: u16, // 9 bits
+  buff_1:u16,
+  buff_2:u16,
+  buff_3:u16
 };

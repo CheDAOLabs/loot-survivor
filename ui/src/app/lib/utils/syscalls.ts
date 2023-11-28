@@ -1597,11 +1597,9 @@ export function syscalls({
         }
     };
 
-    const buffAdventurer = async (option: string, value: number) => {
+    const buffAdventurer = async (buff_index: number) => {
 
-        option = option.toLowerCase();
-        console.log("option", option);
-        console.log("value", value);
+        console.log("buff_index", buff_index);
 
         const upgradeTx = {
             contractAddress: gameContract?.address ?? "",
@@ -1610,27 +1608,7 @@ export function syscalls({
                 // adventurerId
                 adventurer?.id?.toString() ?? "",
                 "0",
-                // potion
-                option === "hp" ? value.toString() : "0",
-                // statUpgrades
-                option === "strength"
-                    ? value.toString()
-                    : "0",
-                option === "dexterity"
-                    ? value.toString()
-                    : "0",
-                option === "vitality"
-                    ? value.toString()
-                    : "0",
-                option === "intelligence"
-                    ? value.toString()
-                    : "0",
-                option === "wisdom"
-                    ? value.toString()
-                    : "0",
-                option === "charisma"
-                    ? value.toString()
-                    : "0",
+                buff_index.toString()
             ],
         };
         addToCalls(upgradeTx);
