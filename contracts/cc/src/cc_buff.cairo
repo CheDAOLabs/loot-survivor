@@ -24,35 +24,24 @@ struct CcBuff {
     charisma: u8,
 }
 
-fn get_buffs() -> Array<CcBuff> {
-    let mut buffs = ArrayTrait::<CcBuff>::new();
-    buffs.append(CcBuff { id: 1, strength: 1, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 0  });
-    buffs.append(CcBuff { id: 2, strength: 0, dexterity: 1, vitality: 1, intelligence: 1, wisdom: 0, charisma: 0  });
-    buffs.append(CcBuff { id: 3, strength: 0, dexterity: 0, vitality: 1, intelligence: 1, wisdom: 1, charisma: 0  });
-    buffs.append(CcBuff { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 1, charisma: 1  });
-    buffs.append(CcBuff { id: 5, strength: 1, dexterity: 0, vitality: 1, intelligence: 0, wisdom: 1, charisma: 0  });
-    buffs.append(CcBuff { id: 6, strength: 0, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 1  });
-    buffs
-}
-
 fn get_buff_by_id(buff_id: u16) -> CcBuff {
     if buff_id == 1 {
-       return CcBuff { id: 1, strength: 1, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0  };
+       return CcBuff { id: 1, strength: 1, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 0  };
     }
     if buff_id == 2 {
-       return CcBuff { id: 2, strength: 0, dexterity: 1, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0  };
+       return CcBuff { id: 2, strength: 0, dexterity: 1, vitality: 1, intelligence: 1, wisdom: 0, charisma: 0  };
     }
     if buff_id == 3 {
-       return CcBuff { id: 3, strength: 0, dexterity: 0, vitality: 1, intelligence: 0, wisdom: 0, charisma: 0  };
+       return CcBuff { id: 3, strength: 0, dexterity: 0, vitality: 1, intelligence: 1, wisdom: 1, charisma: 0  };
     }
     if buff_id == 4 {
-       return CcBuff { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 0, charisma: 0  };
+       return CcBuff { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 1, charisma: 1  };
     }
     if buff_id == 5 {
-       return CcBuff { id: 5, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 1, charisma: 0  };
+       return CcBuff { id: 5, strength: 1, dexterity: 0, vitality: 1, intelligence: 0, wisdom: 1, charisma: 0  };
     }
     if buff_id == 6 {
-       return CcBuff { id: 6, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 1  };
+       return CcBuff { id: 6, strength: 0, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 1  };
     }
 
     CcBuff { id: 0, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0  }
@@ -61,12 +50,13 @@ fn get_buff_by_id(buff_id: u16) -> CcBuff {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use cc::cc_buff::get_buffs;
+    use cc::cc_buff::get_buff_by_id;
+
 
     #[test]
     #[available_gas(50000)]
-    fn test_buff() {
-        let mut buffs = get_buffs();
-        assert(*buffs.at(0).id == 1, 'wrong')
+    fn test_buff_by_id() {
+        let buff = get_buff_by_id(3);
+        assert(buff.vitality == 1, 'wrong')
     }
 }

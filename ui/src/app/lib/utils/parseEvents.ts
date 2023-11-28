@@ -707,13 +707,13 @@ export async function parseEvents(
           cc_points:parseInt(raw.data[2]),
           beast_health:parseInt(raw.data[3]), // 9 bits
           beast_amount:parseInt(raw.data[4]),
-            has_reward: parseInt(raw.data[5]), // 9 bits
-            strength_increase: parseInt(raw.data[6]), // 9 bits
-            dexterity_increase: parseInt(raw.data[7]), // 9 bits
-            vitality_increase: parseInt(raw.data[8]), // 9 bits
-            intelligence_increase: parseInt(raw.data[9]), // 9 bits
+          has_reward: parseInt(raw.data[5]), // 9 bits
+          strength_increase: parseInt(raw.data[6]), // 9 bits
+          dexterity_increase: parseInt(raw.data[7]), // 9 bits
+          vitality_increase: parseInt(raw.data[8]), // 9 bits
+          intelligence_increase: parseInt(raw.data[9]), // 9 bits
           wisdom_increase: parseInt(raw.data[10]), // 9 bits
-            charisma_increase: parseInt(raw.data[11]), // 9 bits
+          charisma_increase: parseInt(raw.data[11]), // 9 bits
         }
         console.log("parseEvent EnterCC",enterCCData);
         const enterCCEvent = processData(
@@ -826,7 +826,8 @@ export async function parseEvents(
           xpEarnedAdventurer: parseInt(raw.data[50]),
           xpEarnedItems: parseInt(raw.data[51]),
           goldEarned: parseInt(raw.data[52]),
-          curr_beast: parseInt(raw.data[53])
+          curr_beast: parseInt(raw.data[53]),
+          has_reward: parseInt(raw.data[54]),
         };
         const slayedBeastEventCC = processData(
             slayedBeastDataCC,

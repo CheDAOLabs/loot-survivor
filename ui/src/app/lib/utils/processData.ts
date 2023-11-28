@@ -1196,7 +1196,8 @@ export function processData(
         discoveryTime: new Date(),
         blockTime: new Date(),
         timestamp: new Date(),
-        curr_beast:slayedBeastEventCC.curr_beast
+        curr_beast: slayedBeastEventCC.curr_beast,
+        has_reward: slayedBeastEventCC.has_reward,
       };
       const slayedBeastItemsXPCC = processItemsXP(slayedBeastEventCC);
       return [slayedBeastAdventurerDataCC, slayedBeastDataCC, slayedBeastItemsXPCC];

@@ -1091,7 +1091,8 @@ mod Game {
             xp_earned_adventurer,
             xp_earned_items,
             gold_earned,
-            cc_cave.curr_beast
+            cc_cave.curr_beast,
+            cc_cave.has_reward,
         );
 
         // if adventurers new level is greater than previous level
@@ -3081,6 +3082,7 @@ mod Game {
         xp_earned_items: u16,
         gold_earned: u16,
         curr_beast: u16,
+        has_reward:u16
     }
 
 
@@ -3492,6 +3494,7 @@ mod Game {
         xp_earned_items: u16,
         gold_earned: u16,
         curr_beast: u16,
+        has_reward: u16
     ) {
         let adventurer_state = AdventurerState {
             owner: get_caller_address(), adventurer_id, adventurer
@@ -3507,6 +3510,7 @@ mod Game {
             xp_earned_items,
             gold_earned,
             curr_beast,
+            has_reward,
         };
         self.emit(slayed_beast_event);
     }

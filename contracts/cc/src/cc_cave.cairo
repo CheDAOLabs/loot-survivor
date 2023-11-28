@@ -551,7 +551,6 @@ impl ImplCcCave of ICcCave {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use cc::cc_buff::get_buffs;
     use cc::cc_cave::CcCave;
     use cc::cc_cave::ImplCcCave;
     // #[test]

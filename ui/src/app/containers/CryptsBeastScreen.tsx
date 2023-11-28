@@ -214,6 +214,7 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
     const id2cbs = (id: number) => {
         let cbs = []
         let buff: { [key: string]: number } | undefined = buffs.find(b => b.id === id);
+        console.log("find Buff" , id,buff)
         if (!buff) {
             return [];
         }

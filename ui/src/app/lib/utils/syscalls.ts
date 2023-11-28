@@ -280,7 +280,7 @@ export function syscalls({
            for (let slayedBeastEvent of slayedBeastEvents) {
                setData(
                    "enterCC",
-                   1,
+                   slayedBeastEvent.data[1].has_reward,
                    "has_reward",
                    0
                );

@@ -280,6 +280,7 @@ export type SlayedBeastEventCC = {
   xpEarnedItems: u16;
   goldEarned: u16;
   curr_beast: u16;
+  has_reward: u16;
 };
 
 export type FleeFailedEvent = {
