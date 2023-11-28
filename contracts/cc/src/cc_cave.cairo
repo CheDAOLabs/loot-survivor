@@ -31,12 +31,12 @@ struct CcCave {
     beast_health:u16, // 9 bits
     beast_amount:u16,
     has_reward: u16, // 9 bits
-    strength_increase: u16, // 9 bits
-    dexterity_increase: u16, // 9 bits
-    vitality_increase: u16, // 9 bits
-    intelligence_increase: u16, // 9 bits
-    wisdom_increase: u16, // 9 bits
-    charisma_increase: u16, // 9 bits
+    strength_increase: u8, // 9 bits
+    dexterity_increase: u8, // 9 bits
+    vitality_increase: u8, // 9 bits
+    intelligence_increase: u8, // 9 bits
+    wisdom_increase: u8, // 9 bits
+    charisma_increase: u8, // 9 bits
 }
 
 impl CcCavePacking of Packing<CcCave> {
@@ -94,32 +94,32 @@ impl CcCavePacking of Packing<CcCave> {
 
 #[generate_trait]
 impl ImplCcCave of ICcCave {
-    fn increase_strength(ref self: CcCave,amount:u8) -> u16{
+    fn increase_strength(ref self: CcCave,amount:u8) -> u8{
         self.strength_increase = self.strength_increase + amount.into();
         self.strength_increase
     }
 
-    fn increase_dexterity(ref self: CcCave,amount:u8) -> u16{
+    fn increase_dexterity(ref self: CcCave,amount:u8) -> u8{
         self.dexterity_increase = self.dexterity_increase + amount.into();
         self.dexterity_increase
     }
 
-    fn increase_vitality(ref self: CcCave,amount:u8) -> u16{
+    fn increase_vitality(ref self: CcCave,amount:u8) -> u8{
         self.vitality_increase = self.vitality_increase + amount.into();
         self.vitality_increase
     }
 
-    fn increase_intelligence(ref self: CcCave,amount:u8) -> u16{
+    fn increase_intelligence(ref self: CcCave,amount:u8) -> u8{
         self.intelligence_increase = self.intelligence_increase + amount.into();
         self.intelligence_increase
     }
 
-    fn increase_wisdom(ref self: CcCave,amount:u8) -> u16{
+    fn increase_wisdom(ref self: CcCave,amount:u8) -> u8{
         self.wisdom_increase = self.wisdom_increase + amount.into();
         self.wisdom_increase
     }
 
-    fn increase_charisma(ref self: CcCave,amount:u8) -> u16{
+    fn increase_charisma(ref self: CcCave,amount:u8) -> u8{
         self.charisma_increase = self.charisma_increase + amount.into();
         self.charisma_increase
     }
@@ -553,6 +553,7 @@ mod tests {
     use debug::PrintTrait;
     use cc::cc_cave::CcCave;
     use cc::cc_cave::ImplCcCave;
+    use cc::cc_buff::get_buff_by_id;
     // #[test]
     // #[available_gas(555600)]
     // fn test_cc_get_beast() {
@@ -593,27 +594,26 @@ mod tests {
     #[available_gas(1555600)]
     fn test_get_buff_sees() {
         let mut cc_cave = CcCave {
-            map_id: 1,
+            map_id: 2,
             curr_beast: 1,
-            cc_points: 1,
+            cc_points: 0,
             beast_health: 1,
-            beast_amount: 1,
-            has_reward: 1,
-            strength_increase: 1,
-            dexterity_increase: 1,
-            vitality_increase: 1,
-            intelligence_increase: 1,
-            wisdom_increase: 1,
-            charisma_increase: 1,
+            beast_amount: 3,
+            has_reward: 3,
+            strength_increase: 0,
+            dexterity_increase: 0,
+            vitality_increase: 0,
+            intelligence_increase: 0,
+            wisdom_increase: 0,
+            charisma_increase: 0,
         };
-        let mut adventurer_entropy = 1;
+        let mut adventurer_entropy = 9004952233574142991;
         let seed_1 = cc_cave.get_buff_seed(adventurer_entropy, 1);
         seed_1.print();
 
-        let seed_2 = cc_cave.get_buff_seed(adventurer_entropy, 2);
-        seed_2.print();
+        let config = get_buff_by_id(seed_1);
+        cc_cave.increase_vitality(config.vitality);
 
-        let seed_3 = cc_cave.get_buff_seed(adventurer_entropy, 3);
-        seed_3.print();
+        assert(cc_cave.vitality_increase == 1,'');
     }
 }

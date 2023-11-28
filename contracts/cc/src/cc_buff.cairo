@@ -57,6 +57,8 @@ mod tests {
     #[available_gas(50000)]
     fn test_buff_by_id() {
         let buff = get_buff_by_id(3);
-        assert(buff.vitality == 1, 'wrong')
+        assert(buff.vitality == 1, 'wrong');
+        assert(buff.wisdom == 1, 'wrong');
+
     }
 }

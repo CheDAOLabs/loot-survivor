@@ -190,29 +190,29 @@ mod Game {
         }
 
         // upgrade adventurer's stats
-        if cc_buff_config.strength != 0  && buff_index == 1{
+        if buff_index == 1{
             adventurer.stats.increase_strength(cc_buff_config.strength);
             cc_cave.increase_strength(cc_buff_config.strength);
         }
-        if cc_buff_config.dexterity != 0 && buff_index == 2 {
+        if  buff_index == 2 {
             adventurer.stats.increase_dexterity(cc_buff_config.dexterity);
             cc_cave.increase_dexterity(cc_buff_config.dexterity);
         }
-        if cc_buff_config.vitality != 0 && buff_index == 3 {
+        if  buff_index == 3 {
             adventurer.stats.increase_vitality(cc_buff_config.vitality);
             adventurer
                 .increase_health(VITALITY_INSTANT_HEALTH_BONUS * cc_buff_config.vitality.into());
             cc_cave.increase_vitality(cc_buff_config.vitality);
         }
-        if cc_buff_config.intelligence != 0 && buff_index == 4{
+        if buff_index == 4{
             adventurer.stats.increase_intelligence(cc_buff_config.intelligence);
             cc_cave.increase_intelligence(cc_buff_config.intelligence);
         }
-        if cc_buff_config.wisdom != 0 && buff_index == 5{
+        if buff_index == 5{
             adventurer.stats.increase_wisdom(cc_buff_config.wisdom);
             cc_cave.increase_wisdom(cc_buff_config.wisdom);
         }
-        if cc_buff_config.charisma != 0 && buff_index == 6{
+        if buff_index == 6{
             adventurer.stats.increase_charisma(cc_buff_config.charisma);
             cc_cave.increase_charisma(cc_buff_config.charisma);
         }
@@ -223,12 +223,12 @@ mod Game {
         adventurer.set_last_action(starknet::get_block_info().unbox().block_number);
 
         let now_buff = Stats{
-            strength: cc_cave.strength_increase.try_into().expect('pack'),
-            dexterity: cc_cave.dexterity_increase.try_into().expect('pack'),
-            vitality: cc_cave.vitality_increase.try_into().expect('pack'),
-            intelligence: cc_cave.intelligence_increase.try_into().expect('pack'),
-            wisdom: cc_cave.wisdom_increase.try_into().expect('pack'),
-            charisma: cc_cave.charisma_increase.try_into().expect('pack'),
+            strength: cc_cave.strength_increase,
+            dexterity: cc_cave.dexterity_increase,
+            vitality: cc_cave.vitality_increase,
+            intelligence: cc_cave.intelligence_increase,
+            wisdom: cc_cave.wisdom_increase,
+            charisma: cc_cave.charisma_increase
         };
         // emit adventurer upgraded event
         __event_AdventurerUpgradedCC(ref self, adventurer, adventurer_id, bag, now_buff);
