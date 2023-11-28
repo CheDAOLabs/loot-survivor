@@ -63,12 +63,6 @@ interface ScoresResult {
 
 interface EnterCCResult {
   [key: string]: Battle[];
-  map_id:number,//9 bits
-  curr_beast:number,
-  cc_points:number,
-  beast_health:number, // 9 bits
-  beast_amount:number,
-  beast_id: number, // 9 bits
 }
 
 interface InitialData {
