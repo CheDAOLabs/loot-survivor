@@ -165,7 +165,7 @@ mod Game {
         );
 
         let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
-        assert(cc_cave.has_reward == 1, 'no reward buff');
+         assert(cc_cave.has_reward > 0, 'no reward buff');
 
 
         let cc_buff_config:CcBuff = get_buff_by_id(cc_cave.has_reward);
@@ -189,7 +189,7 @@ mod Game {
             return;
         }
 
-        // upgrade adventurer's stats
+        //upgrade adventurer's stats
         if buff_index == 1{
             adventurer.stats.increase_strength(cc_buff_config.strength);
             cc_cave.increase_strength(cc_buff_config.strength);

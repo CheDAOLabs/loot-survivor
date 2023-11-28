@@ -13,7 +13,7 @@ mod tests {
     use openzeppelin::token::erc20::interface::{
         IERC20Camel, IERC20CamelDispatcher, IERC20CamelDispatcherTrait, IERC20CamelLibraryDispatcher
     };
-    use openzeppelin::token::erc20::erc20::ERC20;
+    //use openzeppelin::token::erc20::erc20::ERC20;
     use market::market::{ImplMarket, LootWithPrice, ItemPurchase};
     use lootitems::{loot::{Loot, ImplLoot, ILoot}, constants::{ItemId}};
     use game::{
@@ -24,7 +24,7 @@ mod tests {
         }
     };
     use openzeppelin::utils::serde::SerializedAppend;
-    use openzeppelin::tests::mocks::camel20_mock::CamelERC20Mock;
+    //use openzeppelin::tests::mocks::camel20_mock::CamelERC20Mock;
     use openzeppelin::tests::utils;
     use combat::{constants::CombatEnums::{Slot, Tier}, combat::ImplCombat};
     use survivor::{
@@ -61,26 +61,28 @@ mod tests {
         contract_address_const::<10>()
     }
 
-    fn deploy_lords() -> ContractAddress {
-        let mut calldata = array![];
-        calldata.append_serde(NAME);
-        calldata.append_serde(SYMBOL);
-        calldata.append_serde(MAX_LORDS);
-        calldata.append_serde(OWNER());
-
-        let lords0 = utils::deploy(CamelERC20Mock::TEST_CLASS_HASH, calldata);
-
-        lords0
-    }
+    // fn deploy_lords() -> ContractAddress {
+    //     let mut calldata = array![];
+    //     calldata.append_serde(NAME);
+    //     calldata.append_serde(SYMBOL);
+    //     calldata.append_serde(MAX_LORDS);
+    //     calldata.append_serde(OWNER());
+    //
+    //     let lords0 = utils::deploy(CamelERC20Mock::TEST_CLASS_HASH, calldata);
+    //
+    //     lords0
+    // }
 
     fn setup(starting_block: u64) -> IGameDispatcher {
         testing::set_block_number(starting_block);
 
-        let lords = deploy_lords();
+       // let lords = deploy_lords();
 
         let mut calldata = ArrayTrait::new();
-        calldata.append(lords.into());
+        // calldata.append(lords.into());
         calldata.append(DAO().into());
+        calldata.append(DAO().into());
+
         calldata.append(COLLECTIBLE_BEASTS().into());
 
         let (address0, _) = deploy_syscall(
@@ -90,9 +92,9 @@ mod tests {
 
         testing::set_contract_address(OWNER());
 
-        let lordsContract = IERC20CamelDispatcher { contract_address: lords };
+        // let lordsContract = IERC20CamelDispatcher { contract_address: lords };
 
-        lordsContract.approve(address0, APPROVE.into());
+        // lordsContract.approve(address0, APPROVE.into());
 
         IGameDispatcher { contract_address: address0 }
     }
@@ -1811,5 +1813,13 @@ mod tests {
         // assert adventurer has the purchased items
         assert(adventurer.is_equipped(item_1), 'item should be equipped');
         assert(adventurer.is_equipped(item_2), 'item should be equipped');
+    }
+
+    #[test]
+    #[available_gas(300000000000)]
+    fn test_start_cc() {
+        let mut game = new_adventurer(1000);
+        // game
+
     }
 }

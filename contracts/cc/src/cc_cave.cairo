@@ -95,32 +95,32 @@ impl CcCavePacking of Packing<CcCave> {
 #[generate_trait]
 impl ImplCcCave of ICcCave {
     fn increase_strength(ref self: CcCave,amount:u8) -> u8{
-        self.strength_increase = self.strength_increase + amount.into();
+        self.strength_increase = self.strength_increase + amount;
         self.strength_increase
     }
 
     fn increase_dexterity(ref self: CcCave,amount:u8) -> u8{
-        self.dexterity_increase = self.dexterity_increase + amount.into();
+        self.dexterity_increase = self.dexterity_increase + amount;
         self.dexterity_increase
     }
 
     fn increase_vitality(ref self: CcCave,amount:u8) -> u8{
-        self.vitality_increase = self.vitality_increase + amount.into();
+        self.vitality_increase = self.vitality_increase + amount;
         self.vitality_increase
     }
 
     fn increase_intelligence(ref self: CcCave,amount:u8) -> u8{
-        self.intelligence_increase = self.intelligence_increase + amount.into();
+        self.intelligence_increase = self.intelligence_increase + amount;
         self.intelligence_increase
     }
 
     fn increase_wisdom(ref self: CcCave,amount:u8) -> u8{
-        self.wisdom_increase = self.wisdom_increase + amount.into();
+        self.wisdom_increase = self.wisdom_increase + amount;
         self.wisdom_increase
     }
 
     fn increase_charisma(ref self: CcCave,amount:u8) -> u8{
-        self.charisma_increase = self.charisma_increase + amount.into();
+        self.charisma_increase = self.charisma_increase + amount;
         self.charisma_increase
     }
 
@@ -554,6 +554,9 @@ mod tests {
     use cc::cc_cave::CcCave;
     use cc::cc_cave::ImplCcCave;
     use cc::cc_buff::get_buff_by_id;
+
+    use pack::{pack::{Packing, rshift_split}, constants::{MASK_16, pow, MASK_8, MASK_BOOL, mask}};
+
     // #[test]
     // #[available_gas(555600)]
     // fn test_cc_get_beast() {
@@ -588,6 +591,30 @@ mod tests {
 
         // let x = 12;
         // x.print();
+    }
+
+    #[test]
+    #[available_gas(1555600)]
+    fn test_pack() {
+        let mut cc_cave = CcCave {
+            map_id: 2,
+            curr_beast: 1,
+            cc_points: 0,
+            beast_health: 1,
+            beast_amount: 3,
+            has_reward: 3,
+            strength_increase: 0,
+            dexterity_increase: 0,
+            vitality_increase: 0,
+            intelligence_increase: 0,
+            wisdom_increase: 0,
+            charisma_increase: 0,
+        };
+        let packed = cc_cave.pack();
+        let unpacked:CcCave = Packing::unpack(packed);
+        assert(unpacked.map_id==2,'');
+        assert(unpacked.charisma_increase==0,'');
+
     }
 
     #[test]
