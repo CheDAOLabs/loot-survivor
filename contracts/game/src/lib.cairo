@@ -164,6 +164,7 @@ mod Game {
         );
 
         let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
+        assert(cc_cave.has_reward == 1, 'no reward buff');
 
         if potions == 0 {
             adventurer.increase_stat_points_available(1);
@@ -195,21 +196,27 @@ mod Game {
         }
         if stat_upgrades.dexterity != 0 {
             adventurer.stats.increase_dexterity(stat_upgrades.dexterity);
+            cc_cave.increase_dexterity(stat_upgrades.dexterity);
         }
         if stat_upgrades.vitality != 0 {
             adventurer.stats.increase_vitality(stat_upgrades.vitality);
             adventurer
                 .increase_health(VITALITY_INSTANT_HEALTH_BONUS * stat_upgrades.vitality.into());
+            cc_cave.increase_vitality(stat_upgrades.vitality);
         }
         if stat_upgrades.intelligence != 0 {
             adventurer.stats.increase_intelligence(stat_upgrades.intelligence);
+            cc_cave.increase_intelligence(stat_upgrades.intelligence);
         }
         if stat_upgrades.wisdom != 0 {
             adventurer.stats.increase_wisdom(stat_upgrades.wisdom);
+            cc_cave.increase_wisdom(stat_upgrades.wisdom);
         }
         if stat_upgrades.charisma != 0 {
             adventurer.stats.increase_charisma(stat_upgrades.charisma);
+            cc_cave.increase_charisma(stat_upgrades.charisma);
         }
+        cc_cave.has_reward = 0;
         adventurer.stat_points_available -= 1;
 
         // update players last action block number
@@ -220,6 +227,8 @@ mod Game {
 
         // remove stat boosts, pack, and save adventurer
         _pack_adventurer_remove_stat_boost(ref self, ref adventurer, adventurer_id, stat_boosts);
+
+        _pack_cc_cave(ref self, adventurer_id, cc_cave);
     }
 
     // ------------------------------------------ //
@@ -1053,6 +1062,7 @@ mod Game {
         let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
         cc_cave.curr_beast = cc_cave.curr_beast + 1;
         cc_cave.set_beast_health(beast.starting_health);
+        cc_cave.has_reward = 1;
         __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
 
         // emit slayed beast event
