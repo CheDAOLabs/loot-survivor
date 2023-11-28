@@ -169,7 +169,8 @@ impl ImplCcCave of ICcCave {
         // 当points（8|11），randomNumber=2|3
         // 当points（12），randomNumber=3|5
         if self.cc_points < 3 {
-            return (seed % 3).try_into().unwrap();
+            //return (seed % 3).try_into().unwrap();
+            return 1+(seed % 3).try_into().unwrap();
         } else if self.cc_points < 5 {
             return 1 + (seed % 2).try_into().unwrap();
         } else if self.cc_points < 8 {

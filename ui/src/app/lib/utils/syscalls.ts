@@ -464,11 +464,21 @@ export function syscalls({
                for (let rewardItemsEvent of rewardItemsEvents) {
                    console.log("rewardItemsEvent",rewardItemsEvent)
                    reward_items = rewardItemsEvent.data[1];
+                   //
+                   // setData("adventurerByIdQuery", {
+                   //     adventurers: [rewardItemsEvent.data[0]],
+                   // });
+                   // setAdventurer(rewardItemsEvent.data[0]);
+
+                   console.log("refresh items");
+                   setData("itemsByAdventurerQuery", {
+                       items: [...[], ...rewardItemsEvent.data[2]],
+                   });
                }
            }
 
            console.log("reversedBattles", reversedBattles)
-           stopLoading(reversedBattles);
+           stopLoading("attcked cc beasts");
            setEquipItems([]);
            setDropItems([]);
            setMintAdventurer(false);

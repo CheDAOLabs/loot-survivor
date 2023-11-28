@@ -1097,7 +1097,7 @@ mod Game {
                 let mut items = ArrayTrait::<u8>::new();
                 let mut index: u8 = 0;
                 loop {
-                    if (index >= item_awards_number) {
+                    if (index >= item_awards_number || bag.is_full()) {
                         break;
                     }
                     let reward_seed: u128 = cc_cave.get_reward_seed(adventurer_entropy, index);

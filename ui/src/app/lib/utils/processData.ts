@@ -1227,6 +1227,21 @@ export function processData(
             gameData.ITEMS[rewardItemsEvent.itemIds[i]]
         );
       }
-      return [rewardItemsAdventurerData, formattedRewardItems];
+      console.log("rewardItemsAdventurerData",rewardItemsAdventurerData);
+
+      let reward_items = [];
+      for (let i = 0; i < rewardItemsEvent.itemIds.length; i++) {
+          reward_items.push({
+              item:{
+                  id:rewardItemsEvent.itemIds[i]
+              }
+          })
+      }
+      const newItems = processPurchases(
+          reward_items,
+          rewardItemsEvent.adventurerStateWithBag.adventurerState
+      );
+
+      return [rewardItemsAdventurerData, formattedRewardItems, newItems];
   }
 }
