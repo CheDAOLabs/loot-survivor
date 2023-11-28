@@ -272,10 +272,10 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
                                 <p>WISDOM:{ccCaveData.wisdom_increase}</p>
                                 <p>CHARISMA:{ccCaveData.charisma_increase}</p>
                             </div>
-                            <div className="flex  gap-2 border-b border-terminal-green">
-                                <p>LUCK:0</p>
-                                <p>HP:0</p>
-                            </div>
+                            {/*<div className="flex  gap-2 border-b border-terminal-green">*/}
+                            {/*    <p>LUCK:0</p>*/}
+                            {/*    <p>HP:0</p>*/}
+                            {/*</div>*/}
 
                         </div>
                         <div className="flex flex-col mt-3">

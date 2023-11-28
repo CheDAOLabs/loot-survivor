@@ -176,8 +176,8 @@ mod Game {
         // assert action is valid
         _assert_ownership(@self, adventurer_id);
         _assert_not_dead(adventurer);
-        _assert_not_in_battle(adventurer);
-        _assert_upgrades_available(adventurer);
+        //_assert_not_in_battle(adventurer);
+        //_assert_upgrades_available(adventurer);
         // _assert_stat_balance(adventurer, stat_upgrades);
 
         // get number of blocks between actions
@@ -217,13 +217,21 @@ mod Game {
             cc_cave.increase_charisma(stat_upgrades.charisma);
         }
         cc_cave.has_reward = 0;
-        adventurer.stat_points_available -= 1;
+       // adventurer.stat_points_available -= 1;
 
         // update players last action block number
         adventurer.set_last_action(starknet::get_block_info().unbox().block_number);
 
+        let now_buff = Stats{
+            strength: cc_cave.strength_increase.try_into().expect('pack'),
+            dexterity: cc_cave.dexterity_increase.try_into().expect('pack'),
+            vitality: cc_cave.vitality_increase.try_into().expect('pack'),
+            intelligence: cc_cave.intelligence_increase.try_into().expect('pack'),
+            wisdom: cc_cave.wisdom_increase.try_into().expect('pack'),
+            charisma: cc_cave.charisma_increase.try_into().expect('pack'),
+        };
         // emit adventurer upgraded event
-        __event_AdventurerUpgradedCC(ref self, adventurer, adventurer_id, bag, stat_upgrades);
+        __event_AdventurerUpgradedCC(ref self, adventurer, adventurer_id, bag, now_buff);
 
         // remove stat boosts, pack, and save adventurer
         _pack_adventurer_remove_stat_boost(ref self, ref adventurer, adventurer_id, stat_boosts);
@@ -979,7 +987,13 @@ mod Game {
             let pay_amount:u256 = (cc_point * 2).into();
             _payoutCC(ref self,get_caller_address(),pay_amount,map_owner);
 
-            let mut cc_cave = ImplCcCave::new(map_id,cc_point);
+            //let mut cc_cave = ImplCcCave::new(map_id,cc_point);
+            let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
+            cc_cave.map_id = map_id;
+            cc_cave.cc_points = cc_point;
+            cc_cave.beast_amount = ImplCcCave::get_beast_amount(cc_point);
+            cc_cave.curr_beast = 0;
+            cc_cave.has_reward = 0;
 
             // // adventurer immediately gets ambushed by a starter beast
             // let beast_battle_details = _starter_beast_ambush(
@@ -989,7 +1003,6 @@ mod Game {
             // __event_AmbushedByBeast(ref self, new_adventurer, adventurer_id, beast_battle_details);
 
             let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
-
             cc_cave.set_beast_health(beast.starting_health);
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
 
