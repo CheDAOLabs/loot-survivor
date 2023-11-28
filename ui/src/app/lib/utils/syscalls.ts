@@ -472,7 +472,8 @@ export function syscalls({
 
                    console.log("refresh items");
                    setData("itemsByAdventurerQuery", {
-                       items: [...[], ...rewardItemsEvent.data[2]],
+
+                       items: [...(queryData.itemsByAdventurerQuery?.items ?? []), ...rewardItemsEvent.data[2]],
                    });
                }
            }
