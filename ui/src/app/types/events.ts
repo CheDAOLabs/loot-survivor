@@ -399,7 +399,4 @@ export type EnterCCEvent = {
   intelligence_increase: u16, // 9 bits
   wisdom_increase: u16, // 9 bits
   charisma_increase: u16, // 9 bits
-  buff_1:u16,
-  buff_2:u16,
-  buff_3:u16
 };

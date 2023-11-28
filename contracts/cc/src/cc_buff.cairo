@@ -22,45 +22,40 @@ struct CcBuff {
     wisdom: u8,
     // 5 bits
     charisma: u8,
-    // 5 bits
-    // More
-    luck: u8,
-    // 5 bits
-    hp: u8, // 5 bits
 }
 
 fn get_buffs() -> Array<CcBuff> {
     let mut buffs = ArrayTrait::<CcBuff>::new();
-    buffs.append(CcBuff { id: 1, strength: 1, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 });
-    buffs.append(CcBuff { id: 2, strength: 0, dexterity: 1, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 });
-    buffs.append(CcBuff { id: 3, strength: 0, dexterity: 0, vitality: 1, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 });
-    buffs.append(CcBuff { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 0, charisma: 0, luck: 0, hp: 0 });
-    buffs.append(CcBuff { id: 5, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 1, charisma: 0, luck: 0, hp: 0 });
-    buffs.append(CcBuff { id: 6, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 1, luck: 0, hp: 0 });
+    buffs.append(CcBuff { id: 1, strength: 1, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 0  });
+    buffs.append(CcBuff { id: 2, strength: 0, dexterity: 1, vitality: 1, intelligence: 1, wisdom: 0, charisma: 0  });
+    buffs.append(CcBuff { id: 3, strength: 0, dexterity: 0, vitality: 1, intelligence: 1, wisdom: 1, charisma: 0  });
+    buffs.append(CcBuff { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 1, charisma: 1  });
+    buffs.append(CcBuff { id: 5, strength: 1, dexterity: 0, vitality: 1, intelligence: 0, wisdom: 1, charisma: 0  });
+    buffs.append(CcBuff { id: 6, strength: 0, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 1  });
     buffs
 }
 
 fn get_buff_by_id(buff_id: u16) -> CcBuff {
     if buff_id == 1 {
-       return CcBuff { id: 1, strength: 1, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 };
+       return CcBuff { id: 1, strength: 1, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0  };
     }
     if buff_id == 2 {
-       return CcBuff { id: 2, strength: 0, dexterity: 1, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 };
+       return CcBuff { id: 2, strength: 0, dexterity: 1, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0  };
     }
     if buff_id == 3 {
-       return CcBuff { id: 3, strength: 0, dexterity: 0, vitality: 1, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 };
+       return CcBuff { id: 3, strength: 0, dexterity: 0, vitality: 1, intelligence: 0, wisdom: 0, charisma: 0  };
     }
     if buff_id == 4 {
-       return CcBuff { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 0, charisma: 0, luck: 0, hp: 0 };
+       return CcBuff { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 0, charisma: 0  };
     }
     if buff_id == 5 {
-       return CcBuff { id: 5, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 1, charisma: 0, luck: 0, hp: 0 };
+       return CcBuff { id: 5, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 1, charisma: 0  };
     }
     if buff_id == 6 {
-       return CcBuff { id: 6, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 1, luck: 0, hp: 0 };
+       return CcBuff { id: 6, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 1  };
     }
 
-    CcBuff { id: 0, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0, luck: 0, hp: 0 }
+    CcBuff { id: 0, strength: 0, dexterity: 0, vitality: 0, intelligence: 0, wisdom: 0, charisma: 0  }
 }
 
 #[cfg(test)]

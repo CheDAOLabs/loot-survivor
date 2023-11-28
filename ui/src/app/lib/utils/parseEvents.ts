@@ -714,9 +714,6 @@ export async function parseEvents(
             intelligence_increase: parseInt(raw.data[9]), // 9 bits
           wisdom_increase: parseInt(raw.data[10]), // 9 bits
             charisma_increase: parseInt(raw.data[11]), // 9 bits
-            buff_1: parseInt(raw.data[12]),
-            buff_2: parseInt(raw.data[13]),
-            buff_3: parseInt(raw.data[14])
         }
         console.log("parseEvent EnterCC",enterCCData);
         const enterCCEvent = processData(

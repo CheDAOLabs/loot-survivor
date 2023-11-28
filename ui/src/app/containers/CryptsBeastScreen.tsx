@@ -6,74 +6,75 @@ import useAdventurerStore from "../hooks/useAdventurerStore";
 import {useQueriesStore} from "../hooks/useQueryStore";
 import React, {useEffect, useState} from "react";
 import {processBeastName} from "../lib/utils";
-import {Battle, NullDiscovery, NullBeast, UpgradeStats, ZeroUpgrade, NullCave, CcCave,Monster} from "../types";
+import {Battle, NullDiscovery, NullBeast, UpgradeStats, ZeroUpgrade, NullCave, CcCave, Monster} from "../types";
 import {Button} from "../components/buttons/Button";
+import {type} from "os";
 
-const buffs = [
-    {
-        "id": 0,
-        "strength": 1,
-        "dexterity": 1,
-        "vitality": 1,
-        "intelligence": 0,
-        "wisdom": 0,
-        "charisma": 0,
-    },
-    {
-        "id": 1,
-        "strength": 0,
-        "dexterity": 1,
-        "vitality": 1,
-        "intelligence": 1,
-        "wisdom": 0,
-        "charisma": 0,
-    },
-    {
-        "id": 2,
-        "strength": 0,
-        "dexterity": 0,
-        "vitality": 1,
-        "intelligence": 1,
-        "wisdom": 1,
-        "charisma": 0,
-    },
-    {
-        "id": 3,
-        "strength": 0,
-        "dexterity": 0,
-        "vitality": 0,
-        "intelligence": 1,
-        "wisdom": 1,
-        "charisma": 1,
-    },
-    {
-        "id": 4,
-        "strength": 1,
-        "dexterity": 0,
-        "vitality": 1,
-        "intelligence": 0,
-        "wisdom": 1,
-        "charisma": 0,
-    },
-    {
-        "id": 5,
-        "strength": 0,
-        "dexterity": 1,
-        "vitality": 0,
-        "intelligence": 1,
-        "wisdom": 0,
-        "charisma": 1,
-    },
-    {
-        "id": 6,
-        "strength": 1,
-        "dexterity": 0,
-        "vitality": 1,
-        "intelligence": 0,
-        "wisdom": 0,
-        "charisma": 1,
-    },
-];
+const buffs =
+    [
+        {
+            id: 1,
+            strength: 1,
+            dexterity: 1,
+            vitality: 1,
+            intelligence: 0,
+            wisdom: 0,
+            charisma: 0,
+        },
+        {
+            id: 2,
+            strength: 0,
+            dexterity: 1,
+            vitality: 1,
+            intelligence: 1,
+            wisdom: 0,
+            charisma: 0,
+        },
+        {
+            id: 3,
+            strength: 0,
+            dexterity: 0,
+            vitality: 1,
+            intelligence: 1,
+            wisdom: 1,
+            charisma: 0,
+        },
+        {
+            id: 4,
+            strength: 0,
+            dexterity: 0,
+            vitality: 0,
+            intelligence: 1,
+            wisdom: 1,
+            charisma: 1,
+        },
+        {
+            id: 5,
+            strength: 1,
+            dexterity: 0,
+            vitality: 1,
+            intelligence: 0,
+            wisdom: 1,
+            charisma: 0,
+        },
+        {
+            id: 5,
+            strength: 0,
+            dexterity: 1,
+            vitality: 0,
+            intelligence: 1,
+            wisdom: 0,
+            charisma: 1,
+        },
+        {
+            id: 6,
+            strength: 1,
+            dexterity: 0,
+            vitality: 1,
+            intelligence: 0,
+            wisdom: 0,
+            charisma: 1,
+        }];
 
 function getRandomBuff() {
     const randomIndex = Math.floor(Math.random() * buffs.length);
@@ -91,7 +92,7 @@ interface BeastScreenProps {
  * @container
  * @description Provides the beast screen for adventurer battles.
  */
-export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastScreenProps) {
+export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastScreenProps) {
     /* eslint-disable */
 
     const adventurer = useAdventurerStore((state) => state.adventurer);
@@ -116,25 +117,17 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
         (state) => state.data.battlesByBeastQuery?.battles || []
     );
 
-    const [rewardItems,setRewardItems] = useState([] as string[])
+    interface cb {
+        key: string,
+        value: number
+    }
+
+    const [rewardItems, setRewardItems] = useState([] as string[])
     const [hasRewardBuff, setHasRewardBuff] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [isClearance, setIsClearance] = useState(false);
     const [monsters, setMonsters] = useState([] as Monster[])
-    const [currBuff, setCurrBuff] = useState(() => {
-        let result = [];
-        const buff1 = getRandomBuff();
-        for (const [key, value] of Object.entries(buff1)) {
-            if (key != "id" && value > 0) {
-                result.push({
-                    key: key.toUpperCase(),
-                    value: value
-                });
-            }
-        }
-
-        return result;
-    });
+    const [currBuff, setCurrBuff] = useState([] as cb[]);
 
     const beastName = processBeastName(
         beastData?.beast ?? "",
@@ -142,7 +135,7 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
         beastData?.special3 ?? ""
     );
 
-    const handleOptionChange = (index:number) => {
+    const handleOptionChange = (index: number) => {
         setSelectedIndex(index);
     };
 
@@ -178,11 +171,11 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
     const onAttack = async (index: any) => {
         console.log("onAttack", beastData)
         try {
-           let reward_items =  await attack(false, beastData);
-           if(reward_items.length>0) {
-               console.log("setRewardItems",reward_items);
-               setRewardItems(reward_items);
-           }
+            let reward_items = await attack(false, beastData);
+            if (reward_items.length > 0) {
+                console.log("setRewardItems", reward_items);
+                setRewardItems(reward_items);
+            }
         } catch (e) {
             console.error(e);
         }
@@ -191,17 +184,40 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
     const onConfirm = async () => {
         await buffAdventurer(selectedIndex);
     }
-    
+
     const onExit = async () => {
         exit();
     }
 
+
+    const id2cbs = (id: number) => {
+        let cbs = []
+        let buff: { [key: string]: number } | undefined = buffs.find(b => b.id === id);
+        if (!buff) {
+            return [];
+        }
+        let keys = Object.keys(buff);
+        for (let key of keys) {
+            if (key === 'id') continue;
+            let value = buff[key];
+            if (value > 0) {
+                cbs.push({
+                    key: key,
+                    value: value
+                });
+            }
+        }
+        return cbs;
+    }
 
     useEffect(() => {
         setHasBeast(ccCaveData.curr_beast < ccCaveData.beast_amount);
         setIsClearance(ccCaveData.curr_beast == ccCaveData.beast_amount);
         // setIsClearance(true);
         let monsters: Monster[] = [];
+
+        let cbs: cb[] = id2cbs(ccCaveData.has_reward)
+        setCurrBuff(cbs);
 
         for (let i = 0; i < ccCaveData.beast_amount; i++) {
             monsters.push({
@@ -231,13 +247,13 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
 
 
         setMonsters(monsters);
-        setHasRewardBuff(ccCaveData.has_reward>0)
+        setHasRewardBuff(ccCaveData.has_reward > 0)
 
     }, [ccCaveData]);
 
 
     return (
-        <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row" style={{height:"600px"}}>
+        <div className="sm:w-2/3 sm:h-2/3 flex flex-col sm:flex-row" style={{height: "600px"}}>
             <div className="sm:w-1/2 order-1 sm:order-2">
                 {hasBeast ? (
                     <>
@@ -274,10 +290,10 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
 
                         </div>
                         <div className="flex flex-col mt-3">
-                            {monsters.map((monster:Monster, index) => (
+                            {monsters.map((monster: Monster, index) => (
                                 <Button
                                     size={"lg"}
-                                    disabled={monster.status == 'dead' || loading }
+                                    disabled={monster.status == 'dead' || loading}
                                     key={index}
                                     onClick={() => {
                                         if (monster.status === 'attack') {
@@ -332,7 +348,8 @@ export default function BeastScreen({attack, flee, exit,buffAdventurer }: BeastS
                         <h4>YOU WON ALL THE BATTLES</h4>
                         <div className="flex flex-col ">
                             {rewardItems.map((item_name, index) => (
-                                <div key={index} className="flex flex-row bg-terminal-green text-black mb-1 px-9">{item_name}</div>
+                                <div key={index}
+                                     className="flex flex-row bg-terminal-green text-black mb-1 px-9">{item_name}</div>
                             ))}
                         </div>
                         <Button size={"lg"} onClick={exit}>EXIT</Button>

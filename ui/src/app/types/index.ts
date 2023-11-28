@@ -154,9 +154,6 @@ export interface CcCave {
     intelligence_increase: number, // 9 bits
     wisdom_increase: number, // 9 bits
     charisma_increase: number, // 9 bits
-    buff_1:number,
-    buff_2:number,
-    buff_3:number,
 }
 
 export interface Monster {
@@ -391,9 +388,6 @@ export const NullCave: CcCave = {
     intelligence_increase: 0, // 9 bits
     wisdom_increase: 0, // 9 bits
     charisma_increase: 0, // 9 bits
-    buff_1:0,
-    buff_2:0,
-    buff_3:0,
     // reward_items: []
 }
 

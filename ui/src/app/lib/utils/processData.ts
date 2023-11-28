@@ -997,9 +997,6 @@ export function processData(
             intelligence_increase: enterCCEvent.intelligence_increase,
             wisdom_increase: enterCCEvent.wisdom_increase,
             charisma_increase: enterCCEvent.charisma_increase,
-          buff_1: enterCCEvent.buff_1,
-          buff_2: enterCCEvent.buff_2,
-          buff_3: enterCCEvent.buff_3,
         }
       return [
         enterCCData

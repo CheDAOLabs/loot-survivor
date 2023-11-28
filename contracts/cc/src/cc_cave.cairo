@@ -37,9 +37,6 @@ struct CcCave {
     intelligence_increase: u16, // 9 bits
     wisdom_increase: u16, // 9 bits
     charisma_increase: u16, // 9 bits
-    buff_1:u16,
-    buff_2:u16,
-    buff_3:u16
 }
 
 impl CcCavePacking of Packing<CcCave> {
@@ -56,9 +53,6 @@ impl CcCavePacking of Packing<CcCave> {
             + self.intelligence_increase.into() * pow::TWO_POW_81
             + self.wisdom_increase.into() * pow::TWO_POW_90
             + self.charisma_increase.into() * pow::TWO_POW_99
-            + self.buff_1.into() * pow::TWO_POW_108
-            + self.buff_2.into() * pow::TWO_POW_117
-            + self.buff_3.into() * pow::TWO_POW_126
         ).try_into().expect('pack cc_cave')
     }
     fn unpack(packed: felt252) -> CcCave {
@@ -75,9 +69,6 @@ impl CcCavePacking of Packing<CcCave> {
         let (packed, intelligence_increase) = rshift_split(packed, pow::TWO_POW_9);
         let (packed, wisdom_increase) = rshift_split(packed, pow::TWO_POW_9);
         let (packed, charisma_increase) = rshift_split(packed, pow::TWO_POW_9);
-        let (packed, buff_1) = rshift_split(packed, pow::TWO_POW_9);
-        let (packed, buff_2) = rshift_split(packed, pow::TWO_POW_9);
-        let (packed, buff_3) = rshift_split(packed, pow::TWO_POW_9);
 
         CcCave {
             map_id: map_id.try_into().expect('unpack cc_cave map_id'),
@@ -92,9 +83,6 @@ impl CcCavePacking of Packing<CcCave> {
             intelligence_increase: intelligence_increase.try_into().expect('unpack cc_cave intelligence'),
             wisdom_increase: wisdom_increase.try_into().expect('unpack cc_cave wisdom'),
             charisma_increase: charisma_increase.try_into().expect('unpack cc_cave charisma'),
-            buff_1: buff_1.try_into().expect('unpack cc_cave buff_1'),
-            buff_2: buff_2.try_into().expect('unpack cc_cave buff_2'),
-            buff_3: buff_3.try_into().expect('unpack cc_cave buff_3'),
         }
     }
 
@@ -490,7 +478,7 @@ impl ImplCcCave of ICcCave {
                 hash_span.append(self.curr_beast.into());
                 hash_span.append(adventurer_entropy.into());
                 let poseidon = poseidon_hash_span(hash_span.span());
-                let (d, r) = rshift_split(poseidon.into(), 203363082831567469464458176037923362441);
+                let (d, r) = rshift_split(poseidon.into(), 340282366920938463463374607431768211457);
                 r.try_into().unwrap()
             } else {
                 0
@@ -504,7 +492,7 @@ impl ImplCcCave of ICcCave {
             hash_span.append(adventurer_entropy.into());
             hash_span.append(index.into());
             let poseidon = poseidon_hash_span(hash_span.span());
-            let (d, r) = rshift_split(poseidon.into(), 724950043567312766233463464894128360813);
+            let (d, r) = rshift_split(poseidon.into(), 340282366920938463463374607431768211456);
             r.try_into().unwrap()
     }
 
@@ -515,10 +503,10 @@ impl ImplCcCave of ICcCave {
         hash_span.append(adventurer_entropy.into());
         hash_span.append(index.into());
         let poseidon = poseidon_hash_span(hash_span.span());
-        let (d, r) = rshift_split(poseidon.into(), 674546095234706718430236841283393614263);
-        let seed:u128 = r.try_into().unwrap();
+        let (d, r) = rshift_split(poseidon.into(), 340282366920938463463374607431768211455);
+        let seed:u128 = r.try_into().expect('get_buff_seed 1');
 
-        return 1 + (seed % 6).try_into().unwrap();
+        return 1 + (seed % 6).try_into().expect('get_buff_seed 2');
     }
 
     fn get_beast(self: CcCave,adventurer_entropy: u128) -> (Beast, u128) {
@@ -603,7 +591,7 @@ mod tests {
     }
 
     #[test]
-    #[available_gas(555600)]
+    #[available_gas(1555600)]
     fn test_get_buff_sees() {
         let mut cc_cave = CcCave {
             map_id: 1,
@@ -618,12 +606,15 @@ mod tests {
             intelligence_increase: 1,
             wisdom_increase: 1,
             charisma_increase: 1,
-            buff_1: 1,
-            buff_2: 1,
-            buff_3: 1,
         };
         let mut adventurer_entropy = 1;
-        let seed = cc_cave.get_buff_seed(adventurer_entropy, 1);
-        seed.print()
+        let seed_1 = cc_cave.get_buff_seed(adventurer_entropy, 1);
+        seed_1.print();
+
+        let seed_2 = cc_cave.get_buff_seed(adventurer_entropy, 2);
+        seed_2.print();
+
+        let seed_3 = cc_cave.get_buff_seed(adventurer_entropy, 3);
+        seed_3.print();
     }
 }

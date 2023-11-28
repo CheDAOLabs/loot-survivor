@@ -167,18 +167,8 @@ mod Game {
         let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
         assert(cc_cave.has_reward == 1, 'no reward buff');
 
-        let mut buff_id = 0;
-        if buff_index == 0{
-            buff_id = cc_cave.buff_1;
-        }
-        if buff_index == 1{
-            buff_id = cc_cave.buff_2;
-        }
-        if buff_index == 2{
-            buff_id = cc_cave.buff_3;
-        }
 
-        let cc_buff_config:CcBuff = get_buff_by_id(buff_id);
+        let cc_buff_config:CcBuff = get_buff_by_id(cc_cave.has_reward);
 
         // get bag from storage
         let mut bag = _bag_unpacked(@self, adventurer_id);
@@ -200,36 +190,33 @@ mod Game {
         }
 
         // upgrade adventurer's stats
-        if cc_buff_config.strength != 0 {
+        if cc_buff_config.strength != 0  && buff_index == 1{
             adventurer.stats.increase_strength(cc_buff_config.strength);
             cc_cave.increase_strength(cc_buff_config.strength);
         }
-        if cc_buff_config.dexterity != 0 {
+        if cc_buff_config.dexterity != 0 && buff_index == 2 {
             adventurer.stats.increase_dexterity(cc_buff_config.dexterity);
             cc_cave.increase_dexterity(cc_buff_config.dexterity);
         }
-        if cc_buff_config.vitality != 0 {
+        if cc_buff_config.vitality != 0 && buff_index == 3 {
             adventurer.stats.increase_vitality(cc_buff_config.vitality);
             adventurer
                 .increase_health(VITALITY_INSTANT_HEALTH_BONUS * cc_buff_config.vitality.into());
             cc_cave.increase_vitality(cc_buff_config.vitality);
         }
-        if cc_buff_config.intelligence != 0 {
+        if cc_buff_config.intelligence != 0 && buff_index == 4{
             adventurer.stats.increase_intelligence(cc_buff_config.intelligence);
             cc_cave.increase_intelligence(cc_buff_config.intelligence);
         }
-        if cc_buff_config.wisdom != 0 {
+        if cc_buff_config.wisdom != 0 && buff_index == 5{
             adventurer.stats.increase_wisdom(cc_buff_config.wisdom);
             cc_cave.increase_wisdom(cc_buff_config.wisdom);
         }
-        if cc_buff_config.charisma != 0 {
+        if cc_buff_config.charisma != 0 && buff_index == 6{
             adventurer.stats.increase_charisma(cc_buff_config.charisma);
             cc_cave.increase_charisma(cc_buff_config.charisma);
         }
         cc_cave.has_reward = 0;
-        cc_cave.buff_1=0;
-        cc_cave.buff_2=0;
-        cc_cave.buff_3=0;
        // adventurer.stat_points_available -= 1;
 
         // update players last action block number
@@ -1007,9 +994,6 @@ mod Game {
             cc_cave.beast_amount = ImplCcCave::get_beast_amount(cc_point);
             cc_cave.curr_beast = 0;
             cc_cave.has_reward = 0;
-            cc_cave.buff_1 = 0;
-            cc_cave.buff_2 = 0;
-            cc_cave.buff_3 = 0;
 
             // // adventurer immediately gets ambushed by a starter beast
             // let beast_battle_details = _starter_beast_ambush(
@@ -1091,10 +1075,7 @@ mod Game {
         let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
         cc_cave.curr_beast = cc_cave.curr_beast + 1;
         cc_cave.set_beast_health(beast.starting_health);
-        cc_cave.has_reward = 1;
-        // cc_cave.buff_1 = cc_cave.get_buff_seed(adventurer_entropy, 0);
-        // cc_cave.buff_2 = cc_cave.get_buff_seed(adventurer_entropy, 1);
-        // cc_cave.buff_3 = cc_cave.get_buff_seed(adventurer_entropy, 2);
+        cc_cave.has_reward = cc_cave.get_buff_seed(adventurer_entropy, 1);
 
         __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
 
