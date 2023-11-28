@@ -73,6 +73,7 @@ type EventData =
   | AttackedByBeastEventCC
   | SlayedBeastEventCC
   | AdventurerUpgradedEventCC
+  | RewardItemsEventCC
     ;
 
 function createBaseItems(data: AdventurerState) {
@@ -1222,26 +1223,21 @@ export function processData(
           currentAdventurer
       );
       const formattedRewardItems = [];
-      for (let i = 0; i < rewardItemsEvent.itemIds.length; i++) {
+      for (let i = 0; i < rewardItemsEvent.items.length; i++) {
         formattedRewardItems.push(
-            gameData.ITEMS[rewardItemsEvent.itemIds[i]]
+            gameData.ITEMS[rewardItemsEvent.items[i].item.id]
         );
       }
       console.log("rewardItemsAdventurerData",rewardItemsAdventurerData);
 
-      let reward_items = [];
-      for (let i = 0; i < rewardItemsEvent.itemIds.length; i++) {
-          reward_items.push({
-              item:{
-                  id:rewardItemsEvent.itemIds[i]
-              }
-          })
-      }
-      const newItems = processPurchases(
-          reward_items,
+
+
+
+      const bag = processPurchases(
+          rewardItemsEvent.items,
           rewardItemsEvent.adventurerStateWithBag.adventurerState
       );
 
-      return [rewardItemsAdventurerData, formattedRewardItems, newItems];
+      return [rewardItemsAdventurerData, formattedRewardItems, bag];
   }
 }

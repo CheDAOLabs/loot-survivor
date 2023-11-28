@@ -478,7 +478,7 @@ export function syscalls({
            }
 
            console.log("reversedBattles", reversedBattles)
-           stopLoading("attcked cc beasts");
+           stopLoading("attacked cc beasts");
            setEquipItems([]);
            setDropItems([]);
            setMintAdventurer(false);

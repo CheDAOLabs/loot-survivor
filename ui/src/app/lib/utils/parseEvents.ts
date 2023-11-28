@@ -853,18 +853,13 @@ export async function parseEvents(
         break;
       case "RewardItemsCC":
         console.log("parseEvent RewardItemsCC");
-        const rewardItemIds = [];
-        // Skip array length
-        const rewardItemsData = raw.data.slice(75);
-        for (let i = 0; i < rewardItemsData.length; i++) {
-          rewardItemIds.push(parseInt(rewardItemsData[i]));
-        }
+
         const ItemsData: RewardItemsEventCC = {
           adventurerStateWithBag: {
             adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
             bag: parseBag(raw.data.slice(40, 73)),
           },
-          itemIds: rewardItemIds,
+          items: parseItems(raw.data.slice(75)),
         };
         const rewardItemsEvent = processData(
             ItemsData,

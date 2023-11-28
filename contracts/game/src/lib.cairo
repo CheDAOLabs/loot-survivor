@@ -1094,7 +1094,7 @@ mod Game {
         if cc_cave.curr_beast == cc_cave.beast_amount {
             let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
             if item_awards_number > 0 {
-                let mut items = ArrayTrait::<u8>::new();
+                let mut items = ArrayTrait::<LootWithPrice>::new();
                 let mut index: u8 = 0;
                 loop {
                     if (index >= item_awards_number || bag.is_full()) {
@@ -1104,7 +1104,9 @@ mod Game {
                     let item_reward_level: u8 = cc_cave.get_item_level(reward_seed);
                     let item_reward_id: u8 = cc_cave.get_item_id(item_reward_level, reward_seed);
                     bag.add_new_item(adventurer, item_reward_id);
-                    items.append(item_reward_id);
+
+                    let item = ImplLoot::get_item(item_reward_id);
+                    items.append(LootWithPrice { item: item, price: 0 });
                     index = index + 1;
                 };
                 // if the bag was mutated
@@ -3118,10 +3120,10 @@ mod Game {
         item_ids: Array<u8>,
     }
 
-    #[derive(Clone, Drop, starknet::Event)]
+    #[derive(Drop, starknet::Event)]
     struct RewardItemsCC {
         adventurer_state_with_bag: AdventurerStateWithBag,
-        item_ids: Array<u8>,
+        items: Array<LootWithPrice>,
     }
 
     #[derive(Drop, Serde)]
@@ -3568,13 +3570,13 @@ mod Game {
         adventurer: Adventurer,
         adventurer_id: u256,
         bag: Bag,
-        item_ids: Array<u8>,
+        items: Array<LootWithPrice>
     ) {
         let adventurer_state = AdventurerState {
             owner: get_caller_address(), adventurer_id, adventurer
         };
         let adventurer_state_with_bag = AdventurerStateWithBag { adventurer_state, bag };
-        self.emit(RewardItemsCC { adventurer_state_with_bag, item_ids });
+        self.emit(RewardItemsCC { adventurer_state_with_bag, items });
     }
 
     fn __event_ItemsLeveledUp(
