@@ -518,7 +518,7 @@ impl ImplCcCave of ICcCave {
         let (d, r) = rshift_split(poseidon.into(), 674546095234706718430236841283393614263);
         let seed:u128 = r.try_into().unwrap();
 
-        return (seed % 6).try_into().unwrap();
+        return 1 + (seed % 6).try_into().unwrap();
     }
 
     fn get_beast(self: CcCave,adventurer_entropy: u128) -> (Beast, u128) {
@@ -563,7 +563,9 @@ impl ImplCcCave of ICcCave {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-
+    use cc::cc_buff::get_buffs;
+    use cc::cc_cave::CcCave;
+    use cc::cc_cave::ImplCcCave;
     // #[test]
     // #[available_gas(555600)]
     // fn test_cc_get_beast() {
@@ -588,7 +590,6 @@ mod tests {
         } else {
             return 0;
         }
-
     }
 
     #[test]
@@ -599,5 +600,30 @@ mod tests {
 
         // let x = 12;
         // x.print();
+    }
+
+    #[test]
+    #[available_gas(555600)]
+    fn test_get_buff_sees() {
+        let mut cc_cave = CcCave {
+            map_id: 1,
+            curr_beast: 1,
+            cc_points: 1,
+            beast_health: 1,
+            beast_amount: 1,
+            has_reward: 1,
+            strength_increase: 1,
+            dexterity_increase: 1,
+            vitality_increase: 1,
+            intelligence_increase: 1,
+            wisdom_increase: 1,
+            charisma_increase: 1,
+            buff_1: 1,
+            buff_2: 1,
+            buff_3: 1,
+        };
+        let mut adventurer_entropy = 1;
+        let seed = cc_cave.get_buff_seed(adventurer_entropy, 1);
+        seed.print()
     }
 }

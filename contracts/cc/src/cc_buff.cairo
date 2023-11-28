@@ -66,12 +66,12 @@ fn get_buff_by_id(buff_id: u16) -> CcBuff {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use cc::buff::get_buffs;
+    use cc::cc_buff::get_buffs;
 
     #[test]
     #[available_gas(50000)]
     fn test_buff() {
         let mut buffs = get_buffs();
-        assert(*buffs.at(0).id == 0, 'wrong')
+        assert(*buffs.at(0).id == 1, 'wrong')
     }
 }

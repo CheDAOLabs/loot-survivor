@@ -1092,9 +1092,9 @@ mod Game {
         cc_cave.curr_beast = cc_cave.curr_beast + 1;
         cc_cave.set_beast_health(beast.starting_health);
         cc_cave.has_reward = 1;
-        cc_cave.buff_1 = cc_cave.get_buff_seed(adventurer_entropy, 0);
-        cc_cave.buff_2 = cc_cave.get_buff_seed(adventurer_entropy, 1);
-        cc_cave.buff_3 = cc_cave.get_buff_seed(adventurer_entropy, 2);
+        // cc_cave.buff_1 = cc_cave.get_buff_seed(adventurer_entropy, 0);
+        // cc_cave.buff_2 = cc_cave.get_buff_seed(adventurer_entropy, 1);
+        // cc_cave.buff_3 = cc_cave.get_buff_seed(adventurer_entropy, 2);
 
         __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
 
