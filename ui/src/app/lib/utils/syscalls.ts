@@ -120,14 +120,16 @@ export function syscalls({
                              setStartOption,
                          }: SyscallsProps) {
 
-    const enterCC = async (adventureId: number, tokenId: number) => {
+    const enterCC = async (adventureId: number, tokenId: number,fee:number) => {
 
-        const approveLordsTx = {
-            contractAddress: lordsContract?.address ?? "",
-            entrypoint: "approve",
-            calldata: [gameContract?.address ?? "", (100 * 10 ** 18).toString(), "0"],
-        };
-        addToCalls(approveLordsTx);
+        if(fee>0) {
+            const approveLordsTx = {
+                contractAddress: lordsContract?.address ?? "",
+                entrypoint: "approve",
+                calldata: [gameContract?.address ?? "", (fee * 10 ** 18).toString(), "0"],
+            };
+            addToCalls(approveLordsTx);
+        }
 
 
         const Tx = {

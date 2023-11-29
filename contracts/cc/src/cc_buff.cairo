@@ -61,4 +61,12 @@ mod tests {
         assert(buff.wisdom == 1, 'wrong');
 
     }
+
+    #[test]
+    #[available_gas(50000)]
+    fn test_to_ether() {
+        let amount:u256 = 1;
+        (amount * 1000000000000000000).print();
+
+    }
 }

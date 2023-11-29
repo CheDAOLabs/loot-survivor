@@ -7,6 +7,6 @@ scarb --release build  && starkli declare  ./target/release/game_Game.contract_c
 export LORDS_ADDRESS=0x059dac5df32cbce17b081399e97d90be5fba726f97f00638f838613d088e5a47;
 export DAO_ADDRESS=0x020b96923a9e60f63a1829d440a03cf680768cadbc8fe737f71380258817d85b;
 export ARG=0x000f4dbfe5d15792aa91025e42ee1d74c22bdeb1eef0b9bc19a37216377290c1;
-export CLASS_HASH=0x045364902e9585eb4b11f9fda5cedc88a601584b11e4cdc2250387d75840a8ea;
+export CLASS_HASH=0x05745856d0b50c3a22b9a256e6c3ece8d0d2af3990224a2593f82b912a3ae508;
 starkli deploy $CLASS_HASH $LORDS_ADDRESS $DAO_ADDRESS $ARG  --rpc https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a
 

@@ -1,15 +1,15 @@
-import React, { ChangeEvent, useState } from "react";
-import { Button } from "../components/buttons/Button";
+import React, {ChangeEvent, useState} from "react";
+import {Button} from "../components/buttons/Button";
 
 
-import { EnterCode } from "../components/crypts/EnterCode";
-import { MapInfo } from "../components/crypts/MapInfo";
+import {EnterCode} from "../components/crypts/EnterCode";
+import {MapInfo} from "../components/crypts/MapInfo";
 
 import Info from "../components/adventurer/Info";
-import { NullAdventurer, NullBeast } from "../types";
-import { useQueriesStore } from "../hooks/useQueryStore";
+import {NullAdventurer, NullBeast} from "../types";
+import {useQueriesStore} from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
-import { constants, Contract, num, Provider, shortString, cairo, ContractInterface } from "starknet";
+import {constants, Contract, num, Provider, shortString, cairo, ContractInterface} from "starknet";
 import CryptsBeastScreen from "@/app/containers/CryptsBeastScreen";
 
 // import Storage from "@/app/lib/storage";
@@ -1008,7 +1008,7 @@ interface DungeonData {
  * @container
  * @description
  */
-export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: CryptsScreenProps) {
+export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: CryptsScreenProps) {
 
     const adventurer = useAdventurerStore((state) => state.adventurer);
 
@@ -1038,9 +1038,11 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
         console.log(formData);
 
         //let provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
-        let provider = new Provider({rpc: {
-                        nodeUrl:"https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a",
-        }});
+        let provider = new Provider({
+            rpc: {
+                nodeUrl: "https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a",
+            }
+        });
 
         let contract = new Contract(abi, address, provider);
         console.log(contract);
@@ -1054,16 +1056,15 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
         console.log("dungeon_data", dungeon_data);
 
 
-        
         const dungeon = await contract.generate_dungeon_dojo(token_id);
         console.log("dungeon", dungeon);
 
         // count points
-        const count = countPoints(dungeon.points);
+        const cc_points = countPoints(dungeon.points);
         // count doors
         // const count_doors = countPoints(dungeon.doors);
-        console.log("count", count);
-
+        console.log("cc_points", cc_points);
+        setPoints(cc_points);
 
 
         setDungeon(
@@ -1120,6 +1121,7 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
     const [name, setName] = useState("loading")
     const [svg, setSvg] = useState("")
     const [loading, setLoading] = useState(false)
+    const [points, setPoints] = useState(0)
 
     const [dungeon, setDungeon] = useState<DungeonData>({
         "size": "0x14",
@@ -1253,15 +1255,15 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
         try {
             setLoading(true);
             console.log("adventurer", adventurer)
-            if(!adventurer){
+            if (!adventurer) {
                 return;
             }
-            await enterCc(adventurer.id, formData.name);
+            await enterCc(adventurer.id, formData.name, points * 2);
             // Storage.set('monsterIndex' + adventurer?.id, 1);
             setStep(3);
         } catch (e) {
             console.error(e)
-        }finally {
+        } finally {
             setLoading(false);
         }
     }
@@ -1296,7 +1298,7 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
                     <MapInfo handleBack={onBack} handleEnter={onEnter} name={name} owner={owner} svg={svg}
-                             render={render} dungeon={dungeon} loading={loading}/>
+                             render={render} dungeon={dungeon} loading={loading} points={points}/>
                 </div>
             </div>
         );
@@ -1304,7 +1306,7 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer} />
+                    <Info adventurer={adventurer}/>
                 </div>
                 <CryptsBeastScreen
                     attack={attack} flee={flee} exit={onExit} buffAdventurer={buffAdventurer}/>

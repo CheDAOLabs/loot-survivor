@@ -984,8 +984,10 @@ mod Game {
 
             let map_id:u16 = cc_token_id.try_into().expect('pack map_id');
             let cc_point:u16 = count.try_into().expect('pack cc_point');
-            let pay_amount:u256 = (cc_point * 2).into();
-            _payoutCC(ref self,get_caller_address(),pay_amount,map_owner);
+            if cc_point > 0 {
+                let pay_amount: u256 = cc_point.into() * 2 * 1000000000000000000;
+                _payoutCC( ref self,get_caller_address(), pay_amount, map_owner);
+            }
 
             //let mut cc_cave = ImplCcCave::new(map_id,cc_point);
             let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
@@ -1249,7 +1251,7 @@ mod Game {
         let lords = self._lords.read();
 
         IERC20CamelDispatcher { contract_address: lords }
-                .transferFrom(caller, map_owner, _to_ether(amount));
+                .transferFrom(caller, map_owner, amount);
     }
 
     fn _payout(

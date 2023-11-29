@@ -13,9 +13,10 @@ export interface MapInfoProps {
     render: () => any;
     dungeon: any;
     loading: any;
+    points:number;
 }
 
-export const MapInfo = ({handleBack, handleEnter, owner, name, svg, render, dungeon, loading}: MapInfoProps) => {
+export const MapInfo = ({handleBack, handleEnter, owner, name, svg, render, dungeon, loading, points}: MapInfoProps) => {
 
     return (
         <>
@@ -24,7 +25,7 @@ export const MapInfo = ({handleBack, handleEnter, owner, name, svg, render, dung
                 <div className="2xl:text-xl">
                     <span className="text-3xl">DungeonName:{name}</span>
                     <br/> Owner: {owner}
-                    <br/>ADMISSION FEE: 1/20
+                    <br/>ADMISSION FEE: {points*2} lords
                 </div>
 
                 <div className="hidden sm:flex flex-row justify-center 2xl:gap-10">
