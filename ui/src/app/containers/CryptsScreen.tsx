@@ -1,15 +1,15 @@
-import React, {ChangeEvent, useState} from "react";
-import {Button} from "../components/buttons/Button";
+import React, { ChangeEvent, useState } from "react";
+import { Button } from "../components/buttons/Button";
 
 
-import {EnterCode} from "../components/crypts/EnterCode";
-import {MapInfo} from "../components/crypts/MapInfo";
+import { EnterCode } from "../components/crypts/EnterCode";
+import { MapInfo } from "../components/crypts/MapInfo";
 
 import Info from "../components/adventurer/Info";
-import {NullAdventurer, NullBeast} from "../types";
-import {useQueriesStore} from "../hooks/useQueryStore";
+import { NullAdventurer, NullBeast } from "../types";
+import { useQueriesStore } from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
-import {constants, Contract, num, Provider, shortString, cairo, ContractInterface} from "starknet";
+import { constants, Contract, num, Provider, shortString, cairo, ContractInterface } from "starknet";
 import CryptsBeastScreen from "@/app/containers/CryptsBeastScreen";
 
 // import Storage from "@/app/lib/storage";
@@ -23,6 +23,11 @@ interface CryptsScreenProps {
 }
 
 const abi = [
+    {
+        "type": "impl",
+        "name": "ERC721Enumerable",
+        "interface_name": "cc_starknet::IERC721Enumerable"
+    },
     {
         "type": "struct",
         "name": "core::integer::u256",
@@ -85,6 +90,11 @@ const abi = [
         "state_mutability": "view"
     },
     {
+        "type": "impl",
+        "name": "ERC721EnumerableCamelOnly",
+        "interface_name": "cc_starknet::IERC721EnumerableCamelOnly"
+    },
+    {
         "type": "function",
         "name": "totalSupply",
         "inputs": [],
@@ -130,6 +140,11 @@ const abi = [
             }
         ],
         "state_mutability": "view"
+    },
+    {
+        "type": "impl",
+        "name": "ERC721Impl",
+        "interface_name": "openzeppelin::token::erc721::interface::IERC721"
     },
     {
         "type": "struct",
@@ -300,6 +315,11 @@ const abi = [
         "state_mutability": "view"
     },
     {
+        "type": "impl",
+        "name": "ERC721MetadataImpl",
+        "interface_name": "cc_starknet::IERC721Metadata"
+    },
+    {
         "type": "function",
         "name": "name",
         "inputs": [],
@@ -338,6 +358,11 @@ const abi = [
         "state_mutability": "view"
     },
     {
+        "type": "impl",
+        "name": "ERC721MetadataCamelOnlyImpl",
+        "interface_name": "cc_starknet::IERC721MetadataCamelOnly"
+    },
+    {
         "type": "function",
         "name": "tokenURI",
         "inputs": [
@@ -352,6 +377,11 @@ const abi = [
             }
         ],
         "state_mutability": "view"
+    },
+    {
+        "type": "impl",
+        "name": "ERC721CamelOnlyImpl",
+        "interface_name": "openzeppelin::token::erc721::interface::IERC721CamelOnly"
     },
     {
         "type": "function",
@@ -669,6 +699,90 @@ const abi = [
         "state_mutability": "view"
     },
     {
+        "type": "struct",
+        "name": "cc_starknet::Dungeons::Name",
+        "members": [
+            {
+                "name": "first",
+                "type": "core::felt252"
+            },
+            {
+                "name": "second",
+                "type": "core::felt252"
+            },
+            {
+                "name": "third",
+                "type": "core::felt252"
+            },
+            {
+                "name": "fourth",
+                "type": "core::felt252"
+            },
+            {
+                "name": "fifth",
+                "type": "core::felt252"
+            }
+        ]
+    },
+    {
+        "type": "struct",
+        "name": "cc_starknet::Dungeons::DungeonDojo",
+        "members": [
+            {
+                "name": "size",
+                "type": "core::integer::u8"
+            },
+            {
+                "name": "environment",
+                "type": "core::integer::u8"
+            },
+            {
+                "name": "structure",
+                "type": "core::integer::u8"
+            },
+            {
+                "name": "legendary",
+                "type": "core::integer::u8"
+            },
+            {
+                "name": "layout",
+                "type": "cc_starknet::utils::pack::Pack"
+            },
+            {
+                "name": "doors",
+                "type": "cc_starknet::utils::pack::Pack"
+            },
+            {
+                "name": "points",
+                "type": "cc_starknet::utils::pack::Pack"
+            },
+            {
+                "name": "affinity",
+                "type": "core::felt252"
+            },
+            {
+                "name": "dungeon_name",
+                "type": "cc_starknet::Dungeons::Name"
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "generate_dungeon_dojo",
+        "inputs": [
+            {
+                "name": "token_id",
+                "type": "core::integer::u256"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "cc_starknet::Dungeons::DungeonDojo"
+            }
+        ],
+        "state_mutability": "view"
+    },
+    {
         "type": "function",
         "name": "get_entities",
         "inputs": [
@@ -868,7 +982,7 @@ const abi = [
         ]
     }
 ];
-const address = "0x078fcf70e22f475b8ffde567f8118e5d99ded383da150e01e55fa79251c7c808";
+const address = "0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494";
 
 
 interface DungeonData {
@@ -894,7 +1008,7 @@ interface DungeonData {
  * @container
  * @description
  */
-export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: CryptsScreenProps) {
+export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: CryptsScreenProps) {
 
     const adventurer = useAdventurerStore((state) => state.adventurer);
 
@@ -924,9 +1038,11 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         console.log(formData);
 
         //let provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
-        let provider = new Provider({rpc: {
-                        nodeUrl:"https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a",
-        }});
+        let provider = new Provider({
+            rpc: {
+                nodeUrl: "https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a",
+            }
+        });
 
         let contract = new Contract(abi, address, provider);
         console.log(contract);
@@ -937,7 +1053,21 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         setOwner(num.toHex(owner));
 
         const dungeon_data = await contract.generate_dungeon(token_id);
-        // console.log("dungeon_data", dungeon_data);
+        console.log("dungeon_data", dungeon_data);
+
+
+        
+        const dungeon = await contract.generate_dungeon_dojo(token_id);
+        console.log("dungeon", dungeon);
+
+        // count points
+        const count = countPoints(dungeon.points);
+        // count doors
+        // const count_doors = countPoints(dungeon.doors);
+        console.log("count", count);
+
+
+
         setDungeon(
             {
                 size: dungeon_data.size,
@@ -959,7 +1089,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
             }
         )
 
-        const formatAnswer = {name: 'string', affinity: 'string', legendary: 'number'};
+        const formatAnswer = { name: 'string', affinity: 'string', legendary: 'number' };
         let dungeonName = await contract.get_name(token_id, {
             parseRequest: true,
             parseResponse: true,
@@ -1032,7 +1162,27 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
     });
 
     const coin = "<span class='sk'>🪙</span>";
-    const door = "<span class='sk'>🚪</span>"
+    const door = "<span class='sk'>🚪</span>";
+
+    const countPoints = (layout: any) => {
+        // eslint-disable-next-line
+        let layoutIntFirst = BigInt(layout.first).toString(2).padStart(248, '0');
+        // eslint-disable-next-line
+        let layoutIntSecond = BigInt(layout.second).toString(2);
+        // eslint-disable-next-line
+        let layoutIntThird = BigInt(layout.third).toString(2);
+
+        let bits = layoutIntFirst + layoutIntSecond + layoutIntThird;
+
+        let count = 0;
+        for (let i = 0; i < bits.length; i++) {
+            if (bits[i] == '1') {
+                count++;
+            }
+        }
+
+        return count;
+    }
 
     const decode_map = (layout: any, size: any) => {
         // eslint-disable-next-line
@@ -1105,7 +1255,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         try {
             setLoading(true);
             console.log("adventurer", adventurer)
-            if(!adventurer){
+            if (!adventurer) {
                 return;
             }
             await enterCc(adventurer.id, formData.name);
@@ -1113,7 +1263,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
             setStep(3);
         } catch (e) {
             console.error(e)
-        }finally {
+        } finally {
             setLoading(false);
         }
     }
@@ -1132,11 +1282,11 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer}/>
+                    <Info adventurer={adventurer} />
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
                     <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData}
-                               loading={loading}/>
+                        loading={loading} />
                 </div>
                 net </div>
         );
@@ -1144,11 +1294,11 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer}/>
+                    <Info adventurer={adventurer} />
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
                     <MapInfo handleBack={onBack} handleEnter={onEnter} name={name} owner={owner} svg={svg}
-                             render={render} dungeon={dungeon} loading={loading}/>
+                        render={render} dungeon={dungeon} loading={loading} />
                 </div>
             </div>
         );
@@ -1159,7 +1309,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
                     <Info adventurer={adventurer} />
                 </div>
                 <CryptsBeastScreen
-                    attack={attack} flee={flee} exit={onExit} buffAdventurer={buffAdventurer}/>
+                    attack={attack} flee={flee} exit={onExit} buffAdventurer={buffAdventurer} />
             </div>
         );
     } else {
