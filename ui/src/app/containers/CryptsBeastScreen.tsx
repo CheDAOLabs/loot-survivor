@@ -8,73 +8,18 @@ import React, {useEffect, useState} from "react";
 import {processBeastName} from "../lib/utils";
 import {Battle, NullDiscovery, NullBeast, UpgradeStats, ZeroUpgrade, NullCave, CcCave, Monster} from "../types";
 import {Button} from "../components/buttons/Button";
-import {type} from "os";
+import LootIcon from "@/app/components/icons/LootIcon";
+import {GameData} from "@/app/components/GameData";
 
 const buffs =
     [
-        {
-            id: 1,
-            strength: 1,
-            dexterity: 1,
-            vitality: 1,
-            intelligence: 0,
-            wisdom: 0,
-            charisma: 0,
-        },
-        {
-            id: 2,
-            strength: 0,
-            dexterity: 1,
-            vitality: 1,
-            intelligence: 1,
-            wisdom: 0,
-            charisma: 0,
-        },
-        {
-            id: 3,
-            strength: 0,
-            dexterity: 0,
-            vitality: 1,
-            intelligence: 1,
-            wisdom: 1,
-            charisma: 0,
-        },
-        {
-            id: 4,
-            strength: 0,
-            dexterity: 0,
-            vitality: 0,
-            intelligence: 1,
-            wisdom: 1,
-            charisma: 1,
-        },
-        {
-            id: 5,
-            strength: 1,
-            dexterity: 0,
-            vitality: 1,
-            intelligence: 0,
-            wisdom: 1,
-            charisma: 0,
-        },
-        {
-            id: 5,
-            strength: 0,
-            dexterity: 1,
-            vitality: 0,
-            intelligence: 1,
-            wisdom: 0,
-            charisma: 1,
-        },
-        {
-            id: 6,
-            strength: 1,
-            dexterity: 0,
-            vitality: 1,
-            intelligence: 0,
-            wisdom: 0,
-            charisma: 1,
-        }];
+        { id: 1, strength: 1, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 0  },
+        { id: 2, strength: 0, dexterity: 1, vitality: 1, intelligence: 1, wisdom: 0, charisma: 0  },
+        { id: 3, strength: 0, dexterity: 0, vitality: 1, intelligence: 1, wisdom: 1, charisma: 0  },
+        { id: 4, strength: 0, dexterity: 0, vitality: 0, intelligence: 1, wisdom: 1, charisma: 1  },
+        { id: 5, strength: 1, dexterity: 0, vitality: 1, intelligence: 0, wisdom: 1, charisma: 0  },
+        { id: 6, strength: 0, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 1  }
+];
 
 function getRandomBuff() {
     const randomIndex = Math.floor(Math.random() * buffs.length);
@@ -183,25 +128,25 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
 
     const onConfirm = async () => {
         let selectedIndex = 0;
-        if(selectedKey === "strength"){
+        if (selectedKey === "strength") {
             selectedIndex = 1;
         }
-        if(selectedKey === "dexterity"){
+        if (selectedKey === "dexterity") {
             selectedIndex = 2;
         }
-        if(selectedKey === "vitality"){
+        if (selectedKey === "vitality") {
             selectedIndex = 3;
         }
-        if(selectedKey === "intelligence"){
+        if (selectedKey === "intelligence") {
             selectedIndex = 4;
         }
-        if(selectedKey === "wisdom"){
+        if (selectedKey === "wisdom") {
             selectedIndex = 5;
         }
-        if(selectedKey === "charisma"){
+        if (selectedKey === "charisma") {
             selectedIndex = 6;
         }
-        if(selectedIndex >0) {
+        if (selectedIndex > 0) {
             await buffAdventurer(selectedIndex);
         }
     }
@@ -214,7 +159,7 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
     const id2cbs = (id: number) => {
         let cbs = []
         let buff: { [key: string]: number } | undefined = buffs.find(b => b.id === id);
-        console.log("find Buff" , id,buff)
+        console.log("find Buff", id, buff)
         if (!buff) {
             return [];
         }
@@ -272,6 +217,13 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
         setHasRewardBuff(ccCaveData.has_reward > 0)
 
     }, [ccCaveData]);
+
+    const getSlot = (item_name_format: string) => {
+        const gameData = new GameData();
+        const result = gameData.ITEM_SLOTS[item_name_format];
+        console.log("getSlot", item_name_format, result)
+        return result;
+    }
 
 
     return (
@@ -365,17 +317,24 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
                     </>
                 )}
 
+
                 {isAlive && isClearance && (
                     <>
                         <h3>FULL CLEARANCE</h3>
                         <h4>YOU WON ALL THE BATTLES</h4>
                         <div className="flex flex-col ">
                             {rewardItems.map((item_name, index) => (
-                                <div key={index}
-                                     className="flex flex-row bg-terminal-green text-black mb-1 px-9">{item_name}</div>
+                                <div key={index}>
+                                    <div className="flex flex-row bg-black text-terminal-green mb-1 px-9">
+                                        <LootIcon size={"w-7"} type={getSlot(item_name)}/>
+                                        <span style={{fontSize:"20px",marginLeft:"5px"}}>  {item_name}</span>
+                                    </div>
+                                </div>
                             ))}
                         </div>
-                        <Button size={"lg"} onClick={exit}>EXIT</Button>
+                        <div style={{marginTop: "5px"}}>
+                            <Button size={"lg"} onClick={exit}>EXIT</Button>
+                        </div>
                     </>
                 )}
 

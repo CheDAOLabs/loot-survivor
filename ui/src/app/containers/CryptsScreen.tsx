@@ -1038,11 +1038,9 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
         console.log(formData);
 
         //let provider = new Provider({sequencer: {network: constants.NetworkName.SN_GOERLI}});
-        let provider = new Provider({
-            rpc: {
-                nodeUrl: "https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a",
-            }
-        });
+        let provider = new Provider({rpc: {
+                        nodeUrl:"https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a",
+        }});
 
         let contract = new Contract(abi, address, provider);
         console.log(contract);
@@ -1089,7 +1087,7 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
             }
         )
 
-        const formatAnswer = { name: 'string', affinity: 'string', legendary: 'number' };
+        const formatAnswer = {name: 'string', affinity: 'string', legendary: 'number'};
         let dungeonName = await contract.get_name(token_id, {
             parseRequest: true,
             parseResponse: true,
@@ -1255,7 +1253,7 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
         try {
             setLoading(true);
             console.log("adventurer", adventurer)
-            if (!adventurer) {
+            if(!adventurer){
                 return;
             }
             await enterCc(adventurer.id, formData.name);
@@ -1263,7 +1261,7 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
             setStep(3);
         } catch (e) {
             console.error(e)
-        } finally {
+        }finally {
             setLoading(false);
         }
     }
@@ -1282,11 +1280,11 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer} />
+                    <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
                     <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData}
-                        loading={loading} />
+                               loading={loading}/>
                 </div>
                 net </div>
         );
@@ -1294,11 +1292,11 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer} />
+                    <Info adventurer={adventurer}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
                     <MapInfo handleBack={onBack} handleEnter={onEnter} name={name} owner={owner} svg={svg}
-                        render={render} dungeon={dungeon} loading={loading} />
+                             render={render} dungeon={dungeon} loading={loading}/>
                 </div>
             </div>
         );
@@ -1309,7 +1307,7 @@ export default function CryptsScreen({ attack, flee, enterCc, buffAdventurer }: 
                     <Info adventurer={adventurer} />
                 </div>
                 <CryptsBeastScreen
-                    attack={attack} flee={flee} exit={onExit} buffAdventurer={buffAdventurer} />
+                    attack={attack} flee={flee} exit={onExit} buffAdventurer={buffAdventurer}/>
             </div>
         );
     } else {
