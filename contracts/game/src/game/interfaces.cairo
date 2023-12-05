@@ -5,12 +5,11 @@ use game_entropy::game_entropy::{GameEntropy};
 use market::market::{ItemPurchase};
 use survivor::{
     bag::Bag, adventurer::{Adventurer, Stats}, adventurer_meta::AdventurerMetadata,
-    item_meta::{ItemSpecials, ItemSpecialsStorage}
+    item_meta::{ItemSpecials, ItemSpecialsStorage}, leaderboard::Leaderboard,
+    item_primitive::{ItemPrimitive}
 };
 use game_snapshot::GamesPlayedSnapshot;
 use lootitems::loot::{Loot};
-use market::market::{ItemPurchase};
-use beasts::beast::Beast;
 use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
 
 #[starknet::interface]
@@ -124,22 +123,44 @@ trait IGame<TContractState> {
     fn get_beast_type(self: @TContractState, beast_id: u8) -> u8;
     fn get_beast_tier(self: @TContractState, beast_id: u8) -> u8;
 
-    // cc
-    fn get_cave_cc(self: @TContractState, adventurer_id: u256) -> CcCave;
-    fn enter_cc(ref self: TContractState, adventurer_id:u256, cc_token_id :u256) -> u128;
-    fn attack_cc(ref self: TContractState, adventurer_id: u256, to_the_death: bool);
-    fn set_beast_heath_cc(ref self: TContractState, adventurer_id: u256, health: u16);
-    fn get_attacking_beast_cc(self: @TContractState, adventurer_id: u256) -> Beast;
-    fn get_beast_health_cc(self: @TContractState, adventurer_id: u256) -> u16;
-
-    // TODO: Game settings
-    fn next_global_entropy_rotation(self: @TContractState) -> felt252;
+    // game settings
+    fn next_game_entropy_rotation(self: @TContractState) -> felt252;
+    fn game_rate_limit(self: @TContractState) -> u64;
+    fn starting_gold(self: @TContractState) -> u16;
+    fn starting_health(self: @TContractState) -> u16;
+    fn base_potion_price(self: @TContractState) -> u16;
+    fn potion_health_amount(self: @TContractState) -> u16;
+    fn minimum_potion_price(self: @TContractState) -> u16;
+    fn charisma_potion_discount(self: @TContractState) -> u16;
+    fn items_per_stat_upgrade(self: @TContractState) -> u8;
+    fn item_tier_price_multiplier(self: @TContractState) -> u16;
+    fn charisma_item_discount(self: @TContractState) -> u16;
+    fn minimum_item_price(self: @TContractState) -> u16;
+    fn minimum_damage_to_beasts(self: @TContractState) -> u8;
+    fn minimum_damage_from_beasts(self: @TContractState) -> u8;
+    fn minimum_damage_from_obstacles(self: @TContractState) -> u8;
+    fn obstacle_critical_hit_chance(self: @TContractState) -> u8;
+    fn stat_upgrades_per_level(self: @TContractState) -> u8;
+    fn beast_special_name_unlock_level(self: @TContractState) -> u16;
+    fn item_xp_multiplier_beasts(self: @TContractState) -> u16;
+    fn item_xp_multiplier_obstacles(self: @TContractState) -> u16;
+    fn strength_bonus_damage(self: @TContractState) -> u8;
 
     // contract details
+    fn owner_of(self: @TContractState, adventurer_id: felt252) -> ContractAddress;
     fn get_dao_address(self: @TContractState) -> ContractAddress;
     fn get_lords_address(self: @TContractState) -> ContractAddress;
-    fn get_entropy(self: @TContractState) -> u64;    
+    fn get_game_entropy(self: @TContractState) -> GameEntropy;
+    fn get_idle_penalty_blocks(self: @TContractState) -> u64;
+    fn get_leaderboard(self: @TContractState) -> Leaderboard;
+    fn get_cost_to_play(self: @TContractState) -> u128;
+    fn get_games_played_snapshot(self: @TContractState) -> GamesPlayedSnapshot;
+    fn can_play(self: @TContractState, golden_token_id: u256) -> bool;
 
-    // checks ----------------------------------------------------
-    fn owner_of(self: @TContractState, adventurer_id: u256) -> ContractAddress;
+    // cc
+    fn get_cave_cc(self: @TContractState, adventurer_id: felt252) -> CcCave;
+    fn enter_cc(ref self: TContractState, adventurer_id:felt252, cc_token_id :u256) -> u128;
+    fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool);
+    fn get_attacking_beast_cc(self: @TContractState, adventurer_id: felt252) -> Beast;
+    fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
 }

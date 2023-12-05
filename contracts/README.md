@@ -1,7 +1,13 @@
-export STARKNET_KEYSTORE="./key.json"
-export STARKNET_ACCOUNT="./account.json"
+export STARKNET_KEYSTORE="~/StarkLiWallet/key.json"
+export STARKNET_ACCOUNT="~/StarkLiWallet/account.json"
+export STARKNET_NETWORK="goerli-1"
+export STARKNET_RPC="https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a"
 
-scarb --release build  && starkli declare  ./target/release/game_Game.contract_class.json  --rpc https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a
+
+
+
+scarb --release build  
+starkli declare ./target/dev/game_Game.sierra.json  --rpc https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a
 
 
 export LORDS_ADDRESS=0x059dac5df32cbce17b081399e97d90be5fba726f97f00638f838613d088e5a47;
