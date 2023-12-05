@@ -1,6 +1,6 @@
-import { NotificationBattleDisplay } from "../beast/BattleDisplay";
-import { DiscoveryDisplay } from "../actions/DiscoveryDisplay";
-import { GameData } from "../GameData";
+import { NotificationBattleDisplay } from "@/app/components/beast/BattleDisplay";
+import { DiscoveryDisplay } from "@/app/components/actions/DiscoveryDisplay";
+import { GameData } from "@/app/lib/data/GameData";
 import {
   processBeastName,
   getRandomElement,
@@ -8,7 +8,7 @@ import {
   isObject,
   getItemData,
   getValueFromKey,
-} from "../../lib/utils";
+} from "@/app/lib/utils";
 import {
   Adventurer,
   Battle,
@@ -18,8 +18,11 @@ import {
   UpgradeSummary,
   ItemPurchase,
 } from "@/app/types";
-import LootIcon from "../../components/icons/LootIcon";
-import { HealthPotionIcon } from "../icons/Icons";
+import LootIcon from "@/app/components/icons/LootIcon";
+import {
+  HealthPotionIcon,
+  GiSandsOfTimeIcon,
+} from "@/app/components/icons/Icons";
 
 const handleUpgrade = (notificationData: any, notifications: any[]) => {
   const gameData = new GameData();
@@ -233,10 +236,12 @@ export const processNotifications = (
     | string
     | string[]
     | UpgradeSummary
+    | Error
     | any[],
-  adventurer: Adventurer,
+  adventurer?: Adventurer,
   hasBeast?: boolean,
-  battles?: Battle[]
+  battles?: Battle[],
+  error?: boolean
 ) => {
   const gameData = new GameData();
   const notifications: Notification[] = [];
@@ -244,8 +249,19 @@ export const processNotifications = (
     return processAnimation(type, data, adventurer ?? NullAdventurer);
   };
   const isArray = Array.isArray(notificationData);
-  console.log("processNotifications",type)
-  if ((type == "Attack" || type == "Flee") && isArray) {
+  // handle error first
+  if (error) {
+    const error = notificationData as Error;
+    notifications.push({
+      animation: "damage",
+      message: (
+        <div className="flex flex-col break-words">
+          <p className="text-red-600">{error.name}</p>
+          <p className="text-red-600">{error.message}</p>
+        </div>
+      ),
+    });
+  } else if ((type == "Attack" || type == "Flee") && isArray) {
     const battleScenarios = chunkArray(notificationData as Battle[], 2);
     for (let i = 0; i < battleScenarios.length; i++) {
       const animation = handleAnimation(battleScenarios[i] as Battle[]);
@@ -254,7 +270,6 @@ export const processNotifications = (
         message: (
           <NotificationBattleDisplay
             battleData={battleScenarios[i] as Battle[]}
-            type={type}
           />
         ),
       });
@@ -355,8 +370,20 @@ export const processNotifications = (
         });
       }
     }
-  } else if (type == "Upgrade" && isObject(notificationData)) {
-    handleUpgrade(notificationData, notifications);
+  } else if (type == "Upgrade") {
+    if (notificationData === "Death Penalty") {
+      notifications.push({
+        message: (
+          <span className="flex flex-row items-center justify-between">
+            <p>OOPS! Killed by idle death penalty!</p>
+            <GiSandsOfTimeIcon />
+          </span>
+        ),
+        animation: gameData.ADVENTURER_ANIMATIONS["Dead"],
+      });
+    } else if (isObject(notificationData)) {
+      handleUpgrade(notificationData, notifications);
+    }
   } else {
     const animation = handleAnimation(notificationData as string);
     notifications.push({

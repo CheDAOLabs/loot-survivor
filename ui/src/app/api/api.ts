@@ -1,8 +1,30 @@
-import { useAccount } from "@starknet-react/core";
-
 interface MintEthProps {
   address: string;
 }
+
+export const getBlock = async (blockNumber: number) => {
+  const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL!;
+  try {
+    const requestBody = {
+      jsonrpc: "2.0",
+      method: "starknet_getBlockWithTxHashes",
+      params: [{ block_number: blockNumber }],
+      id: 1,
+    };
+    const response = await fetch(rpcUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error("Error posting data:", error);
+  }
+};
 
 export const mintEth = async ({ address }: MintEthProps) => {
   try {
@@ -36,4 +58,12 @@ export const mintEth = async ({ address }: MintEthProps) => {
     console.error("Error posting data:", error);
     return false;
   }
+};
+
+export const getApibaraStatus = async () => {
+  const response = await fetch(
+    `https://zsvpqg33tc7n.statuspage.io/api/v2/status.json`
+  );
+  const data = await response.json();
+  return data;
 };

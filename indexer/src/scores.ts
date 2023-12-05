@@ -13,6 +13,8 @@ import { MONGO_CONNECTION_STRING } from "./utils/constants.ts";
 
 const GAME = Deno.env.get("GAME");
 const START = +(Deno.env.get("START") || 0);
+const STREAM_URL = Deno.env.get("STREAM_URL");
+const MONGO_DB = Deno.env.get("MONGO_DB");
 
 const filter = {
   header: { weak: true },
@@ -23,7 +25,7 @@ const filter = {
 };
 
 export const config: Config<Starknet, Mongo | Console> = {
-  streamUrl: "https://goerli.starknet.a5a.ch",
+  streamUrl: STREAM_URL,
   network: "starknet",
   filter,
   startingBlock: START,
@@ -31,7 +33,7 @@ export const config: Config<Starknet, Mongo | Console> = {
   sinkType: "mongo",
   sinkOptions: {
     connectionString: MONGO_CONNECTION_STRING,
-    database: "mongo_goerli",
+    database: MONGO_DB,
     collectionName: "scores",
     // @ts-ignore - indexer package not updated
     entityMode: true,
@@ -39,40 +41,31 @@ export const config: Config<Starknet, Mongo | Console> = {
 };
 
 export default function transform({ header, events }: Block) {
-  const { timestamp } = header!;
-
   return events.flatMap(({ event, receipt }) => {
     switch (event.keys[0]) {
       case NEW_HIGH_SCORE: {
-        const { value } = parseNewHighScore(event.data, 0);
-        const as = value.adventurer_state;
         console.log("NEW_HIGH_SCORE", "->", "SCORES UPDATE");
+        const { value } = parseNewHighScore(event.data, 0);
+        const as = value.adventurerState;
         return [
           insertHighScore({
             adventurerId: as.adventurerId,
-            owner: as.owner,
-            rank: value.rank,
-            xp: as.adventurer.xp,
-            txHash: receipt.transactionHash,
-            scoreTime: new Date().toISOString(),
             timestamp: new Date().toISOString(),
             totalPayout: 0,
           }),
         ];
       }
       case REWARD_DISTRIBUTION: {
+        console.log("REWARD_DISTRIBUTION", "->", "SCORES UPDATE");
         const { value } = parseRewardDistribution(event.data, 0);
         const fp = value.firstPlace;
         const sp = value.secondPlace;
         const tp = value.thirdPlace;
-        console.log("REWARD_DISTRIBUTION", "->", "SCORES UPDATE");
         const updates: any[] = [];
         if (BigInt(fp.amount) > 0) {
           updates.push(
             updateTotalPayout({
               adventurerId: fp.adventurerId,
-              owner: fp.address,
-              rank: fp.rank,
               timestamp: new Date().toISOString(),
               newPayout: fp.amount,
             })
@@ -82,8 +75,6 @@ export default function transform({ header, events }: Block) {
           updates.push(
             updateTotalPayout({
               adventurerId: sp.adventurerId,
-              owner: sp.address,
-              rank: sp.rank,
               timestamp: new Date().toISOString(),
               newPayout: sp.amount,
             })
@@ -93,8 +84,6 @@ export default function transform({ header, events }: Block) {
           updates.push(
             updateTotalPayout({
               adventurerId: tp.adventurerId,
-              owner: tp.address,
-              rank: tp.rank,
               timestamp: new Date().toISOString(),
               newPayout: tp.amount,
             })

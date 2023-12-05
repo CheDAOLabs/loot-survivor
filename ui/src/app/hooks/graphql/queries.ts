@@ -4,8 +4,6 @@ const ADVENTURER_FIELDS = `
   id
   lastAction
   owner
-  classType
-  homeRealm
   name
   health
   strength
@@ -14,6 +12,7 @@ const ADVENTURER_FIELDS = `
   intelligence
   wisdom
   charisma
+  luck
   xp
   weapon
   chest
@@ -25,6 +24,9 @@ const ADVENTURER_FIELDS = `
   ring
   beastHealth
   statUpgrades
+  startBlock
+  revealBlock
+  actionsPerBlock
   gold
   createdTime
   lastUpdatedTime
@@ -143,11 +145,6 @@ const BEASTS_FRAGMENT = `
 
 const SCORE_FIELDS = `
   adventurerId
-  owner
-  rank
-  xp
-  txHash
-  scoreTime
   timestamp
   totalPayout
 `;
@@ -155,6 +152,21 @@ const SCORE_FIELDS = `
 const SCORES_FRAGMENT = `
   fragment ScoreFields on Score {
     ${SCORE_FIELDS}
+  }
+`;
+
+const GOLDEN_TOKEN_FIELDS = `
+  contract_address
+  id
+  image
+  name
+  owner
+  token_id
+`;
+
+const GOLDEN_TOKEN_FRAGMENT = `
+  fragment GoldenTokenFields on ERC721Tokens {
+    ${GOLDEN_TOKEN_FIELDS}
   }
 `;
 
@@ -287,15 +299,6 @@ const getAdventurerByGold = gql`
 `;
 
 const getAdventurerByXP = gql`
-  ${ADVENTURERS_FRAGMENT}
-  query get_adventurer_by_xp {
-    adventurers(orderBy: { xp: { desc: true } }, limit: 10000000) {
-      ...AdventurerFields
-    }
-  }
-`;
-
-const getDeadAdventurerByXP = gql`
   ${ADVENTURERS_FRAGMENT}
   query get_adventurer_by_xp {
     adventurers(orderBy: { xp: { desc: true } }, limit: 10000000) {
@@ -457,7 +460,7 @@ const getItemsByOwner = gql`
 const getTopScores = gql`
   ${SCORES_FRAGMENT}
   query get_top_scores {
-    scores(orderBy: { xp: { desc: true } }, limit: 10000000) {
+    scores(limit: 10000000) {
       ...ScoreFields
     }
   }
@@ -466,12 +469,22 @@ const getTopScores = gql`
 const getScoresInList = gql`
   ${SCORES_FRAGMENT}
   query get_top_scores($ids: [FeltValue!]) {
-    scores(
-      where: { adventurerId: { In: $ids } }
-      orderBy: { xp: { desc: true } }
-      limit: 10000000
-    ) {
+    scores(where: { adventurerId: { In: $ids } }, limit: 10000000) {
       ...ScoreFields
+    }
+  }
+`;
+
+const getGoldenTokensByOwner = gql`
+  ${GOLDEN_TOKEN_FRAGMENT}
+  query getGoldenTokensByOwner($contractAddress: String!, $owner: String!) {
+    getERC721Tokens(
+      contract_address: $contractAddress
+      cursor: 0
+      limit: 10000
+      owner: $owner
+    ) {
+      ...GoldenTokenFields
     }
   }
 `;
@@ -504,4 +517,5 @@ export {
   getAdventurersByXPPaginated,
   getTopScores,
   getScoresInList,
+  getGoldenTokensByOwner,
 };

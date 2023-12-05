@@ -1,15 +1,14 @@
-import React, {ChangeEvent, useState} from "react";
-import {Button} from "../components/buttons/Button";
+import React, {useState} from "react";
 
 
 import {EnterCode} from "../components/crypts/EnterCode";
 import {MapInfo} from "../components/crypts/MapInfo";
 
 import Info from "../components/adventurer/Info";
-import {NullAdventurer, NullBeast} from "../types";
+import { NullBeast} from "../types";
 import {useQueriesStore} from "../hooks/useQueryStore";
 import useAdventurerStore from "../hooks/useAdventurerStore";
-import {constants, Contract, num, Provider, shortString, cairo, ContractInterface} from "starknet";
+import {Contract, num, Provider, shortString, cairo} from "starknet";
 import CryptsBeastScreen from "@/app/containers/CryptsBeastScreen";
 
 // import Storage from "@/app/lib/storage";
@@ -20,6 +19,8 @@ interface CryptsScreenProps {
     flee: (...args: any[]) => any;
     enterCc: (...args: any[]) => any;
     buffAdventurer: (...args: any[]) => any;
+    gameContract:Contract,
+    beastsContract:Contract
 }
 
 const abi = [
@@ -1008,7 +1009,7 @@ interface DungeonData {
  * @container
  * @description
  */
-export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: CryptsScreenProps) {
+export default function CryptsScreen({attack, flee, enterCc, buffAdventurer,gameContract,beastsContract}: CryptsScreenProps) {
 
     const adventurer = useAdventurerStore((state) => state.adventurer);
 
@@ -1119,7 +1120,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
 
     const [owner, setOwner] = useState("0x....")
     const [name, setName] = useState("loading")
-    const [svg, setSvg] = useState("")
+    const [svg, _] = useState("")
     const [loading, setLoading] = useState(false)
     const [points, setPoints] = useState(0)
 
@@ -1282,7 +1283,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer}/>
+                    <Info adventurer={adventurer} gameContract={gameContract}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
                     <EnterCode handleBack={onEnterCode} setFormData={setFormData} formData={formData}
@@ -1294,7 +1295,7 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer}/>
+                    <Info adventurer={adventurer} gameContract={gameContract}/>
                 </div>
                 <div className="hidden sm:block sm:w-1/2 lg:w-2/3">
                     <MapInfo handleBack={onBack} handleEnter={onEnter} name={name} owner={owner} svg={svg}
@@ -1306,10 +1307,10 @@ export default function CryptsScreen({attack, flee, enterCc, buffAdventurer}: Cr
         return (
             <div className="flex flex-col sm:flex-row flex-wrap">
                 <div className="hidden sm:block sm:w-1/2 lg:w-1/3">
-                    <Info adventurer={adventurer}/>
+                    <Info adventurer={adventurer} gameContract={gameContract}/>
                 </div>
                 <CryptsBeastScreen
-                    attack={attack} flee={flee} exit={onExit} buffAdventurer={buffAdventurer}/>
+                    attack={attack} flee={flee} exit={onExit} buffAdventurer={buffAdventurer} beastsContract={beastsContract}/>
             </div>
         );
     } else {

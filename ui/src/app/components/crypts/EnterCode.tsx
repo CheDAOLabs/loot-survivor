@@ -1,7 +1,6 @@
 import React, {useState, ChangeEvent} from "react";
 import {Button} from "../buttons/Button";
 import {FormData} from "@/app/types";
-import {constants, Contract, Provider, num} from "starknet";
 
 export interface AdventurerNameProps {
     setFormData: (data: FormData) => void;
@@ -34,12 +33,6 @@ export const EnterCode = ({
         }
     };
 
-    const handleNameEntry = (name: string) => {
-        setFormData({...formData, name: name});
-        // setTimeout(() => {
-        //     setStep(step + 1);
-        // }, 1000);
-    };
 
     return (
         <>

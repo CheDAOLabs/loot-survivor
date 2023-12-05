@@ -1,16 +1,15 @@
-import Lords from "../../../../public/lords.svg";
+import Lords from "public/icons/lords.svg";
 import { useUiSounds, soundSelector } from "@/app/hooks/useUiSound";
-import { formatNumber } from "@/app/lib/utils";
+import { formatNumber, calculateLevel } from "@/app/lib/utils";
+import { Adventurer } from "@/app/types";
 
 interface ScoreLeaderboardRowProps {
-  index: number;
-  adventurer: any;
+  adventurer: Adventurer;
   rank: number;
   handleRowSelected: (id: number) => void;
 }
 
 const ScoreRow = ({
-  index,
   adventurer,
   rank,
   handleRowSelected,
@@ -18,7 +17,7 @@ const ScoreRow = ({
   const { play: clickPlay } = useUiSounds(soundSelector.click);
   return (
     <tr
-      className="text-center border-b border-terminal-green hover:bg-terminal-green hover:text-terminal-black cursor-pointer"
+      className="text-center border-b border-terminal-green hover:bg-terminal-green hover:text-terminal-black cursor-pointer xl:h-2 xl:text-lg 2xl:text-xl 2xl:h-10"
       onClick={() => {
         handleRowSelected(adventurer.id ?? 0);
         clickPlay();
@@ -26,36 +25,18 @@ const ScoreRow = ({
     >
       <td>{rank}</td>
       <td>{`${adventurer.name} - ${adventurer.id}`}</td>
+      <td>{calculateLevel(adventurer.xp ?? 0)}</td>
       <td>{adventurer.xp}</td>
       <td>
-        {adventurer.totalPayout > 0 ? (
+        {((adventurer.totalPayout as number) ?? 0) > 0 ? (
           <span className="flex flex-row gap-1 items-center justify-center">
             <Lords className="h-4 w-4 sm:w-5 sm:h-5 fill-current" />
-            {formatNumber(parseInt(adventurer.totalPayout))}
+            {formatNumber(adventurer.totalPayout as number)}
           </span>
         ) : (
           "-"
         )}
       </td>
-      {/* <td>
-        <div className="flex flex-row items-center justify-center gap-2">
-          <span
-            className={` ${
-              index == 0
-                ? "text-gold"
-                : index == 1
-                ? "text-silver"
-                : index == 2
-                ? "text-bronze"
-                : ""
-            }`}
-          >
-            {index == 0 ? 13 : index == 1 ? 8 : index == 2 ? 4 : ""}
-          </span>
-
-          <Lords className="self-center w-6 h-6 ml-4 fill-current" />
-        </div>
-      </td> */}
     </tr>
   );
 };

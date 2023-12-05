@@ -1,4 +1,3 @@
-import KeyboardControl, {ButtonData} from "../components/KeyboardControls";
 import {BattleDisplay} from "../components/beast/BattleDisplay";
 import {BeastDisplay} from "../components/beast/BeastDisplay";
 import useLoadingStore from "../hooks/useLoadingStore";
@@ -6,10 +5,11 @@ import useAdventurerStore from "../hooks/useAdventurerStore";
 import {useQueriesStore} from "../hooks/useQueryStore";
 import React, {useEffect, useState} from "react";
 import {processBeastName} from "../lib/utils";
-import {Battle, NullDiscovery, NullBeast, UpgradeStats, ZeroUpgrade, NullCave, CcCave, Monster} from "../types";
+import {Battle, NullBeast,  NullCave, CcCave, Monster} from "../types";
 import {Button} from "../components/buttons/Button";
 import LootIcon from "@/app/components/icons/LootIcon";
-import {GameData} from "@/app/components/GameData";
+import {GameData} from "@/app/lib/data/GameData";
+import {Contract} from "starknet";
 
 const buffs =
     [
@@ -21,35 +21,28 @@ const buffs =
         { id: 6, strength: 0, dexterity: 1, vitality: 1, intelligence: 0, wisdom: 0, charisma: 1  }
 ];
 
-function getRandomBuff() {
-    const randomIndex = Math.floor(Math.random() * buffs.length);
-    return buffs[randomIndex];
-}
 
 interface BeastScreenProps {
     attack: (...args: any[]) => any;
     flee: (...args: any[]) => any;
     exit: (...args: any[]) => any;
     buffAdventurer: (...args: any[]) => any;
+    beastsContract: Contract;
 }
 
 /**
  * @container
  * @description Provides the beast screen for adventurer battles.
  */
-export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastScreenProps) {
+export default function BeastScreen({attack, exit, buffAdventurer,  beastsContract}: BeastScreenProps) {
     /* eslint-disable */
 
-    const adventurer = useAdventurerStore((state) => state.adventurer);
     const loading = useLoadingStore((state) => state.loading);
-    const resetNotification = useLoadingStore((state) => state.resetNotification);
     const [showBattleLog, setShowBattleLog] = useState(false);
 
     const [hasBeast, setHasBeast] = useState(true);//useAdventurerStore((state) => state.computed.hasBeast);
     const isAlive = useAdventurerStore((state) => state.computed.isAlive);
-    const lastBeast = useQueriesStore(
-        (state) => state.data.lastBeastQuery?.discoveries[0] || NullDiscovery
-    );
+
     const beastData = useQueriesStore(
         (state) => state.data.beastQueryCC?.beasts[0] || NullBeast
     );
@@ -231,7 +224,7 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
             <div className="sm:w-1/2 order-1 sm:order-2">
                 {hasBeast ? (
                     <>
-                        <BeastDisplay beastData={beastData}/>
+                        <BeastDisplay beastData={beastData} beastsContract={beastsContract}/>
                     </>
                 ) : (
                     <div className="flex flex-col items-center border-2 border-terminal-green">
@@ -333,7 +326,7 @@ export default function BeastScreen({attack, flee, exit, buffAdventurer}: BeastS
                             ))}
                         </div>
                         <div style={{marginTop: "5px"}}>
-                            <Button size={"lg"} onClick={exit}>EXIT</Button>
+                            <Button size={"lg"} onClick={onExit}>EXIT</Button>
                         </div>
                     </>
                 )}

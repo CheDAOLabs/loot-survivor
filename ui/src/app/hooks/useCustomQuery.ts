@@ -1,7 +1,7 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useQuery } from "@apollo/client";
-import { useQueriesStore, QueryKey } from "./useQueryStore";
-import { isEqual } from "lodash";
+import { useQueriesStore, QueryKey } from "@/app/hooks/useQueryStore";
+import { gameClient } from "../lib/clients";
 
 type Variables = Record<
   string,
@@ -20,7 +20,8 @@ const useCustomQuery = (
     setRefetch: state.setRefetch,
   }));
 
-  const { data, loading, refetch, error } = useQuery(query, {
+  const { data, refetch } = useQuery(query, {
+    client: gameClient,
     variables: variables,
     skip: skip,
   });

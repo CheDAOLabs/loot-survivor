@@ -1,7 +1,5 @@
-import useAdventurerStore from "../../hooks/useAdventurerStore";
-import { processBeastName } from "../../lib/utils";
+import { processBeastName } from "@/app/lib/utils";
 import {
-  HeartIcon,
   CoinIcon,
   GiBruteIcon,
   SkullCrossedBonesIcon,
@@ -9,8 +7,7 @@ import {
   GiSandsOfTimeIcon,
   TwoCoinIcon,
   HealthPotionIcon,
-  GiStarsStackIcon,
-} from "../icons/Icons";
+} from "@/app/components/icons/Icons";
 import { Discovery } from "@/app/types";
 
 interface DiscoveryProps {
@@ -32,14 +29,21 @@ export const DiscoveryDisplay = ({ discoveryData }: DiscoveryProps) => {
         if (AdventurerHealthExists) {
           return (
             <span className="flex flex-row items-center justify-between">
-              <p>YIKES! Ambushed by a {beastName}</p>
+              <p>
+                YIKES! Ambushed by a {beastName} for {discoveryData.damageTaken}{" "}
+                damage to {discoveryData.damageLocation}!
+              </p>
               <GiBruteIcon />
             </span>
           );
         } else {
           return (
             <span className="flex flex-row items-center justify-between">
-              <p>YIKES! Killed by a {beastName} from an ambush</p>
+              <p>
+                YIKES! Killed by a {beastName} from an ambush of{" "}
+                {discoveryData.damageTaken} damage to{" "}
+                {discoveryData.damageLocation}!
+              </p>
               <SkullCrossedBonesIcon />
             </span>
           );
@@ -76,7 +80,8 @@ export const DiscoveryDisplay = ({ discoveryData }: DiscoveryProps) => {
               {discoveryData?.obstacle?.endsWith("s")
                 ? `a ${discoveryData?.obstacle}`
                 : discoveryData?.obstacle}{" "}
-              with {discoveryData?.damageTaken} damage!
+              with {discoveryData?.damageTaken} damage to{" "}
+              {discoveryData.damageLocation}!
             </p>
             <SkullCrossedBonesIcon />
           </span>
@@ -89,7 +94,8 @@ export const DiscoveryDisplay = ({ discoveryData }: DiscoveryProps) => {
               {discoveryData?.obstacle?.endsWith("s")
                 ? discoveryData?.obstacle
                 : `A ${discoveryData?.obstacle}`}{" "}
-              inflicted {discoveryData?.damageTaken} damage!
+              inflicted {discoveryData?.damageTaken} damage to{" "}
+              {discoveryData.damageLocation}!
             </p>
             <SpikedWallIcon />
           </span>
@@ -131,15 +137,6 @@ export const DiscoveryDisplay = ({ discoveryData }: DiscoveryProps) => {
               <p>GREAT! Discovered {discoveryData?.outputAmount} health! </p>
             </div>
             <HealthPotionIcon />
-          </span>
-        );
-      }
-
-      if (discoveryData?.subDiscoveryType === "XP") {
-        return (
-          <span className="flex flex-row items-center justify-between">
-            <p>NICE! Discovered {discoveryData.outputAmount} XP!</p>
-            <GiStarsStackIcon />
           </span>
         );
       }

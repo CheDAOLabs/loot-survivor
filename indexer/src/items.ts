@@ -9,13 +9,13 @@ import {
   EQUIPPED_ITEMS,
   HIT_BY_OBSTACLE,
   ITEMS_LEVELED_UP,
-  NEW_ITEMS_AVAILABLE,
+  UPGRADES_AVAILABLE,
   parseAdventurerUpgraded,
   parseDodgedObstacle,
   parseDroppedItems,
   parseEquippedItems,
   parseHitByObstacle,
-  parseNewItemsAvailable,
+  parseUpgradesAvailable,
   parseItemsLeveledUp,
   parsePurchasedItems,
   parseSlayedBeast,
@@ -25,11 +25,13 @@ import {
   START_GAME,
 } from "./utils/events.ts";
 import { insertItem, updateItemsXP } from "./utils/helpers.ts";
-import { checkExistsInt } from "./utils/encode.ts";
-import { MONGO_CONNECTION_STRING, ITEMS_NUMBER } from "./utils/constants.ts";
+import { checkExistsInt, encodeIntAsBytes } from "./utils/encode.ts";
+import { MONGO_CONNECTION_STRING } from "./utils/constants.ts";
 
 const GAME = Deno.env.get("GAME");
 const START = +(Deno.env.get("START") || 0);
+const STREAM_URL = Deno.env.get("STREAM_URL");
+const MONGO_DB = Deno.env.get("MONGO_DB");
 
 const filter = {
   header: { weak: true },
@@ -42,13 +44,13 @@ const filter = {
     { fromAddress: GAME, keys: [DODGED_OBSTACLE] },
     { fromAddress: GAME, keys: [SLAYED_BEAST] },
     { fromAddress: GAME, keys: [ITEMS_LEVELED_UP] },
-    { fromAddress: GAME, keys: [NEW_ITEMS_AVAILABLE] },
+    { fromAddress: GAME, keys: [UPGRADES_AVAILABLE] },
     { fromAddress: GAME, keys: [ADVENTURER_UPGRADED] },
   ],
 };
 
 export const config: Config<Starknet, Mongo | Console> = {
-  streamUrl: "https://goerli.starknet.a5a.ch",
+  streamUrl: STREAM_URL,
   network: "starknet",
   filter,
   startingBlock: START,
@@ -56,7 +58,7 @@ export const config: Config<Starknet, Mongo | Console> = {
   sinkType: "mongo",
   sinkOptions: {
     connectionString: MONGO_CONNECTION_STRING,
-    database: "mongo_goerli",
+    database: MONGO_DB,
     collectionName: "items",
     // @ts-ignore - indexer package not updated
     entityMode: true,
@@ -64,8 +66,6 @@ export const config: Config<Starknet, Mongo | Console> = {
 };
 
 export default function transform({ header, events }: Block) {
-  const { timestamp } = header!;
-
   return events.flatMap(({ event, receipt }) => {
     switch (event.keys[0]) {
       case START_GAME: {
@@ -73,25 +73,6 @@ export default function transform({ header, events }: Block) {
         const as = value.adventurerState;
         const itemInserts: any[] = [];
         console.log("START_GAME", "->", "ITEMS UPDATES");
-        for (let i = 1; i < ITEMS_NUMBER; i++) {
-          itemInserts.push(
-            insertItem({
-              item: i,
-              adventurerId: as.adventurerId,
-              owner: false,
-              equipped: false,
-              ownerAddress: 0,
-              xp: 0,
-              special1: 0,
-              special2: 0,
-              special3: 0,
-              isAvailable: false,
-              purchasedTime: 0,
-              timestamp: new Date().toISOString(),
-            })
-          );
-        }
-
         const starterWeapon = {
           entity: {
             item: checkExistsInt(BigInt(as.adventurer.weapon.id)),
@@ -104,11 +85,17 @@ export default function transform({ header, events }: Block) {
               owner: true,
               equipped: true,
               ownerAddress: checkExistsInt(BigInt(as.owner)),
+              xp: encodeIntAsBytes(BigInt(0)),
+              special1: null,
+              special2: null,
+              special3: null,
+              isAvailable: false,
+              purchasedTime: null,
               timestamp: new Date().toISOString(),
             },
           },
         };
-        return [...itemInserts, starterWeapon];
+        return starterWeapon;
       }
       case PURCHASED_ITEMS: {
         const { value } = parsePurchasedItems(event.data, 0);
@@ -212,7 +199,23 @@ export default function transform({ header, events }: Block) {
         const as = value.adventurerState;
         console.log("ITEMS_LEVELED_UP", "->", "ITEMS UPDATES");
         const result = value.items.map((item) => {
-          if (item.prefixesUnlocked) {
+          if (item.prefixesUnlocked && item.suffixUnlocked) {
+            return {
+              entity: {
+                item: checkExistsInt(BigInt(item.itemId)),
+                adventurerId: checkExistsInt(BigInt(as.adventurerId)),
+              },
+              update: {
+                $set: {
+                  item: checkExistsInt(BigInt(item.itemId)),
+                  adventurerId: checkExistsInt(BigInt(as.adventurerId)),
+                  special1: checkExistsInt(BigInt(item.specials.special1)),
+                  special2: checkExistsInt(BigInt(item.specials.special2)),
+                  special3: checkExistsInt(BigInt(item.specials.special3)),
+                },
+              },
+            };
+          } else if (item.prefixesUnlocked) {
             return {
               entity: {
                 item: checkExistsInt(BigInt(item.itemId)),
@@ -227,8 +230,7 @@ export default function transform({ header, events }: Block) {
                 },
               },
             };
-          }
-          if (item.suffixUnlocked) {
+          } else if (item.suffixUnlocked) {
             return {
               entity: {
                 item: checkExistsInt(BigInt(item.itemId)),
@@ -247,24 +249,26 @@ export default function transform({ header, events }: Block) {
         const filteredResult = result.filter((value) => value !== undefined);
         return filteredResult;
       }
-      case NEW_ITEMS_AVAILABLE: {
-        const { value } = parseNewItemsAvailable(event.data, 0);
+      case UPGRADES_AVAILABLE: {
+        const { value } = parseUpgradesAvailable(event.data, 0);
         const as = value.adventurerState;
-        console.log("NEW_ITEMS_AVAILABLE", "->", "ITEMS UPDATES");
-        const newResult = value.items.map((item) => ({
-          entity: {
-            item: checkExistsInt(BigInt(item)),
-            adventurerId: checkExistsInt(BigInt(as.adventurerId)),
-          },
-          update: {
-            $set: {
-              item: checkExistsInt(BigInt(item)),
-              adventurerId: checkExistsInt(BigInt(as.adventurerId)),
-              isAvailable: true,
-              timestamp: new Date().toISOString(),
-            },
-          },
-        }));
+        console.log("UPGRADES_AVAILABLE", "->", "ITEMS UPDATES");
+        const newResult = value.items.map((item) =>
+          insertItem({
+            item: item,
+            adventurerId: as.adventurerId,
+            owner: false,
+            equipped: false,
+            ownerAddress: 0,
+            xp: 0,
+            special1: 0,
+            special2: 0,
+            special3: 0,
+            isAvailable: true,
+            purchasedTime: 0,
+            timestamp: new Date().toISOString(),
+          })
+        );
         return newResult;
       }
       case ADVENTURER_UPGRADED: {

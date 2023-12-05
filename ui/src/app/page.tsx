@@ -1,56 +1,39 @@
 "use client";
 import {
   useAccount,
-  useConnectors,
-  useNetwork,
-  useProvider,
-  useContractWrite,
-  useTransactionManager,
+  useConnect,
+  useContract,
+  Connector,
 } from "@starknet-react/core";
 import { constants } from "starknet";
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Button } from "./components/buttons/Button";
-import HorizontalKeyboardControl from "./components/menu/HorizontalMenu";
-import ActionsScreen from "./containers/ActionsScreen";
-import AdventurerScreen from "./containers/AdventurerScreen";
-import InventoryScreen from "./containers/InventoryScreen";
-import LeaderboardScreen from "./containers/LeaderboardScreen";
-import EncountersScreen from "./containers/EncountersScreen";
-import GuideScreen from "./containers/GuideScreen";
-import UpgradeScreen from "./containers/UpgradeScreen";
-import { displayAddress, padAddress, formatNumber } from "./lib/utils";
-import TransactionHistory from "./components/navigation/TransactionHistory";
-import TransactionCart from "./components/navigation/TransactionCart";
-import Intro from "./components/intro/Intro";
-import { TxActivity } from "./components/navigation/TxActivity";
-import useLoadingStore from "./hooks/useLoadingStore";
-import useAdventurerStore from "./hooks/useAdventurerStore";
-import useUIStore from "./hooks/useUIStore";
-import useTransactionCartStore from "./hooks/useTransactionCartStore";
-import { NotificationDisplay } from "./components/notifications/NotificationDisplay";
-import { useMusic } from "./hooks/useMusic";
-import { Menu, NullAdventurer, NullDiscovery } from "./types";
-import { useQueriesStore } from "./hooks/useQueryStore";
-import Profile from "./containers/ProfileScreen";
-import { DeathDialog } from "./components/adventurer/DeathDialog";
-import WalletSelect from "./components/intro/WalletSelect";
-import {
-  CogIcon,
-  MuteIcon,
-  VolumeIcon,
-  GithubIcon,
-  RefreshIcon,
-  CartIconSimple,
-  ArcadeIcon,
-} from "./components/icons/Icons";
-import Lords from "../../public/lords.svg";
-import Settings from "./components/navigation/Settings";
-import MobileHeader from "./components/navigation/MobileHeader";
-import Player from "./components/adventurer/Player";
-import { useUiSounds } from "./hooks/useUiSound";
-import { soundSelector } from "./hooks/useUiSound";
-import { PenaltyCountDown } from "./components/CountDown";
-import useCustomQuery from "./hooks/useCustomQuery";
+import { useState, useEffect, useMemo } from "react";
+import ActionsScreen from "@/app/containers/ActionsScreen";
+import AdventurerScreen from "@/app/containers/AdventurerScreen";
+import InventoryScreen from "@/app/containers/InventoryScreen";
+import LeaderboardScreen from "@/app/containers/LeaderboardScreen";
+import EncountersScreen from "@/app/containers/EncountersScreen";
+import GuideScreen from "@/app/containers/GuideScreen";
+import UpgradeScreen from "@/app/containers/UpgradeScreen";
+import { padAddress } from "@/app/lib/utils";
+import Intro from "@/app/components/intro/Intro";
+import { TxActivity } from "@/app/components/navigation/TxActivity";
+import useLoadingStore from "@/app/hooks/useLoadingStore";
+import useAdventurerStore from "@/app/hooks/useAdventurerStore";
+import useUIStore from "@/app/hooks/useUIStore";
+import useTransactionCartStore from "@/app/hooks/useTransactionCartStore";
+import { NotificationDisplay } from "@/app/components/notifications/NotificationDisplay";
+import { useMusic } from "@/app/hooks/useMusic";
+import { Menu, ZeroUpgrade, BurnerStorage } from "@/app/types";
+import { useQueriesStore } from "@/app/hooks/useQueryStore";
+import Profile from "@/app/containers/ProfileScreen";
+import { DeathDialog } from "@/app/components/adventurer/DeathDialog";
+import WalletSelect from "@/app/components/intro/WalletSelect";
+import Settings from "@/app/components/navigation/Settings";
+import MobileHeader from "@/app/components/navigation/MobileHeader";
+import Player from "@/app/components/adventurer/Player";
+import useCustomQuery from "@/app/hooks/useCustomQuery";
+import { useQuery } from "@apollo/client";
+import { goldenTokenClient } from "@/app/lib/clients";
 import {
   getAdventurerById,
   getAdventurersByOwner,
@@ -60,16 +43,31 @@ import {
   getBattlesByBeast,
   getItemsByAdventurer,
   getLatestMarketItems,
-} from "./hooks/graphql/queries";
-import { ArcadeDialog } from "./components/ArcadeDialog";
-import NetworkSwitchError from "./components/navigation/NetworkSwitchError";
-import { syscalls } from "./lib/utils/syscalls";
-import { useContracts } from "./hooks/useContracts";
-import { Maintenance } from "./components/archived/Maintenance";
-import { set } from "lodash";
-import LootIconLoader from "./components/icons/Loader";
-import { useBalance } from "@starknet-react/core";
-import CryptsScreen from "./containers/CryptsScreen";
+  getGoldenTokensByOwner,
+} from "@/app/hooks/graphql/queries";
+import { ArcadeDialog } from "@/app/components/ArcadeDialog";
+import { TopUpDialog } from "@/app/components/TopUpDialog";
+import NetworkSwitchError from "@/app/components/navigation/NetworkSwitchError";
+import { syscalls } from "@/app/lib/utils/syscalls";
+import Game from "@/app/abi/Game.json";
+import Lords from "@/app/abi/Lords.json";
+import EthBalanceFragment from "@/app/abi/EthBalanceFragment.json";
+import Beasts from "@/app/abi/Beasts.json";
+import { ArcadeIntro } from "@/app/components/intro/ArcadeIntro";
+import ScreenMenu from "@/app/components/menu/ScreenMenu";
+import {
+  getArcadeConnectors,
+  checkArcadeConnector,
+} from "@/app/lib/connectors";
+import Header from "@/app/components/navigation/Header";
+import { fetchBalances, fetchEthBalance } from "@/app/lib/balances";
+import useTransactionManager from "@/app/hooks/useTransactionManager";
+import { StarknetProvider } from "@/app//provider";
+import { SpecialBeast } from "@/app/components/notifications/SpecialBeast";
+import { useBurner } from "@/app/lib/burner";
+import { connectors } from "@/app/lib/connectors";
+import Storage from "@/app/lib/storage";
+import CryptsScreen from "@/app/containers/CryptsScreen";
 
 const allMenuItems: Menu[] = [
   { id: 1, label: "Start", screen: "start", disabled: false },
@@ -91,15 +89,36 @@ const mobileMenuItems: Menu[] = [
   { id: 6, label: "Guide", screen: "guide", disabled: false },
 ];
 
-export default function Home() {
-  const { disconnect, connectors } = useConnectors();
-  const { chain } = useNetwork();
-  const { provider } = useProvider();
+export default function Main() {
+  const [appConnectors, setAppConnectors] = useState<Connector[]>([]);
+
+  const { listConnectors } = useBurner({});
+
+  const updateConnectors = () => {
+    const arcadeConnectors = listConnectors();
+    setAppConnectors([...arcadeConnectors, ...connectors]);
+  };
+
+  useEffect(() => {
+    updateConnectors();
+  }, []);
+  return (
+    <StarknetProvider connectors={appConnectors}>
+      <Home updateConnectors={updateConnectors} />
+    </StarknetProvider>
+  );
+}
+
+interface HomeProps {
+  updateConnectors: () => void;
+}
+
+function Home({ updateConnectors }: HomeProps) {
+  const { connector, connectors } = useConnect();
   const disconnected = useUIStore((state) => state.disconnected);
   const setDisconnected = useUIStore((state) => state.setDisconnected);
   const { account, address, status, isConnected } = useAccount();
   const isMuted = useUIStore((state) => state.isMuted);
-  const setIsMuted = useUIStore((state) => state.setIsMuted);
   const [introComplete, setIntroComplete] = useState(false);
   const adventurer = useAdventurerStore((state) => state.adventurer);
   const setAdventurer = useAdventurerStore((state) => state.setAdventurer);
@@ -107,93 +126,156 @@ export default function Home() {
   const screen = useUIStore((state) => state.screen);
   const setScreen = useUIStore((state) => state.setScreen);
   const deathDialog = useUIStore((state) => state.deathDialog);
-  const displayHistory = useUIStore((state) => state.displayHistory);
-  const setDisplayHistory = useUIStore((state) => state.setDisplayHistory);
-  const displayCart = useUIStore((state) => state.displayCart);
-  const setDisplayCart = useUIStore((state) => state.setDisplayCart);
-  const setMintAdventurer = useUIStore((state) => state.setMintAdventurer);
-  const { play: clickPlay } = useUiSounds(soundSelector.click);
   const hasBeast = useAdventurerStore((state) => state.computed.hasBeast);
   const hasStatUpgrades = useAdventurerStore(
     (state) => state.computed.hasStatUpgrades
   );
-  const isAlive = useAdventurerStore((state) => state.computed.isAlive);
-  const hasNoXp = useAdventurerStore((state) => state.computed.hasNoXp);
   const owner = account?.address ? padAddress(account.address) : "";
   const isWrongNetwork = useUIStore((state) => state.isWrongNetwork);
   const setIsWrongNetwork = useUIStore((state) => state.setIsWrongNetwork);
-  const displayHistoryButtonRef = useRef<HTMLButtonElement>(null);
-  const displayCartButtonRef = useRef<HTMLButtonElement>(null);
-
   const arcadeDialog = useUIStore((state) => state.arcadeDialog);
-  const showArcadeDialog = useUIStore((state) => state.showArcadeDialog);
+  const arcadeIntro = useUIStore((state) => state.arcadeIntro);
+  const showArcadeIntro = useUIStore((state) => state.showArcadeIntro);
+  const closedArcadeIntro = useUIStore((state) => state.closedArcadeIntro);
+  const topUpDialog = useUIStore((state) => state.topUpDialog);
+  const showTopUpDialog = useUIStore((state) => state.showTopUpDialog);
+  const setTopUpAccount = useUIStore((state) => state.setTopUpAccount);
+  const setEstimatingFee = useUIStore((state) => state.setEstimatingFee);
+  const setSpecialBeast = useUIStore((state) => state.setSpecialBeast);
+  const setIsMintingLords = useUIStore((state) => state.setIsMintingLords);
+  const hash = useLoadingStore((state) => state.hash);
+  const specialBeastDefeated = useUIStore(
+    (state) => state.specialBeastDefeated
+  );
+  const setSpecialBeastDefeated = useUIStore(
+    (state) => state.setSpecialBeastDefeated
+  );
+  const { contract: gameContract } = useContract({
+    address: process.env.NEXT_PUBLIC_GAME_ADDRESS,
+    abi: Game,
+  });
+  const { contract: lordsContract } = useContract({
+    address: process.env.NEXT_PUBLIC_LORDS_ADDRESS,
+    abi: Lords,
+  });
+  const { contract: ethContract } = useContract({
+    address: process.env.NEXT_PUBLIC_ETH_ADDRESS,
+    abi: EthBalanceFragment,
+  });
+  const { contract: beastsContract } = useContract({
+    address: process.env.NEXT_PUBLIC_BEASTS_ADDRESS,
+    abi: Beasts,
+  });
 
-  const { gameContract, lordsContract } = useContracts();
   const { addTransaction } = useTransactionManager();
   const addToCalls = useTransactionCartStore((state) => state.addToCalls);
+  const resetCalls = useTransactionCartStore((state) => state.resetCalls);
   const handleSubmitCalls = useTransactionCartStore(
     (state) => state.handleSubmitCalls
   );
   const startLoading = useLoadingStore((state) => state.startLoading);
   const stopLoading = useLoadingStore((state) => state.stopLoading);
+  const pendingMessage = useLoadingStore((state) => state.pendingMessage);
   const setTxHash = useLoadingStore((state) => state.setTxHash);
-  const { writeAsync } = useContractWrite({ calls });
   const setEquipItems = useUIStore((state) => state.setEquipItems);
   const setDropItems = useUIStore((state) => state.setDropItems);
+  const setPotionAmount = useUIStore((state) => state.setPotionAmount);
+  const setUpgrades = useUIStore((state) => state.setUpgrades);
+  const setPurchaseItems = useUIStore((state) => state.setPurchaseItems);
   const setDeathMessage = useLoadingStore((state) => state.setDeathMessage);
   const showDeathDialog = useUIStore((state) => state.showDeathDialog);
-  const resetNotification = useLoadingStore((state) => state.resetNotification);
   const setStartOption = useUIStore((state) => state.setStartOption);
+  const setUpdateDeathPenalty = useUIStore(
+    (state) => state.setUpdateDeathPenalty
+  );
+  const [accountChainId, setAccountChainId] = useState<
+    constants.StarknetChainId | undefined
+  >();
 
-  const lordsBalance = useBalance({
-    token: lordsContract?.address,
-    address,
-  });
+  const arcadeConnectors = getArcadeConnectors(connectors);
+
+  const [ethBalance, setEthBalance] = useState<bigint>(BigInt(0));
+  const [lordsBalance, setLordsBalance] = useState<bigint>(BigInt(0));
+
+  const getBalances = async () => {
+    const balances = await fetchBalances(
+      address ?? "0x0",
+      ethContract,
+      lordsContract,
+      gameContract
+    );
+    setEthBalance(balances[0]);
+    setLordsBalance(balances[1]);
+  };
+
+  const getEthBalance = async () => {
+    const ethBalance = await fetchEthBalance(address ?? "0x0", ethContract);
+    setEthBalance(ethBalance);
+  };
+
+  useEffect(() => {
+    getBalances();
+  }, [account]);
+
+  const { data, refetch, resetData, setData, setIsLoading, setNotLoading } =
+    useQueriesStore();
 
   const {
-    data,
-    refetch,
-    resetData,
-    setData,
-    isLoading,
-    setIsLoading,
-    setNotLoading,
-  } = useQueriesStore();
-
-  const { spawn, explore, attack, flee, upgrade, multicall,enterCC, attackCC ,buffAdventurer} = syscalls({
-    gameContract,
-    lordsContract,
+    spawn,
+    explore,
+    attack,
+    flee,
+    upgrade,
+    slayIdles,
+    multicall,
+    mintLords,
+    enterCC,
+    attackCC,
+    buffAdventurer
+  } = syscalls({
+    gameContract: gameContract!,
+    lordsContract: lordsContract!,
+    beastsContract: beastsContract!,
     addTransaction,
-    account,
     queryData: data,
     resetData,
     setData,
-    adventurer,
+    adventurer: adventurer!,
     addToCalls,
     calls,
     handleSubmitCalls,
     startLoading,
     stopLoading,
     setTxHash,
-    writeAsync,
     setEquipItems,
     setDropItems,
     setDeathMessage,
     showDeathDialog,
-    resetNotification,
     setScreen,
     setAdventurer,
-    setMintAdventurer,
     setStartOption,
+    ethBalance: ethBalance,
+    showTopUpDialog,
+    setTopUpAccount,
+    setEstimatingFee,
+    account: account!,
+    resetCalls,
+    setSpecialBeastDefeated,
+    setSpecialBeast,
+    connector,
+    getEthBalance,
+    getBalances,
+    setIsMintingLords,
+    setUpdateDeathPenalty,
   });
 
   const playState = useMemo(
     () => ({
       isInBattle: hasBeast,
-      isDead: false, // set this to true when player is dead
+      isDead: deathDialog, // set this to true when player is dead
       isMuted: isMuted,
     }),
-    [hasBeast, isMuted]
+    [hasBeast, deathDialog, isMuted]
   );
 
   const { play, stop } = useMusic(playState, {
@@ -266,6 +348,30 @@ export default function Home() {
 
   useCustomQuery("battlesByBeastQuery", getBattlesByBeast, beastVariables);
 
+  const goldenTokenVariables = useMemo(() => {
+    const storage: BurnerStorage = Storage.get("burners");
+    const isArcade = checkArcadeConnector(connector);
+    if (isArcade) {
+      const masterAccount = storage[address!].masterAccount;
+      return {
+        contractAddress:
+          process.env.NEXT_PUBLIC_GOLDEN_TOKEN_ADDRESS?.toLowerCase(),
+        owner: padAddress(masterAccount ?? ""),
+      };
+    } else {
+      return {
+        contractAddress:
+          process.env.NEXT_PUBLIC_GOLDEN_TOKEN_ADDRESS?.toLowerCase(),
+        owner: padAddress(address ?? ""),
+      };
+    }
+  }, [address]);
+
+  const { data: goldenTokenData } = useQuery(getGoldenTokensByOwner, {
+    client: goldenTokenClient,
+    variables: goldenTokenVariables,
+  });
+
   const handleSwitchAdventurer = async (adventurerId: number) => {
     setIsLoading();
     const newAdventurerData = await refetch("adventurerByIdQuery", {
@@ -309,27 +415,12 @@ export default function Home() {
     };
   }, [play, stop]);
 
-  useEffect(() => {
-    const isWrongNetwork = chain?.id !== constants.StarknetChainId.SN_GOERLI;
-    setIsWrongNetwork(isWrongNetwork);
-  }, [chain, provider, isConnected]);
-
   // Initialize adventurers from owner
   useEffect(() => {
     if (adventurersData) {
       setData("adventurersByOwnerQuery", adventurersData);
     }
   }, [adventurersData]);
-
-  // useEffect(() => {
-  //   if ((isAlive && !hasStatUpgrades) || (isAlive && hasNoXp)) {
-  //     setScreen("play");
-  //   } else if (hasStatUpgrades) {
-  //     setScreen("upgrade");
-  //   } else if (!adventurer || !isAlive) {
-  //     setScreen("start");
-  //   }
-  // }, [hasStatUpgrades, isAlive, hasNoXp, adventurer]);
 
   const mobileMenuDisabled = [
     false,
@@ -356,156 +447,115 @@ export default function Home() {
     }
   }, [isConnected]);
 
+  const getAccountChainId = async () => {
+    if (account) {
+      const chainId = await account!.getChainId();
+      setAccountChainId(chainId);
+    }
+  };
+
+  useEffect(() => {
+    getAccountChainId();
+    const isWrongNetwork =
+      accountChainId !==
+      (process.env.NEXT_PUBLIC_NETWORK === "mainnet"
+        ? constants.StarknetChainId.SN_MAIN
+        : constants.StarknetChainId.SN_GOERLI);
+    setIsWrongNetwork(isWrongNetwork);
+  }, [account, accountChainId, isConnected]);
+
+  useEffect(() => {
+    if (arcadeConnectors.length === 0 && !closedArcadeIntro) {
+      showArcadeIntro(true);
+    } else {
+      showArcadeIntro(false);
+    }
+  }, [arcadeConnectors]);
+
+  useEffect(() => {
+    resetCalls();
+    setDropItems([]);
+    setEquipItems([]);
+    setPotionAmount(0);
+    setPurchaseItems([]);
+    setUpgrades({ ...ZeroUpgrade });
+  }, [adventurer]);
+
+  const spawnLoader =
+    pendingMessage &&
+    (pendingMessage === "Spawning Adventurer" ||
+      pendingMessage.includes("Spawning Adventurer"));
+
   if (!isConnected && introComplete && disconnected) {
     return <WalletSelect />;
   }
 
   return (
-    // <Maintenance />
     <main
-      className={`min-h-screen container mx-auto flex flex-col p-4 pt-8 sm:p-8 lg:p-10 2xl:p-20 `}
+      className={`min-h-screen container mx-auto flex flex-col sm:pt-8 sm:p-8 lg:p-10 2xl:p-20 `}
     >
       {introComplete ? (
         <>
+          <NetworkSwitchError isWrongNetwork={isWrongNetwork} />
           <div className="flex flex-col w-full">
-            <NetworkSwitchError isWrongNetwork={isWrongNetwork} />
-
-            <div className="sm:hidden">
-              <TxActivity />
-            </div>
-            <div className="flex flex-row justify-between">
-              <span className="flex flex-row items-center gap-2 sm:gap-5">
-                <h1 className="glitch m-0 text-lg sm:text-4xl">
-                  Loot Survivor
-                </h1>
-                {adventurer?.id && (
-                  <PenaltyCountDown
-                    lastDiscoveryTime={
-                      data.latestDiscoveriesQuery?.discoveries[0]?.timestamp
-                    }
-                    lastBattleTime={data.lastBattleQuery?.battles[0]?.timestamp}
-                    dataLoading={isLoading.global}
-                  />
-                )}
-              </span>
-              <div className="flex flex-row items-center self-end gap-1 flex-wrap">
-                <button className="flex items-center sm:h-10 sm:w-20 px-1 py-1 sm:py-2 text-xs sm:text-lg bg-terminal-black border border-terminal-green hover:bg-terminal-green/20 sm:hover:animate-pulse text-terminal-green">
-                  <span className="flex flex-row items-center justify-between w-full">
-                    <Lords className="self-center h-4 w-4 sm:w-6 sm:h-6 fill-current" />
-                    <p>
-                      {formatNumber(
-                        parseInt(lordsBalance.data?.formatted ?? "0")
-                      )}
-                    </p>
-                  </span>
-                </button>
-                <Button
-                  onClick={() => showArcadeDialog(!arcadeDialog)}
-                  disabled={isWrongNetwork}
-                >
-                  <ArcadeIcon className="w-4 sm:w-8 justify-center" />
-                  <span className="hidden sm:block">arcade account</span>
-                </Button>
-                <Button
-                  onClick={() => {
-                    setIsMuted(!isMuted);
-                    clickPlay();
-                  }}
-                  className="hidden sm:block"
-                >
-                  <div className="flex items-center justify-center">
-                    {isMuted ? (
-                      <MuteIcon className="w-4 h-4 sm:w-6 sm:h-6" />
-                    ) : (
-                      <VolumeIcon className="w-4 h-4 sm:w-6 sm:h-6" />
-                    )}
-                  </div>
-                </Button>
-                {account && calls.length > 0 && (
-                  <button
-                    ref={displayCartButtonRef}
-                    onClick={() => {
-                      setDisplayCart(!displayCart);
-                      clickPlay();
-                    }}
-                    className="relative flex flex-row items-center justify-center gap-2 p-1 sm:p-2 bg-black border border-terminal-green text-xs sm:text-base w-9 sm:w-fit"
-                  >
-                    <CartIconSimple className="w-4 h-4" />
-                    <p className="hidden sm:block">
-                      {displayCart ? "Hide Cart" : "Show Cart"}
-                    </p>
-                  </button>
-                )}
-                {displayCart && (
-                  <TransactionCart
-                    buttonRef={displayCartButtonRef}
-                    multicall={multicall}
-                  />
-                )}
-                <div className="flex items-center sm:hidden">
-                  <button
-                    className="w-6 h-6"
-                    onClick={() => {
-                      setScreen("settings");
-                      clickPlay();
-                    }}
-                  >
-                    <CogIcon />
-                  </button>
-                </div>
-                <div className="hidden sm:block sm:flex sm:flex-row sm:items-center sm:gap-1">
-                  {account && (
-                    <>
-                      <Button
-                        ref={displayHistoryButtonRef}
-                        onClick={() => {
-                          setDisplayHistory(!displayHistory);
-                        }}
-                      >
-                        {displayHistory ? "Hide Ledger" : "Show Ledger"}
-                      </Button>
-                    </>
-                  )}
-
-                  <Button
-                    onClick={() => {
-                      disconnect();
-                      resetData();
-                      setAdventurer(NullAdventurer);
-                      setDisconnected(true);
-                    }}
-                  >
-                    {account ? displayAddress(account.address) : "Connect"}
-                  </Button>
-
-                  <Button href="https://github.com/BibliothecaDAO/loot-survivor">
-                    <GithubIcon className="w-6" />
-                  </Button>
-                </div>
-                {account && displayHistory && (
-                  <TransactionHistory buttonRef={displayHistoryButtonRef} />
-                )}
+            {specialBeastDefeated && <SpecialBeast />}
+            {!spawnLoader && hash && (
+              <div className="sm:hidden">
+                <TxActivity />
               </div>
-            </div>
+            )}
+            <Header
+              multicall={multicall}
+              mintLords={mintLords}
+              lordsBalance={lordsBalance}
+              arcadeConnectors={arcadeConnectors}
+              gameContract={gameContract!}
+            />
           </div>
-          <div className="w-full h-4 sm:h-6 my-2 bg-terminal-green text-terminal-black px-4">
-            <div className="hidden sm:block">
-              <TxActivity />
-            </div>
+          <div className="w-full h-1 sm:h-6 sm:my-2 bg-terminal-green text-terminal-black px-4">
+            {!spawnLoader && hash && (
+              <div className="hidden sm:block">
+                <TxActivity />
+              </div>
+            )}
           </div>
           <NotificationDisplay />
 
           {deathDialog && <DeathDialog />}
-
-          {status == "connected" && arcadeDialog && <ArcadeDialog />}
-
-          {/* {!onboarded && tutorialDialog && <TutorialDialog />} */}
+          {arcadeIntro && (
+            <ArcadeIntro
+              ethBalance={ethBalance}
+              lordsBalance={lordsBalance}
+              gameContract={gameContract!}
+              lordsContract={lordsContract!}
+              ethContract={ethContract!}
+              updateConnectors={updateConnectors}
+              mintLords={mintLords}
+            />
+          )}
+          {status == "connected" && arcadeDialog && (
+            <ArcadeDialog
+              gameContract={gameContract!}
+              lordsContract={lordsContract!}
+              ethContract={ethContract!}
+              updateConnectors={updateConnectors}
+              lordsBalance={Number(lordsBalance)}
+              ethBalance={Number(ethBalance)}
+            />
+          )}
+          {status == "connected" && topUpDialog && (
+            <TopUpDialog
+              ethContract={ethContract!}
+              getEthBalance={getEthBalance}
+              ethBalance={Number(ethBalance)}
+            />
+          )}
 
           {introComplete ? (
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full h-[600px] sm:h-[625px]">
               <>
-                <div className="sm:hidden flex justify-center sm:justify-normal sm:pb-2">
-                  <HorizontalKeyboardControl
+                <div className="sm:hidden flex  sm:justify-normal sm:pb-2">
+                  <ScreenMenu
                     buttonsData={mobileMenuItems}
                     onButtonClick={(value) => {
                       setScreen(value);
@@ -514,7 +564,7 @@ export default function Home() {
                   />
                 </div>
                 <div className="hidden sm:block flex justify-center sm:justify-normal sm:pb-2">
-                  <HorizontalKeyboardControl
+                  <ScreenMenu
                     buttonsData={allMenuItems}
                     onButtonClick={(value) => {
                       setScreen(value);
@@ -526,18 +576,15 @@ export default function Home() {
                 <div className="sm:hidden">
                   <MobileHeader />
                 </div>
-
-                {/* <div className="overflow-y-auto h-[460px] sm:h-full"> */}
-                {/* {isLoading.global ? (
-                  <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <LootIconLoader size="w-10" />
-                  </div>
-                ) : ( */}
-                <>
+                <div className="h-[550px] xl:h-[500px] 2xl:h-[580px]">
                   {screen === "start" && (
                     <AdventurerScreen
                       spawn={spawn}
                       handleSwitchAdventurer={handleSwitchAdventurer}
+                      lordsBalance={lordsBalance}
+                      gameContract={gameContract!}
+                      goldenTokenData={goldenTokenData}
+                      getBalances={getBalances}
                     />
                   )}
                   {screen === "play" && (
@@ -545,22 +592,40 @@ export default function Home() {
                       explore={explore}
                       attack={attack}
                       flee={flee}
+                      gameContract={gameContract!}
+                      beastsContract={beastsContract!}
                     />
                   )}
-                  {screen === "inventory" && <InventoryScreen />}
-                  {screen === "leaderboard" && <LeaderboardScreen />}
-                  {screen === "upgrade" && <UpgradeScreen upgrade={upgrade} />}
-                  {screen === "profile" && <Profile />}
+                  {screen === "inventory" && (
+                    <InventoryScreen gameContract={gameContract!} />
+                  )}
+                  {screen === "leaderboard" && (
+                    <LeaderboardScreen
+                      slayIdles={slayIdles}
+                      gameContract={gameContract!}
+                    />
+                  )}
+                  {screen === "upgrade" && (
+                    <UpgradeScreen
+                      upgrade={upgrade}
+                      gameContract={gameContract!}
+                    />
+                  )}
+                  {screen === "profile" && (
+                    <Profile gameContract={gameContract!} />
+                  )}
                   {screen === "encounters" && <EncountersScreen />}
                   {screen === "guide" && <GuideScreen />}
                   {screen === "settings" && <Settings />}
-                  {screen === "player" && <Player />}
+                  {screen === "player" && (
+                    <Player gameContract={gameContract!} />
+                  )}
                   {screen === "wallet" && <WalletSelect />}
+
                   { screen === "crypts" &&
-                      <CryptsScreen attack={ attackCC } flee={ flee }  enterCc={enterCC} buffAdventurer={buffAdventurer}/> }
-                </>
-                {/* )} */}
-                {/* </div> */}
+                      <CryptsScreen attack={ attackCC } flee={ flee }  enterCc={enterCC} buffAdventurer={buffAdventurer} beastsContract={beastsContract!} gameContract={gameContract!}/> }
+
+                </div>
               </>
             </div>
           ) : null}

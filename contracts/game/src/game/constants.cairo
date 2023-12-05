@@ -20,22 +20,32 @@ mod messages {
     const ITEM_ALREADY_OWNED: felt252 = 'Item already owned';
     const ADVENTURER_DOESNT_OWN_ITEM: felt252 = 'Adventurer doesnt own item';
     const ZERO_DEXTERITY: felt252 = 'Cant flee, no dexterity';
-    const WRONG_STARTING_STATS: felt252 = 'Wrong starting stat count';
+    const WRONG_NUM_STARTING_STATS: felt252 = 'Wrong starting stat count';
     const MUST_USE_ALL_STATS: felt252 = 'Must use all stats';
     const NO_ITEMS: felt252 = 'Must provide item ids';
+    const NON_ZERO_STARTING_LUCK: felt252 = 'Luck must be zero';
+    const RATE_LIMIT_EXCEEDED: felt252 = 'rate limit exceeded';
+    const NOT_ON_LEADERBOARD: felt252 = 'Not on leaderboard';
+    const TIME_NOT_REACHED: felt252 = 'Time not reached';
+    const CANNOT_PLAY_WITH_TOKEN: felt252 = 'Token already used today';
+    const NOT_OWNER_OF_TOKEN: felt252 = 'Not owner of token';
+    const MA_PERIOD_LESS_THAN_WEEK: felt252 = 'MA period too small';
+    const TERMINAL_TIME_REACHED: felt252 = 'terminal time reached';
 }
 
-const BLOCKS_IN_A_WEEK: u64 = 1;
-const COST_TO_PLAY: u8 = 25;
-const STARTING_STATS: u8 = 6;
-const IDLE_DEATH_PENALTY_BLOCKS: u8 = 12;
-const MIN_BLOCKS_FOR_GAME_ENTROPY_CHANGE: u8 = 25;
+// TODO: Update for mainnet
+const BLOCKS_IN_A_WEEK: u64 = 1000;
+const COST_TO_PLAY: u128 = 25000000000000000000;
+const NUM_STARTING_STATS: u8 = 9;
+const STARTING_GAME_ENTROPY_ROTATION_INTERVAL: u8 = 6;
+const MINIMUM_DAMAGE_FROM_BEASTS: u8 = 2;
+const MAINNET_REVEAL_DELAY_BLOCKS: u8 = 11;
 
 const U64_MAX: u64 = 18446744073709551615;
 const U128_MAX: u128 = 340282366920938463463374607431768211455;
 
 #[derive(Drop, Copy)]
-struct Week {
+struct Rewards {
     DAO: u256,
     INTERFACE: u256,
     FIRST_PLACE: u256,
@@ -43,28 +53,28 @@ struct Week {
     THIRD_PLACE: u256,
 }
 
-mod REWARD_DISTRIBUTIONS_PHASE1 {
+mod REWARD_DISTRIBUTIONS_PHASE1_BP {
     const DAO: u256 = 0;
     const INTERFACE: u256 = 0;
-    const FIRST_PLACE: u256 = 12;
-    const SECOND_PLACE: u256 = 8;
-    const THIRD_PLACE: u256 = 5;
+    const FIRST_PLACE: u256 = 480;
+    const SECOND_PLACE: u256 = 320;
+    const THIRD_PLACE: u256 = 200;
 }
 
-mod REWARD_DISTRIBUTIONS_PHASE2 {
-    const DAO: u256 = 5;
-    const INTERFACE: u256 = 0;
-    const FIRST_PLACE: u256 = 10;
-    const SECOND_PLACE: u256 = 6;
-    const THIRD_PLACE: u256 = 4;
+mod REWARD_DISTRIBUTIONS_PHASE2_BP {
+    const DAO: u256 = 0;
+    const INTERFACE: u256 = 280;
+    const FIRST_PLACE: u256 = 320;
+    const SECOND_PLACE: u256 = 240;
+    const THIRD_PLACE: u256 = 160;
 }
 
-mod REWARD_DISTRIBUTIONS_PHASE3 {
-    const DAO: u256 = 5;
-    const INTERFACE: u256 = 4;
-    const FIRST_PLACE: u256 = 9;
-    const SECOND_PLACE: u256 = 4;
-    const THIRD_PLACE: u256 = 3;
+mod REWARD_DISTRIBUTIONS_PHASE3_BP {
+    const DAO: u256 = 200;
+    const INTERFACE: u256 = 240;
+    const FIRST_PLACE: u256 = 280;
+    const SECOND_PLACE: u256 = 160;
+    const THIRD_PLACE: u256 = 120;
 }
 
 const STARTER_BEAST_ATTACK_DAMAGE: u16 = 10;

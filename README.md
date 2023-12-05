@@ -6,7 +6,7 @@
 </a>
 
 
-[![discord](https://img.shields.io/badge/join-bibliothecadao-black?logo=discord&logoColor=white)](https://discord.gg/bibliothecadao)
+[![discord](https://img.shields.io/badge/join-bibliothecadao-black?logo=discord&logoColor=white)](https://discord.gg/realmsworld)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ![background](.github/bg.png)
@@ -16,7 +16,7 @@
 
 > Go and die with glory
 
-Play [Loot Survivor](http://107.23.80.88:3000/)
+Play [Loot Survivor](https://goerli-survivor.realms.world/)
 
 Table of contents
 

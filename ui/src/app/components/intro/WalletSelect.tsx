@@ -1,29 +1,26 @@
-import { useState, useEffect } from "react";
-import { Button } from "../buttons/Button";
-import { useConnectors, useAccount } from "@starknet-react/core";
-import useUIStore from "../../hooks/useUIStore";
+import { useState } from "react";
 import Image from "next/image";
-import { WalletTutorial } from "../tutorial/WalletTutorial";
+import { Button } from "@/app/components/buttons/Button";
+import { useConnect } from "@starknet-react/core";
+import useUIStore from "@/app/hooks/useUIStore";
+import { WalletTutorial } from "@/app/components/intro/WalletTutorial";
+import Storage from "@/app/lib/storage";
+import { BurnerStorage } from "@/app/types";
+import { getArcadeConnectors, getWalletConnectors } from "@/app/lib/connectors";
 
 interface WalletSelectProps {}
 
 const WalletSelect = ({}: WalletSelectProps) => {
-  const { connectors, connect } = useConnectors();
+  const { connectors, connect } = useConnect();
   const setDisconnected = useUIStore((state) => state.setDisconnected);
   const [screen, setScreen] = useState("wallet");
 
   if (!connectors) return <div></div>;
 
-  const arcadeConnectors = () =>
-    connectors.filter(
-      (connector) =>
-        typeof connector.id === "string" && connector.id.includes("0x")
-    );
-  const walletConnectors = () =>
-    connectors.filter(
-      (connector) =>
-        typeof connector.id !== "string" || !connector.id.includes("0x")
-    );
+  const arcadeConnectors = getArcadeConnectors(connectors);
+  const walletConnectors = getWalletConnectors(connectors);
+
+  const storage: BurnerStorage = Storage.get("burners");
 
   return (
     <div className="min-h-screen container flex justify-center items-center m-auto p-4 pt-8 sm:w-1/2 sm:p-8 lg:p-10 2xl:p-20">
@@ -48,9 +45,9 @@ const WalletSelect = ({}: WalletSelectProps) => {
                 <Button onClick={() => setScreen("tutorial")}>
                   I don&apos;t have a wallet
                 </Button>
-                {walletConnectors().map((connector, index) => (
+                {walletConnectors.map((connector, index) => (
                   <Button
-                    onClick={() => connect(connector)}
+                    onClick={() => connect({ connector })}
                     key={index}
                     className="w-full"
                   >
@@ -60,19 +57,25 @@ const WalletSelect = ({}: WalletSelectProps) => {
                   </Button>
                 ))}
               </div>
-              {arcadeConnectors().length ? (
+              {arcadeConnectors.length ? (
                 <>
                   <h5 className="text-center">Arcade Accounts</h5>
-                  <div className="flex flex-col sm:flex-row gap-2 overflow-auto h-[300px] sm:h-full w-full  sm:h-20">
-                    {arcadeConnectors().map((connector, index) => (
-                      <Button
-                        onClick={() => connect(connector)}
-                        key={index}
-                        className="w-full"
-                      >
-                        Connect {connector.id}
-                      </Button>
-                    ))}
+                  <div className="flex flex-col sm:flex-row gap-2 overflow-auto h-[300px] sm:h-full w-full sm:w-[400px]">
+                    {arcadeConnectors.map((connector, index) => {
+                      const currentGamePermissions =
+                        storage[connector.name].gameContract ==
+                        process.env.NEXT_PUBLIC_GAME_ADDRESS;
+                      return (
+                        <Button
+                          onClick={() => connect({ connector })}
+                          key={index}
+                          className="w-full"
+                          disabled={!currentGamePermissions}
+                        >
+                          Connect {connector.id}
+                        </Button>
+                      );
+                    })}
                   </div>
                 </>
               ) : (

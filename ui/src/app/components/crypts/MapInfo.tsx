@@ -1,7 +1,5 @@
-import React, {useState, ChangeEvent, useEffect} from "react";
+import React from "react";
 import {Button} from "../buttons/Button";
-import {FormData} from "@/app/types";
-import {constants, Provider, Contract} from "starknet";
 
 
 export interface MapInfoProps {

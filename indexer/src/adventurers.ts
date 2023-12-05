@@ -39,8 +39,8 @@ import {
   parseHitByObstacle,
   DODGED_OBSTACLE,
   parseDodgedObstacle,
-  NEW_ITEMS_AVAILABLE,
-  parseNewItemsAvailable,
+  UPGRADES_AVAILABLE,
+  parseUpgradesAvailable,
   DISCOVERED_BEAST,
   parseDiscoveredBeast,
 } from "./utils/events.ts";
@@ -49,6 +49,8 @@ import { MONGO_CONNECTION_STRING } from "./utils/constants.ts";
 
 const GAME = Deno.env.get("GAME");
 const START = +(Deno.env.get("START") || 0);
+const STREAM_URL = Deno.env.get("STREAM_URL");
+const MONGO_DB = Deno.env.get("MONGO_DB");
 
 const filter = {
   header: { weak: true },
@@ -73,12 +75,12 @@ const filter = {
     { fromAddress: GAME, keys: [FLEE_FAILED] },
     { fromAddress: GAME, keys: [FLEE_SUCCEEDED] },
     { fromAddress: GAME, keys: [ITEMS_LEVELED_UP] },
-    { fromAddress: GAME, keys: [NEW_ITEMS_AVAILABLE] },
+    { fromAddress: GAME, keys: [UPGRADES_AVAILABLE] },
   ],
 };
 
 export const config: Config<Starknet, Mongo | Console> = {
-  streamUrl: "https://goerli.starknet.a5a.ch",
+  streamUrl: STREAM_URL,
   network: "starknet",
   filter,
   startingBlock: START,
@@ -86,7 +88,7 @@ export const config: Config<Starknet, Mongo | Console> = {
   sinkType: "mongo",
   sinkOptions: {
     connectionString: MONGO_CONNECTION_STRING,
-    database: "mongo_goerli",
+    database: MONGO_DB,
     collectionName: "adventurers",
     // @ts-ignore - indexer package not updated
     entityMode: true,
@@ -97,15 +99,15 @@ export default function transform({ header, events }: Block) {
   return events.flatMap(({ event }) => {
     switch (event.keys[0]) {
       case START_GAME: {
+        console.log("START_GAME", "->", "ADVENTURER UPDATES");
         const { value } = parseStartGame(event.data, 0);
         const as = value.adventurerState;
         const am = value.adventurerMeta;
-        console.log("START_GAME", "->", "ADVENTURER UPDATES");
         return [
           insertAdventurer({
             id: as.adventurerId,
             owner: as.owner,
-            lastAction: as.adventurer.lastAction,
+            lastAction: as.adventurer.lastActionBlock,
             health: as.adventurer.health,
             xp: as.adventurer.xp,
             strength: as.adventurer.stats.strength,
@@ -114,6 +116,7 @@ export default function transform({ header, events }: Block) {
             intelligence: as.adventurer.stats.intelligence,
             wisdom: as.adventurer.stats.wisdom,
             charisma: as.adventurer.stats.charisma,
+            luck: as.adventurer.stats.luck,
             gold: as.adventurer.gold,
             weapon: as.adventurer.weapon.id,
             chest: as.adventurer.chest.id,
@@ -125,10 +128,10 @@ export default function transform({ header, events }: Block) {
             ring: as.adventurer.ring.id,
             beastHealth: as.adventurer.beastHealth,
             statUpgrades: as.adventurer.statsPointsAvailable,
+            actionsPerBlock: as.adventurer.actionsPerBlock,
             name: am.name,
-            homeRealm: am.homeRealm,
-            classType: am.class,
-            entropy: am.entropy,
+            startBlock: am.startBlock,
+            revealBlock: value.revealBlock,
             createdTime: new Date().toISOString(),
             lastUpdatedTime: new Date().toISOString(),
             timestamp: new Date().toISOString(),
@@ -136,8 +139,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case ADVENTURER_UPGRADED: {
-        const { value } = parseAdventurerUpgraded(event.data, 0);
         console.log("ADVENTURER_UPGRADED", "->", "ADVENTURER UPDATES");
+        const { value } = parseAdventurerUpgraded(event.data, 0);
         return [
           updateAdventurer({
             adventurerState: value.adventurerStateWithBag.adventurerState,
@@ -146,8 +149,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case DISCOVERED_HEALTH: {
-        const { value } = parseDiscoveredHealth(event.data, 0);
         console.log("DISCOVERED_HEALTH", "->", "ADVENTURER UPDATES");
+        const { value } = parseDiscoveredHealth(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -156,8 +159,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case DISCOVERED_GOLD: {
-        const { value } = parseDiscoveredGold(event.data, 0);
         console.log("DISCOVERED_GOLD", "->", "ADVENTURER UPDATES");
+        const { value } = parseDiscoveredGold(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -166,8 +169,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case DISCOVERED_XP: {
-        const { value } = parseDiscoveredXp(event.data, 0);
         console.log("DISCOVERED_XP", "->", "ADVENTURER UPDATES");
+        const { value } = parseDiscoveredXp(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -176,8 +179,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case DODGED_OBSTACLE: {
-        const { value } = parseDodgedObstacle(event.data, 0);
         console.log("DODGED_OBSTACLE", "->", "ADVENTURER UPDATES");
+        const { value } = parseDodgedObstacle(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -186,8 +189,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case HIT_BY_OBSTACLE: {
-        const { value } = parseHitByObstacle(event.data, 0);
         console.log("HIT_BY_OBSTACLE", "->", "ADVENTURER UPDATES");
+        const { value } = parseHitByObstacle(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -196,8 +199,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case DISCOVERED_BEAST: {
-        const { value } = parseDiscoveredBeast(event.data, 0);
         console.log("DISCOVERED_BEAST", "->", "ADVENTURER UPDATES");
+        const { value } = parseDiscoveredBeast(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -206,8 +209,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case PURCHASED_POTIONS: {
-        const { value } = parseDiscoveredXp(event.data, 0);
         console.log("PURCHASED_POTIONS", "->", "ADVENTURER UPDATES");
+        const { value } = parseDiscoveredXp(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -216,8 +219,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case PURCHASED_ITEMS: {
-        const { value } = parsePurchasedItems(event.data, 0);
         console.log("PURCHASED_ITEMS", "->", "ADVENTURER UPDATES");
+        const { value } = parsePurchasedItems(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -226,8 +229,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case EQUIPPED_ITEMS: {
-        const { value } = parseEquippedItems(event.data, 0);
         console.log("EQUIPPED_ITEMS", "->", "ADVENTURER UPDATES");
+        const { value } = parseEquippedItems(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -236,8 +239,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case DROPPED_ITEMS: {
-        const { value } = parseDroppedItems(event.data, 0);
         console.log("DROPPED_ITEMS", "->", "ADVENTURER UPDATES");
+        const { value } = parseDroppedItems(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -246,8 +249,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case ATTACKED_BEAST: {
-        const { value } = parseAttackedByBeast(event.data, 0);
         console.log("ATTACKED_BEAST", "->", "ADVENTURER UPDATES");
+        const { value } = parseAttackedByBeast(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -256,8 +259,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case ATTACKED_BY_BEAST: {
-        const { value } = parseAttackedByBeast(event.data, 0);
         console.log("ATTACKED_BY_BEAST", "->", "ADVENTURER UPDATES");
+        const { value } = parseAttackedByBeast(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -266,8 +269,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case AMBUSHED_BY_BEAST: {
-        const { value } = parseAmbushedByBeast(event.data, 0);
         console.log("AMBUSHED_BY_BEAST", "->", "ADVENTURER UPDATES");
+        const { value } = parseAmbushedByBeast(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -276,8 +279,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case SLAYED_BEAST: {
-        const { value } = parseSlayedBeast(event.data, 0);
         console.log("SLAYED_BEAST", "->", "ADVENTURER UPDATES");
+        const { value } = parseSlayedBeast(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -286,8 +289,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case ADVENTURER_DIED: {
-        const { value } = parseAdventurerDied(event.data, 0);
         console.log("ADVENTURER_DIED", "->", "ADVENTURER UPDATES");
+        const { value } = parseAdventurerDied(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -296,8 +299,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case FLEE_FAILED: {
-        const { value } = parseFleeFailed(event.data, 0);
         console.log("FLEE_FAILED", "->", "ADVENTURER UPDATES");
+        const { value } = parseFleeFailed(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -306,8 +309,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case FLEE_SUCCEEDED: {
-        const { value } = parseFleeSucceeded(event.data, 0);
         console.log("FLEE_SUCCEEDED", "->", "ADVENTURER UPDATES");
+        const { value } = parseFleeSucceeded(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -316,8 +319,8 @@ export default function transform({ header, events }: Block) {
         ];
       }
       case ITEMS_LEVELED_UP: {
-        const { value } = parseItemsLeveledUp(event.data, 0);
         console.log("ITEMS_LEVELED_UP", "->", "ADVENTURER UPDATES");
+        const { value } = parseItemsLeveledUp(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -325,9 +328,9 @@ export default function transform({ header, events }: Block) {
           }),
         ];
       }
-      case NEW_ITEMS_AVAILABLE: {
-        const { value } = parseNewItemsAvailable(event.data, 0);
-        console.log("NEW_ITEMS_AVAILABLE", "->", "ADVENTURER UPDATES");
+      case UPGRADES_AVAILABLE: {
+        console.log("UPGRADES_AVAILABLE", "->", "ADVENTURER UPDATES");
+        const { value } = parseUpgradesAvailable(event.data, 0);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),

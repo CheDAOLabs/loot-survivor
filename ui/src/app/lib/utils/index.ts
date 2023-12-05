@@ -1,16 +1,17 @@
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import BN from "bn.js";
-
-import Realms from "../realms.json";
-import { Adventurer, Item } from "../../types";
-import { GameData } from "../../components/GameData";
+import { z } from "zod";
+import { Adventurer, Item, ItemPurchase } from "@/app/types";
+import { GameData } from "@/app/lib/data/GameData";
 import {
   itemCharismaDiscount,
   itemBasePrice,
   itemMinimumPrice,
   potionBasePrice,
-} from "../constants";
+} from "@/app/lib/constants";
+import { deathMessages } from "@/app/lib/constants";
+import { getBlock } from "@/app/api/api";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -33,7 +34,7 @@ export function indexAddress(address: string) {
 }
 
 export function padAddress(address: string) {
-  if (address !== "") {
+  if (address && address !== "") {
     const length = address.length;
     const neededLength = 66 - length;
     let zeros = "";
@@ -45,6 +46,10 @@ export function padAddress(address: string) {
   } else {
     return "";
   }
+}
+
+export function isChecksumAddress(address: string) {
+  return /^0x[0-9a-f]{63,64}$/.test(address);
 }
 
 export function displayAddress(string: string) {
@@ -130,8 +135,17 @@ export const formatTime = (date: Date) => {
   );
 };
 
+export const formatTimeSeconds = (totalSeconds: number) => {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds - hours * 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
+};
+
 export function shortenHex(hexString: string, numDigits = 6) {
-  if (hexString.length <= numDigits) {
+  if (hexString?.length <= numDigits) {
     return hexString;
   }
 
@@ -150,12 +164,6 @@ export function convertTime(time: number) {
 
   const TimeUTC = dateTime.getTime() + timezoneOffsetMilliseconds;
   return TimeUTC;
-}
-
-export function getRealmNameById(id: number) {
-  return Realms.features.find(
-    (realm: any) => realm.properties.realm_idx === id
-  );
 }
 
 export function getRankFromList(id: number, data: Adventurer[]) {
@@ -338,4 +346,204 @@ export function isObject(value: any): value is object {
 
 export function convertToBoolean(value: number): boolean {
   return value === 1;
+}
+
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export const uint256Schema = z.object({
+  low: z.bigint(),
+  high: z.bigint(),
+});
+
+export const balanceSchema = z.object({
+  balance: uint256Schema,
+});
+
+export function getDeathMessageByRank(rank: number): string {
+  // The || {} is to prevent destructure error in case find returns undefined
+  if (rank === 0) {
+    return "Better luck next time - You can improve!";
+  }
+
+  const { message } = deathMessages.find((item) => rank <= item.rank) || {};
+
+  return message || "Better luck next time - You can improve!";
+}
+
+export const fetchAverageBlockTime = async (
+  currentBlock: number,
+  numberOfBlocks: number
+) => {
+  try {
+    let totalTimeInterval = 0;
+
+    for (let i = currentBlock - numberOfBlocks; i < currentBlock; i++) {
+      const currentBlockData = await getBlock(i);
+      const nextBlockData = await getBlock(i + 1);
+
+      const timeInterval = nextBlockData.timestamp - currentBlockData.timestamp;
+      totalTimeInterval += timeInterval;
+    }
+    const averageTime = totalTimeInterval / numberOfBlocks;
+    return averageTime;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+export const fetchBlockTime = async (currentBlock: number) => {
+  try {
+    const currentBlockData = await getBlock(currentBlock);
+    return currentBlockData.timestamp;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+export const calculateVitBoostRemoved = (
+  purchases: ItemPurchase[],
+  adventurer: Adventurer,
+  items: Item[]
+) => {
+  const gameData = new GameData();
+  const equippedItems = purchases.filter((purchase) => purchase.equip === "1");
+  const itemStrings = equippedItems.map(
+    (purchase) => gameData.ITEMS[parseInt(purchase?.item) ?? 0]
+  );
+  const slotStrings = itemStrings.map(
+    (itemString) => gameData.ITEM_SLOTS[itemString.split(" ").join("")]
+  );
+
+  // loop through slots and check what item is equipped
+  const unequippedSuffixBoosts = [];
+  for (const slot of slotStrings) {
+    if (slot === "Weapon") {
+      unequippedSuffixBoosts.push(
+        gameData.ITEM_SUFFIX_BOOST[
+          parseInt(
+            getKeyFromValue(
+              gameData.ITEM_SUFFIXES,
+              items.find((item) => item.item === adventurer.weapon)?.special1 ??
+                ""
+            ) ?? "0"
+          )
+        ]
+      );
+    }
+    if (slot === "Chest") {
+      unequippedSuffixBoosts.push(
+        gameData.ITEM_SUFFIX_BOOST[
+          parseInt(
+            getKeyFromValue(
+              gameData.ITEM_SUFFIXES,
+              items.find((item) => item.item === adventurer.chest)?.special1 ??
+                ""
+            ) ?? "0"
+          )
+        ]
+      );
+    }
+    if (slot === "Head") {
+      unequippedSuffixBoosts.push(
+        gameData.ITEM_SUFFIX_BOOST[
+          parseInt(
+            getKeyFromValue(
+              gameData.ITEM_SUFFIXES,
+              items.find((item) => item.item === adventurer.head)?.special1 ??
+                ""
+            ) ?? "0"
+          )
+        ]
+      );
+    }
+    if (slot === "Waist") {
+      unequippedSuffixBoosts.push(
+        gameData.ITEM_SUFFIX_BOOST[
+          parseInt(
+            getKeyFromValue(
+              gameData.ITEM_SUFFIXES,
+              items.find((item) => item.item === adventurer.waist)?.special1 ??
+                ""
+            ) ?? "0"
+          )
+        ]
+      );
+    }
+    if (slot === "Foot") {
+      unequippedSuffixBoosts.push(
+        gameData.ITEM_SUFFIX_BOOST[
+          parseInt(
+            getKeyFromValue(
+              gameData.ITEM_SUFFIXES,
+              items.find((item) => item.item === adventurer.foot)?.special1 ??
+                ""
+            ) ?? "0"
+          )
+        ]
+      );
+    }
+    if (slot === "Hand") {
+      unequippedSuffixBoosts.push(
+        gameData.ITEM_SUFFIX_BOOST[
+          parseInt(
+            getKeyFromValue(
+              gameData.ITEM_SUFFIXES,
+              items.find((item) => item.item === adventurer.hand)?.special1 ??
+                ""
+            ) ?? "0"
+          )
+        ]
+      );
+    }
+    if (slot === "Neck") {
+      unequippedSuffixBoosts.push(
+        gameData.ITEM_SUFFIX_BOOST[
+          parseInt(
+            getKeyFromValue(
+              gameData.ITEM_SUFFIXES,
+              items.find((item) => item.item === adventurer.neck)?.special1 ??
+                ""
+            ) ?? "0"
+          )
+        ]
+      );
+    }
+    if (slot === "Ring") {
+      unequippedSuffixBoosts.push(
+        gameData.ITEM_SUFFIX_BOOST[
+          parseInt(
+            getKeyFromValue(
+              gameData.ITEM_SUFFIXES,
+              items.find((item) => item.item === adventurer.ring)?.special1 ??
+                ""
+            ) ?? "0"
+          )
+        ]
+      );
+    }
+  }
+  const filteredSuffixBoosts = unequippedSuffixBoosts.filter(
+    (suffix) => suffix !== undefined
+  );
+  const vitTotal = findAndSumVitValues(filteredSuffixBoosts);
+  return vitTotal;
+};
+
+function findAndSumVitValues(arr: string[]): number {
+  let total = 0;
+
+  arr.forEach((str) => {
+    const matches = str.match(/VIT \+\d+/g);
+
+    if (matches) {
+      matches.forEach((match) => {
+        const value = parseInt(match.split("+")[1]);
+        total += value;
+      });
+    }
+  });
+
+  return total;
 }

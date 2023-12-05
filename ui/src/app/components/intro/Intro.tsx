@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { Button } from "../buttons/Button";
 import { TypeAnimation } from "react-type-animation";
-import { prologue, chapter1, chapter2, chapter3 } from "../../lib/constants";
 import Image from "next/image";
+import { Button } from "@/app/components/buttons/Button";
+import { prologue, chapter1, chapter2, chapter3 } from "@/app/lib/constants";
 
 interface IntroProps {
   onIntroComplete: () => void;
@@ -58,12 +58,13 @@ const Intro: React.FC<IntroProps> = ({ onIntroComplete }) => {
   }, [screen]);
 
   const renderScreen = (src: string, alt: string, sequence: any) => (
-    <div className="flex w-full h-full">
+    <div className="flex w-full h-full p-2">
       <Image
-        className=" absolute object-cover animate-pulse"
+        className="absolute object-cover animate-pulse"
         src={src}
         alt={alt}
         fill
+        priority
       />
 
       <div className="w-full z-10 pt-20">

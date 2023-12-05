@@ -24,10 +24,10 @@ export function insertAdventurer({
   ring,
   beastHealth,
   statUpgrades,
+  actionsPerBlock,
   name,
-  homeRealm,
-  classType,
-  entropy,
+  startBlock,
+  revealBlock,
   createdTime,
   lastUpdatedTime,
   timestamp,
@@ -62,10 +62,10 @@ export function insertAdventurer({
         ring: checkExistsInt(BigInt(ring)),
         beastHealth: encodeIntAsBytes(BigInt(beastHealth)),
         statUpgrades: checkExistsInt(BigInt(statUpgrades)),
+        actionsPerBlock: encodeIntAsBytes(BigInt(actionsPerBlock)),
         name: checkExistsInt(BigInt(name)),
-        homeRealm: checkExistsInt(BigInt(homeRealm)),
-        classType: checkExistsInt(BigInt(classType)),
-        entropy: encodeIntAsBytes(BigInt(entropy)),
+        startBlock: encodeIntAsBytes(BigInt(startBlock)),
+        revealBlock: encodeIntAsBytes(BigInt(revealBlock)),
         createdTime: createdTime,
         lastUpdatedTime: lastUpdatedTime,
         timestamp,
@@ -162,15 +162,16 @@ export function updateAdventurer({
   timestamp: string;
 }) {
   const { adventurer } = adventurerState;
+  const entity = {
+    id: checkExistsInt(BigInt(adventurerState.adventurerId)),
+    owner: checkExistsInt(BigInt(adventurerState.owner)),
+  };
   return {
-    entity: {
-      id: checkExistsInt(BigInt(adventurerState.adventurerId)),
-    },
+    entity,
     update: {
       $set: {
-        id: checkExistsInt(BigInt(adventurerState.adventurerId)),
-        owner: checkExistsInt(BigInt(adventurerState.owner)),
-        lastAction: encodeIntAsBytes(BigInt(adventurer.lastAction)),
+        ...entity,
+        lastAction: encodeIntAsBytes(BigInt(adventurer.lastActionBlock)),
         health: encodeIntAsBytes(BigInt(adventurer.health)),
         xp: encodeIntAsBytes(BigInt(adventurer.xp)),
         strength: encodeIntAsBytes(BigInt(adventurer.stats.strength)),
@@ -179,6 +180,7 @@ export function updateAdventurer({
         intelligence: encodeIntAsBytes(BigInt(adventurer.stats.intelligence)),
         wisdom: encodeIntAsBytes(BigInt(adventurer.stats.wisdom)),
         charisma: encodeIntAsBytes(BigInt(adventurer.stats.charisma)),
+        luck: encodeIntAsBytes(BigInt(adventurer.stats.luck)),
         gold: encodeIntAsBytes(BigInt(adventurer.gold)),
         weapon: checkExistsInt(BigInt(adventurer.weapon.id)),
         chest: checkExistsInt(BigInt(adventurer.chest.id)),
@@ -190,6 +192,7 @@ export function updateAdventurer({
         ring: checkExistsInt(BigInt(adventurer.ring.id)),
         beastHealth: encodeIntAsBytes(BigInt(adventurer.beastHealth)),
         statUpgrades: encodeIntAsBytes(BigInt(adventurer.statsPointsAvailable)),
+        actionsPerBlock: encodeIntAsBytes(BigInt(adventurer.actionsPerBlock)),
         lastUpdatedTime: timestamp,
         timestamp,
       },
@@ -339,21 +342,63 @@ export function insertItem({
 
   return {
     entity,
-    update: {
-      $set: {
-        ...entity,
-        owner: checkExistsInt(BigInt(owner)),
-        equipped,
-        ownerAddress: checkExistsInt(BigInt(ownerAddress)),
-        xp: encodeIntAsBytes(BigInt(xp)),
-        special1: checkExistsInt(BigInt(special1)),
-        special2: checkExistsInt(BigInt(special2)),
-        special3: checkExistsInt(BigInt(special3)),
-        isAvailable,
-        purchasedTime,
-        timestamp,
+    update: [
+      {
+        $set: {
+          ...entity,
+          owner: {
+            $cond: [
+              { $not: ["$owner"] },
+              checkExistsInt(BigInt(owner)),
+              "$owner",
+            ],
+          },
+          equipped: {
+            $cond: [
+              { $not: ["$owner"] },
+              checkExistsInt(BigInt(equipped)),
+              "$equipped",
+            ],
+          },
+          ownerAddress: {
+            $cond: [
+              { $not: ["$owner"] },
+              checkExistsInt(BigInt(ownerAddress)),
+              "$ownerAddress",
+            ],
+          },
+          xp: {
+            $cond: [{ $not: ["$owner"] }, encodeIntAsBytes(BigInt(xp)), "$xp"],
+          },
+          special1: {
+            $cond: [
+              { $not: ["$owner"] },
+              checkExistsInt(BigInt(special1)),
+              "$special1",
+            ],
+          },
+          special2: {
+            $cond: [
+              { $not: ["$owner"] },
+              checkExistsInt(BigInt(special2)),
+              "$special2",
+            ],
+          },
+          special3: {
+            $cond: [
+              { $not: ["$owner"] },
+              checkExistsInt(BigInt(special3)),
+              "$special3",
+            ],
+          },
+          isAvailable,
+          purchasedTime: {
+            $cond: [{ $not: ["$owner"] }, purchasedTime, "$purchasedTime"],
+          },
+          timestamp,
+        },
       },
-    },
+    ],
   };
 }
 
@@ -469,19 +514,9 @@ export function updateItemSpecials({
   };
 }
 
-export function insertHighScore({
-  adventurerId,
-  owner,
-  rank,
-  xp,
-  txHash,
-  scoreTime,
-  timestamp,
-  totalPayout,
-}: any) {
+export function insertHighScore({ adventurerId, timestamp, totalPayout }: any) {
   const entity = {
     adventurerId: checkExistsInt(BigInt(adventurerId)),
-    owner: checkExistsInt(BigInt(owner)),
   };
 
   return {
@@ -489,10 +524,6 @@ export function insertHighScore({
     update: {
       $set: {
         ...entity,
-        rank: checkExistsInt(BigInt(rank)),
-        xp: encodeIntAsBytes(BigInt(xp)),
-        txHash: checkExistsInt(BigInt(txHash)),
-        scoreTime,
         timestamp,
         totalPayout: totalPayout,
       },
@@ -500,16 +531,9 @@ export function insertHighScore({
   };
 }
 
-export function updateTotalPayout({
-  adventurerId,
-  owner,
-  rank,
-  timestamp,
-  newPayout,
-}: any) {
+export function updateTotalPayout({ adventurerId, timestamp, newPayout }: any) {
   const entity = {
     adventurerId: checkExistsInt(BigInt(adventurerId)),
-    owner: checkExistsInt(BigInt(owner)),
   };
 
   return {
@@ -521,6 +545,41 @@ export function updateTotalPayout({
       },
       $inc: {
         totalPayout: parseInt(newPayout),
+      },
+    },
+  };
+}
+
+export function insertEntropy({
+  prevHash,
+  prevBlockNumber,
+  prevBlockTimestamp,
+  prevNextRotationBlock,
+  newHash,
+  newBlockNumber,
+  newBlockTimestamp,
+  newNextRotationBlock,
+  blocksPerHour,
+  currentTimestamp,
+}: any) {
+  const entity = {
+    prevHash: checkExistsInt(BigInt(prevHash)),
+    prevBlockNumber: prevBlockNumber,
+    prevBlockTimestamp: prevBlockTimestamp,
+    prevNextRotationBlock: prevNextRotationBlock,
+    newHash: checkExistsInt(BigInt(newHash)),
+    newBlockNumber: newBlockNumber,
+    newBlockTimestamp: newBlockTimestamp,
+    newNextRotationBlock: newNextRotationBlock,
+    blocksPerHour: blocksPerHour,
+    currentTimestamp: currentTimestamp,
+  };
+
+  return {
+    entity,
+    update: {
+      $set: {
+        ...entity,
       },
     },
   };

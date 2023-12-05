@@ -1,42 +1,18 @@
-import TwitterShareButton from "../buttons/TwitterShareButtons";
-import useAdventurerStore from "../../hooks/useAdventurerStore";
-import { useQueriesStore } from "../../hooks/useQueryStore";
-import { getRankFromList, getOrdinalSuffix } from "../../lib/utils";
-import { processBeastName, getBeastData } from "../../lib/utils";
-import { Adventurer, Battle, Discovery } from "@/app/types";
-import Head from "../../../../public/icons/loot/head.svg";
-import Hand from "../../../../public/icons/loot/hand.svg";
-import Chest from "../../../../public/icons/loot/chest.svg";
-import Waist from "../../../../public/icons/loot/waist.svg";
-import Foot from "../../../../public/icons/loot/foot.svg";
-import { appUrl, battle } from "@/app/lib/constants";
+import TwitterShareButton from "@/app/components/buttons/TwitterShareButtons";
+import useAdventurerStore from "@/app/hooks/useAdventurerStore";
+import { processBeastName, getBeastData } from "@/app/lib/utils";
+import { Battle } from "@/app/types";
 import {
   GiWalkingBootIcon,
   GiFootTripIcon,
   GiBattleGearIcon,
   SkullCrossedBonesIcon,
-  GiSandsOfTimeIcon,
-} from "../icons/Icons";
+} from "@/app/components/icons/Icons";
 
 interface BattleDisplayProps {
   battleData: Battle;
   beastName: string;
 }
-
-const getAttackLocationIcon = (attackLocation: string) => {
-  if (!attackLocation) return null;
-
-  if (attackLocation == "Hand")
-    return <Hand className="self-center w-6 h-6 fill-current" />;
-  if (attackLocation == "Chest")
-    return <Chest className="self-center w-6 h-6 fill-current" />;
-  if (attackLocation == "Waist")
-    return <Waist className="self-center w-6 h-6 fill-current" />;
-  if (attackLocation == "Foot")
-    return <Foot className="self-center w-6 h-6 fill-current" />;
-  if (attackLocation == "Head")
-    return <Head className="self-center w-6 h-6 fill-current" />;
-};
 
 /**
  * @component
@@ -47,7 +23,6 @@ export const BattleDisplay = ({
   beastName,
 }: BattleDisplayProps) => {
   const damageLocation = battleData?.damageLocation ?? "";
-  const damageIcon = getAttackLocationIcon(damageLocation);
   const BeastFled = battleData.fled;
   const AdventurerAttack = battleData.attacker === "Adventurer";
   const BeastAttack = battleData.attacker === "Beast";
@@ -173,12 +148,10 @@ export const BattleDisplay = ({
 
 interface NotificationBattleDisplayProps {
   battleData: Battle[] | Battle;
-  type: string;
 }
 
 export const NotificationBattleDisplay = ({
   battleData,
-  type,
 }: NotificationBattleDisplayProps) => {
   const adventurer = useAdventurerStore((state) => state.adventurer);
 
@@ -212,13 +185,6 @@ export const NotificationBattleDisplay = ({
   };
 
   const { beastName, beastLevel, tier } = handleBeastInfo();
-  const { data } = useQueriesStore();
-  const rank = getRankFromList(
-    adventurer?.id ?? 0,
-    data.adventurersByXPQuery?.adventurers ?? []
-  );
-  const ordinalRank = getOrdinalSuffix(rank + 1 ?? 0);
-
   const BeastFled = isArray && battleData.some((data) => data.fled);
   const FailedToFlee =
     isArray &&
@@ -265,7 +231,8 @@ export const NotificationBattleDisplay = ({
           <span className="flex flex-col gap-1">
             <p>Failed to flee the {beastName || ""}.</p>
             <p>
-              {beastName || ""} dealt {battleData[1]?.damageTaken} damage
+              {beastName || ""} dealt {battleData[1]?.damageTaken} damage to{" "}
+              {battleData[1].damageLocation}
               {battleData[1]?.criticalHit && (
                 <>
                   , a <span className="text-terminal-yellow">critical hit</span>
@@ -281,10 +248,9 @@ export const NotificationBattleDisplay = ({
       return (
         <span className="flex flex-row items-center justify-between w-full">
           <span className="flex flex-col gap-1">
-            <p>Failed to flee the {beastName || ""}.</p>
             <p>
               Killed by the {beastName || ""} from {battleData[1]?.damageTaken}{" "}
-              damage
+              damage to {battleData[1]?.damageLocation}
               {battleData[1]?.criticalHit && (
                 <>
                   , a <span className="text-terminal-yellow">critical hit</span>
@@ -312,7 +278,7 @@ export const NotificationBattleDisplay = ({
             </p>
             <p>
               {beastName || ""} counterattacked for {battleData[1]?.damageTaken}{" "}
-              damage
+              damage to {battleData[1]?.damageLocation}
               {battleData[1]?.criticalHit && ", a critical hit"}!
             </p>
           </span>
@@ -324,23 +290,15 @@ export const NotificationBattleDisplay = ({
         <span className="flex flex-row items-center justify-between w-full">
           <span className="flex flex-col gap-1">
             <p>
-              With a last breath you strike the {beastName || ""} for{" "}
-              {battleData[0]?.damageDealt} damage
+              Killed by the {beastName || ""} taking {""}
+              {battleData[1]?.damageTaken} damage to{" "}
+              {battleData[1]?.damageLocation}
               {battleData[0]?.criticalHit && (
                 <>
                   , a <span className="text-terminal-yellow">critical hit</span>
                 </>
               )}
               !
-            </p>
-            <p>
-              Killed by the {beastName || ""} taking {""}
-              {battleData[1]?.damageTaken} damage
-              {battleData[0]?.criticalHit && (
-                <>
-                  , a <span className="text-terminal-yellow">critical hit</span>
-                </>
-              )}
             </p>
           </span>
           <SkullCrossedBonesIcon />
@@ -362,18 +320,16 @@ export const NotificationBattleDisplay = ({
             </p>
             <GiBattleGearIcon />
           </span>
-          {/* <TwitterShareButton
-            text={`My adventurer just slew a level ${beastLevel} ${beastName} (Tier ${tier}) on #LootSurvivor.\n\n${adventurer?.name} is currently ${ordinalRank} place on the leaderboard.\n\nThink you can out-survive me?\n\nEnter here and try to survive: ${appUrl}\n\n@lootrealms #Starknet #Play2Die #LootSurvivor`}
-          /> */}
           <TwitterShareButton
-            text={`${adventurer?.name} just slew a level ${beastLevel} ${beastName} (Tier ${tier}) on #LootSurvivor.\n\nThink you can out-survive me?\n\nEnter here and try to survive: ${appUrl}\n\n@lootrealms #Starknet #Play2Die #LootSurvivor`}
+            text={`${adventurer?.name} just slew a level ${beastLevel} ${beastName} (Tier ${tier}) on #LootSurvivor.\n\nThink you can out-survive me?\n\nEnter here and try to survive: ${process.env.NEXT_PUBLIC_APP_URL}\n\n@lootrealms #Starknet #Play2Die #🪦`}
+            className="animate-pulse"
           />
         </div>
       );
     } else if (IdleDeathPenalty) {
       return (
         <span className="flex flex-row items-center justify-between w-full">
-          <p>You were killed from the idle death penalty!</p>
+          <p>Killed from the idle death penalty!</p>
           <SkullCrossedBonesIcon />
         </span>
       );

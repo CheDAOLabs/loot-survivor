@@ -1,16 +1,18 @@
-type u128 = number;
 type u256 = {
   low: u128;
   high: u128;
 };
+
+type u128 = number;
+type u64 = number;
 type u16 = number;
 type u8 = number;
 
 type AdventurerMetadata = {
+  startBlock: u64;
+  startingStats: Stats;
   name: u128;
-  homeRealm: u16;
-  class: u8;
-  entropy: u128;
+  interfaceCamel: boolean;
 };
 
 type Stats = {
@@ -20,6 +22,7 @@ type Stats = {
   intelligence: u8;
   wisdom: u8;
   charisma: u8;
+  luck: u8;
 };
 
 type LootStatistics = {
@@ -44,6 +47,7 @@ type Adventurer = {
   ring: LootStatistics;
   beastHealth: u16;
   statPointsAvailable: u8;
+  actionsPerBlock: u8;
   mutated: boolean;
 };
 
@@ -104,11 +108,11 @@ type Loot = {
   slot: Slot;
 };
 
-type ContractAddress = any; // This needs to be defined or imported from its source.
+type ContractAddress = string;
 
 export type AdventurerState = {
   owner: ContractAddress;
-  adventurerId: u256;
+  adventurerId: u128;
   adventurer: Adventurer;
 };
 
@@ -125,11 +129,11 @@ type CombatSpec = {
   specials: SpecialPowers;
 };
 
-type ItemSpecials = {
-  special1: u8;
-  special2: u8;
-  special3: u8;
-};
+// type ItemSpecials = {
+//   special1: u8;
+//   special2: u8;
+//   special3: u8;
+// };
 
 type AdventurerStateWithBag = {
   adventurerState: AdventurerState;
@@ -140,6 +144,7 @@ type AdventurerStateWithBag = {
 export type StartGameEvent = {
   adventurerState: AdventurerState;
   adventurerMeta: AdventurerMetadata;
+  revealBlock: u64;
 };
 
 export type UpgradeAvailableEvent = {
@@ -365,7 +370,7 @@ export type AdventurerLeveledUpEvent = {
   newLevel: u8;
 };
 
-export type NewItemsAvailableEvent = {
+export type UpgradesAvailableEvent = {
   adventurerState: AdventurerState;
   items: number[];
 };
@@ -386,6 +391,13 @@ export type AdventurerUpgradedEvent = {
   wisdomIncrease: u8;
   charismaIncrease: u8;
 };
+
+export type ERC721TransferEvent = {
+  from: ContractAddress;
+  to: ContractAddress;
+  tokenId: u256;
+};
+
 
 export type EnterCCEvent = {
   map_id:u16,//9 bits

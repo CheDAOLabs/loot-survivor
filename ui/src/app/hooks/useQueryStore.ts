@@ -1,7 +1,6 @@
 import { create } from "zustand";
-import { isEqual } from "lodash";
-import { Battle, Beast, Item, Adventurer, Discovery, Score } from "../types";
-import { GameData } from "../components/GameData";
+import { Battle, Beast, Item, Adventurer, Discovery, Score } from "@/app/types";
+import { GameData } from "@/app/lib/data/GameData";
 
 export type QueryKey =
   | "lastBattleQuery"
@@ -31,32 +30,32 @@ export type QueryKey =
   | "beastQueryCC"
     ;
 
-interface BattlesResult {
+export interface BattlesResult {
   [key: string]: Battle[];
   battles: Battle[];
 }
 
-interface DiscoveriesResult {
+export interface DiscoveriesResult {
   [key: string]: Battle[];
   discoveries: Discovery[];
 }
 
-interface BeastsResult {
+export interface BeastsResult {
   [key: string]: Battle[];
   beasts: Beast[];
 }
 
-interface AdventurersResult {
+export interface AdventurersResult {
   [key: string]: Battle[];
   adventurers: Adventurer[];
 }
 
-interface ItemsResult {
+export interface ItemsResult {
   [key: string]: Battle[];
   items: Item[];
 }
 
-interface ScoresResult {
+export interface ScoresResult {
   [key: string]: Battle[];
   scores: Score[];
 }
@@ -65,8 +64,7 @@ interface EnterCCResult {
   [key: string]: Battle[];
 }
 
-interface InitialData {
-  // [key: string]: BattlesResult | DiscoveriesResult | BeastsResult | AdventurersResult | ItemsResult | ScoresResult | null;
+export interface QueryData {
   lastBattleQuery: BattlesResult | null;
   lastBeastBattleQuery: BattlesResult | null;
   battlesByAdventurerQuery: BattlesResult | null;
@@ -92,11 +90,11 @@ interface InitialData {
   //CC
   enterCC:EnterCCResult | null;
   beastQueryCC: BeastsResult | null;
-
 }
 
+
 type QueriesState = {
-  data: InitialData;
+  data: QueryData;
   setData: (
     queryKey: QueryKey,
     data: any,
@@ -112,7 +110,7 @@ type QueriesState = {
   resetData: (queryKey?: QueryKey) => void;
 };
 
-const initialData: InitialData = {
+const initialData: QueryData = {
   lastBattleQuery: null,
   lastBeastBattleQuery: null,
   battlesByAdventurerQuery: null,

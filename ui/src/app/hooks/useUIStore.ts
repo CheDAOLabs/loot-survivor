@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { ItemPurchase, UpgradeStats, ZeroUpgrade, u256 } from "../types";
+import {
+  ItemPurchase,
+  UpgradeStats,
+  ZeroUpgrade,
+  SpecialBeast,
+} from "@/app/types";
 
 export type ScreenPage =
   | "start"
@@ -54,8 +59,6 @@ type State = {
   setSlayAdventurers: (value: string[]) => void;
   lastAction: Date | null;
   setLastAction: (value: Date | null) => void;
-  mintAdventurer: boolean;
-  setMintAdventurer: (value: boolean) => void;
   inventorySelected: number | null;
   setInventorySelected: (value: number) => void;
   upgradeScreen: number;
@@ -64,8 +67,30 @@ type State = {
   setStartOption: (value: string) => void;
   arcadeDialog: boolean;
   showArcadeDialog: (value: boolean) => void;
+  arcadeIntro: boolean;
+  showArcadeIntro: (value: boolean) => void;
+  closedArcadeIntro: boolean;
+  setClosedArcadeIntro: (value: boolean) => void;
+  topUpDialog: boolean;
+  showTopUpDialog: (value: boolean) => void;
+  topUpAccount: string;
+  setTopUpAccount: (value: string) => void;
+  estimatingFee: boolean;
+  setEstimatingFee: (value: boolean) => void;
   switchAdventurer: boolean;
   setSwitchAdventurer: (value: boolean) => void;
+  specialBeastDefeated: boolean;
+  setSpecialBeastDefeated: (value: boolean) => void;
+  specialBeast: SpecialBeast | null;
+  setSpecialBeast: (value: SpecialBeast | null) => void;
+  isMintingLords: boolean;
+  setIsMintingLords: (value: boolean) => void;
+  averageBlockTime: number;
+  setAverageBlockTime: (value: number) => void;
+  updateDeathPenalty: boolean;
+  setUpdateDeathPenalty: (value: boolean) => void;
+  startPenalty: boolean;
+  setStartPenalty: (value: boolean) => void;
 };
 
 const useUIStore = create<State>((set) => ({
@@ -105,8 +130,6 @@ const useUIStore = create<State>((set) => ({
   slayAdventurers: [],
   setSlayAdventurers: (value) => set({ slayAdventurers: value }),
   setLastAction: (value) => set({ lastAction: value }),
-  mintAdventurer: false,
-  setMintAdventurer: (value) => set({ mintAdventurer: value }),
   inventorySelected: null,
   setInventorySelected: (value) => set({ inventorySelected: value }),
   upgradeScreen: 1,
@@ -115,8 +138,30 @@ const useUIStore = create<State>((set) => ({
   setStartOption: (value) => set({ startOption: value }),
   arcadeDialog: false,
   showArcadeDialog: (value) => set({ arcadeDialog: value }),
+  arcadeIntro: false,
+  showArcadeIntro: (value) => set({ arcadeIntro: value }),
+  closedArcadeIntro: false,
+  setClosedArcadeIntro: (value) => set({ closedArcadeIntro: value }),
+  topUpDialog: false,
+  showTopUpDialog: (value) => set({ topUpDialog: value }),
+  topUpAccount: "",
+  setTopUpAccount: (value) => set({ topUpAccount: value }),
+  estimatingFee: false,
+  setEstimatingFee: (value) => set({ estimatingFee: value }),
   switchAdventurer: false,
   setSwitchAdventurer: (value) => set({ switchAdventurer: value }),
+  specialBeastDefeated: false,
+  setSpecialBeastDefeated: (value) => set({ specialBeastDefeated: value }),
+  specialBeast: null,
+  setSpecialBeast: (value) => set({ specialBeast: value }),
+  isMintingLords: false,
+  setIsMintingLords: (value) => set({ isMintingLords: value }),
+  averageBlockTime: 0,
+  setAverageBlockTime: (value) => set({ averageBlockTime: value }),
+  updateDeathPenalty: false,
+  setUpdateDeathPenalty: (value) => set({ updateDeathPenalty: value }),
+  startPenalty: false,
+  setStartPenalty: (value) => set({ startPenalty: value }),
 }));
 
 export default useUIStore;

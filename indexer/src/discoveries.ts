@@ -22,6 +22,8 @@ import { MONGO_CONNECTION_STRING } from "./utils/constants.ts";
 
 const GAME = Deno.env.get("GAME");
 const START = +(Deno.env.get("START") || 0);
+const STREAM_URL = Deno.env.get("STREAM_URL");
+const MONGO_DB = Deno.env.get("MONGO_DB");
 
 const filter = {
   header: { weak: true },
@@ -37,7 +39,7 @@ const filter = {
 };
 
 export const config: Config<Starknet, Mongo | Console> = {
-  streamUrl: "https://goerli.starknet.a5a.ch",
+  streamUrl: STREAM_URL,
   network: "starknet",
   filter,
   startingBlock: START,
@@ -45,7 +47,7 @@ export const config: Config<Starknet, Mongo | Console> = {
   sinkType: "mongo",
   sinkOptions: {
     connectionString: MONGO_CONNECTION_STRING,
-    database: "mongo_goerli",
+    database: MONGO_DB,
     collectionName: "discoveries",
     // @ts-ignore - indexer package not updated
     entityMode: true,
@@ -53,8 +55,6 @@ export const config: Config<Starknet, Mongo | Console> = {
 };
 
 export default function transform({ header, events }: Block) {
-  const { timestamp } = header!;
-
   return events.flatMap(({ event, receipt }) => {
     switch (event.keys[0]) {
       case DISCOVERED_HEALTH: {

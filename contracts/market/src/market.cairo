@@ -4,13 +4,12 @@ use array::{ArrayTrait, SpanTrait};
 use option::OptionTrait;
 use core::clone::Clone;
 use poseidon::poseidon_hash_span;
+use integer::u256_try_as_non_zero;
 
 use lootitems::{loot::{Loot, ILoot, ImplLoot}, constants::{ItemId, NUM_ITEMS}};
 
 use combat::constants::CombatEnums::{Tier, Slot};
 use super::constants::{NUM_LOOT_ITEMS, NUMBER_OF_ITEMS_PER_LEVEL, TIER_PRICE};
-use pack::pack::{rshift_split};
-
 
 #[derive(Drop, Serde)]
 struct LootWithPrice {
@@ -52,7 +51,7 @@ impl ImplMarket of IMarket {
     // @param adventurer_stat_points The stat points of the adventurer used for market size
     // @return An array of items that are available on the market.
     fn get_market_items(
-        adventurer_entropy: u128, adventurer_xp: u16, adventurer_stat_points: u8
+        adventurer_entropy: felt252, adventurer_xp: u16, adventurer_stat_points: u8
     ) -> Array<u8> {
         let market_size = ImplMarket::get_market_size(adventurer_stat_points);
         if market_size >= NUM_ITEMS.into() {
@@ -83,7 +82,7 @@ impl ImplMarket of IMarket {
     // @param slot The slot of the item to filter by
     // @return An array of items that are available on the market that match the slot
     fn get_items_by_slot(
-        adventurer_entropy: u128, adventurer_xp: u16, adventurer_stat_points: u8, slot: Slot
+        adventurer_entropy: felt252, adventurer_xp: u16, adventurer_stat_points: u8, slot: Slot
     ) -> Array<u8> {
         let (seed, offset) = ImplMarket::get_market_seed_and_offset(
             adventurer_entropy, adventurer_xp
@@ -113,7 +112,7 @@ impl ImplMarket of IMarket {
     // @param tier The tier of the item to filter by
     // @return An array of items that are available on the market that match the tier
     fn get_items_by_tier(
-        adventurer_entropy: u128, adventurer_xp: u16, adventurer_stat_points: u8, tier: Tier
+        adventurer_entropy: felt252, adventurer_xp: u16, adventurer_stat_points: u8, tier: Tier
     ) -> Array<u8> {
         let (seed, offset) = ImplMarket::get_market_seed_and_offset(
             adventurer_entropy, adventurer_xp
@@ -147,7 +146,9 @@ impl ImplMarket of IMarket {
     // @param seed a 256-bit unsigned integer representing a unique identifier for the seed.
     // @return a u8 representing the item ID.
     fn get_id(seed: u256) -> u8 {
-        let (_, item_id) = rshift_split(seed, NUM_ITEMS.into());
+        let (_, item_id) = integer::U256DivRem::div_rem(
+            seed, u256_try_as_non_zero(NUM_ITEMS.into()).unwrap()
+        );
         1 + item_id.try_into().unwrap()
     }
 
@@ -158,7 +159,7 @@ impl ImplMarket of IMarket {
     // @param item_id The item id to check for availability
     // @return A boolean indicating if the item is available on the market.
     fn is_item_available(
-        adventurer_entropy: u128, adventurer_xp: u16, adventurer_stat_points: u8, item_id: u8
+        adventurer_entropy: felt252, adventurer_xp: u16, adventurer_stat_points: u8, item_id: u8
     ) -> bool {
         // if the size of the market is larger than the number of items
         let market_size = ImplMarket::get_market_size(adventurer_stat_points);
@@ -205,9 +206,9 @@ impl ImplMarket of IMarket {
     // @param adventurer_entropy The entropy of the adventurer used for randomness.
     // @param xp The experience points of the adventurer.
     // @return A 128bit hash used for market seed and an 8bit offset used for market offset.z
-    fn get_market_seed_and_offset(adventurer_entropy: u128, xp: u16) -> (u256, u8) {
+    fn get_market_seed_and_offset(adventurer_entropy: felt252, xp: u16) -> (u256, u8) {
         let mut hash_span = ArrayTrait::new();
-        hash_span.append(adventurer_entropy.into());
+        hash_span.append(adventurer_entropy);
         hash_span.append(xp.into());
         ImplMarket::split_hash_into_seed_and_offset(poseidon_hash_span(hash_span.span()))
     }
@@ -220,7 +221,9 @@ impl ImplMarket of IMarket {
     // market seed and the second element is an 8-bit unsigned integer that represents the market offset.
     fn split_hash_into_seed_and_offset(poseidon_hash: felt252) -> (u256, u8) {
         // split hash into two u128s, one for market seed, one for offset
-        let (market_seed, offset) = rshift_split(poseidon_hash.into(), NUM_ITEMS.into() - 1);
+        let (market_seed, offset) = integer::U256DivRem::div_rem(
+            poseidon_hash.into(), u256_try_as_non_zero(NUM_ITEMS.into() - 1).unwrap()
+        );
 
         // return market seed and market offset
         (market_seed, 1 + offset.try_into().unwrap())
@@ -241,8 +244,6 @@ mod tests {
     use market::{
         market::ImplMarket, constants::{NUM_LOOT_ITEMS, NUMBER_OF_ITEMS_PER_LEVEL, TIER_PRICE}
     };
-    use pack::pack::{rshift_split};
-
     const TEST_MARKET_SEED: u256 = 515;
     const TEST_OFFSET: u8 = 3;
 
@@ -579,7 +580,7 @@ mod tests {
             if (i == 100) {
                 break;
             }
-            let adventurer_id: u256 = 1;
+            let adventurer_id: felt252 = 1;
             let block_number = 839152;
             let xp: u16 = 3;
             let stats_points_available: u8 = 4;

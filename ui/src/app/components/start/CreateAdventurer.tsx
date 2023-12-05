@@ -1,32 +1,34 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { FormData, Adventurer } from "@/app/types";
-import { AdventurerName } from "./AdventurerName";
-import { WeaponSelect } from "./WeaponSelect";
-import { ClassSelect } from "./ClassSelect";
-import { Spawn } from "./Spawn";
+import { Contract } from "starknet";
+import { FormData } from "@/app/types";
+import { AdventurerName } from "@/app/components/start/AdventurerName";
+import { WeaponSelect } from "@/app/components/start/WeaponSelect";
+import { Spawn } from "@/app/components/start/Spawn";
 
 export interface CreateAdventurerProps {
   isActive: boolean;
   onEscape: () => void;
   spawn: (...args: any[]) => any;
+  lordsBalance?: bigint;
+  goldenTokenData: any;
+  gameContract: Contract;
+  getBalances: () => Promise<void>;
 }
 
 export const CreateAdventurer = ({
   isActive,
   onEscape,
   spawn,
+  lordsBalance,
+  goldenTokenData,
+  gameContract,
+  getBalances,
 }: CreateAdventurerProps) => {
   const [formData, setFormData] = useState<FormData>({
     startingWeapon: "",
     name: "",
     homeRealmId: "",
     class: "",
-    startingStrength: "0",
-    startingDexterity: "0",
-    startingVitality: "0",
-    startingIntelligence: "0",
-    startingWisdom: "0",
-    startingCharisma: "0",
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [step, setStep] = useState(1);
@@ -73,38 +75,74 @@ export const CreateAdventurer = ({
     setStep((step) => Math.max(step - 1, 1));
   };
 
-  if (step === 1) {
-    return (
-      <ClassSelect
-        setFormData={setFormData}
-        formData={formData}
-        step={step}
-        setStep={setStep}
-      />
-    );
-  } else if (step === 2) {
-    return (
-      <WeaponSelect
-        setFormData={setFormData}
-        formData={formData}
-        handleBack={handleBack}
-        step={step}
-        setStep={setStep}
-      />
-    );
-  } else if (step === 3) {
-    return (
-      <AdventurerName
-        setFormData={setFormData}
-        formData={formData}
-        handleBack={handleBack}
-        step={step}
-        setStep={setStep}
-      />
-    );
-  } else if (step === 4) {
-    return <Spawn formData={formData} spawn={spawn} handleBack={handleBack} />;
-  } else {
-    return null;
-  }
+  return (
+    <>
+      {step == 1 && (
+        <>
+          <div className="hidden sm:flex flex-col 2xl:gap-5 justify-center items-center">
+            <WeaponSelect
+              setFormData={setFormData}
+              formData={formData}
+              handleBack={handleBack}
+              step={step}
+              setStep={setStep}
+            />
+            <AdventurerName
+              setFormData={setFormData}
+              formData={formData}
+              handleBack={handleBack}
+              step={step}
+              setStep={setStep}
+            />
+          </div>
+          <div className="sm:hidden">
+            <WeaponSelect
+              setFormData={setFormData}
+              formData={formData}
+              handleBack={handleBack}
+              step={step}
+              setStep={setStep}
+            />
+          </div>
+        </>
+      )}
+      {step == 2 && (
+        <>
+          <div className="hidden sm:flex w-full">
+            <Spawn
+              formData={formData}
+              spawn={spawn}
+              handleBack={handleBack}
+              lordsBalance={lordsBalance}
+              goldenTokenData={goldenTokenData}
+              gameContract={gameContract}
+              getBalances={getBalances}
+            />
+          </div>
+          <div className="sm:hidden">
+            <AdventurerName
+              setFormData={setFormData}
+              formData={formData}
+              handleBack={handleBack}
+              step={step}
+              setStep={setStep}
+            />
+          </div>
+        </>
+      )}
+      {step == 3 && (
+        <div className="sm:hidden">
+          <Spawn
+            formData={formData}
+            spawn={spawn}
+            handleBack={handleBack}
+            lordsBalance={lordsBalance}
+            goldenTokenData={goldenTokenData}
+            gameContract={gameContract}
+            getBalances={getBalances}
+          />
+        </div>
+      )}
+    </>
+  );
 };

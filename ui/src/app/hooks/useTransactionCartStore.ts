@@ -1,10 +1,18 @@
 import { create } from "zustand";
-import { Call } from "../types";
+import { Call } from "@/app/types";
+import { AccountInterface } from "starknet";
 
 type TransactionCartState = {
   error: boolean;
   setError: (error: boolean) => void;
-  handleSubmitCalls: (writeAsync: () => Promise<any>) => Promise<any>;
+  handleSubmitCalls: (
+    account: AccountInterface,
+    calls: Call[],
+    isArcade: boolean,
+    ethBalance: number,
+    showTopUpDialog: (show: boolean) => void,
+    setTopUpAccount: (account: string) => void
+  ) => Promise<any>;
   calls: Call[];
   addToCalls: (value: Call) => void;
   removeFromCalls: (value: Call) => void;
@@ -36,14 +44,45 @@ const useTransactionCartStore = create<TransactionCartState>((set) => {
     }));
   };
 
-  const handleSubmitCalls = async (writeAsync: () => Promise<any>) => {
+  const handleSubmitCalls = async (
+    account: AccountInterface,
+    calls: Call[],
+    isArcade: boolean,
+    ethBalance: number,
+    showTopUpDialog: (show: boolean) => void,
+    setTopUpAccount: (account: string) => void
+  ) => {
     try {
-      const tx = await writeAsync();
+      let tx;
+      if (isArcade) {
+        // If they have an arcade account, estimate the max fee
+        const feeEstimateResult = await account.estimateInvokeFee(calls);
+        if (ethBalance < feeEstimateResult.suggestedMaxFee! * BigInt(2)) {
+          showTopUpDialog(true);
+          setTopUpAccount(account?.address ?? "");
+          throw new Error("Not enough eth for gas.");
+        } else {
+          tx = await account.execute(calls, undefined, {
+            maxFee: feeEstimateResult.suggestedMaxFee! * BigInt(2),
+          });
+        }
+      } else {
+        tx = await account.execute(calls);
+      }
+
       set({ calls: [], error: false });
+
       return tx;
     } catch (error) {
       setError(true);
       resetCalls();
+      if (error instanceof Error) {
+        console.log(error);
+        throw new Error(error.message);
+      } else {
+        // Handle non-Error types
+        console.log("An error occurred:", error);
+      }
     }
   };
 

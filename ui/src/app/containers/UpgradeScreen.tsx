@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import { useContracts } from "../hooks/useContracts";
+import { CallData, Contract } from "starknet";
 import {
   getItemData,
   getValueFromKey,
   getItemPrice,
   getPotionPrice,
-} from "../lib/utils";
-import { GameData } from "../components/GameData";
-import VerticalKeyboardControl from "../components/menu/VerticalMenu";
-import useLoadingStore from "../hooks/useLoadingStore";
-import useAdventurerStore from "../hooks/useAdventurerStore";
-import useTransactionCartStore from "../hooks/useTransactionCartStore";
-import Info from "../components/adventurer/Info";
-import { Button } from "../components/buttons/Button";
+} from "@/app/lib/utils";
+import { GameData } from "@/app/lib/data/GameData";
+import ButtonMenu from "@/app/components/menu/ButtonMenu";
+import useLoadingStore from "@/app/hooks/useLoadingStore";
+import useAdventurerStore from "@/app/hooks/useAdventurerStore";
+import useTransactionCartStore from "@/app/hooks/useTransactionCartStore";
+import Info from "@/app/components/adventurer/Info";
+import { Button } from "@/app/components/buttons/Button";
 import {
   ArrowTargetIcon,
   CatIcon,
@@ -21,31 +21,45 @@ import {
   HeartVitalityIcon,
   LightbulbIcon,
   ScrollIcon,
-  HealthPotionIcon,
   HeartIcon,
-} from "../components/icons/Icons";
-import PurchaseHealth from "../components/actions/PurchaseHealth";
-import MarketplaceScreen from "./MarketplaceScreen";
-import { UpgradeNav } from "../components/upgrade/UpgradeNav";
-import { StatAttribute } from "../components/upgrade/StatAttribute";
-import useUIStore from "../hooks/useUIStore";
-import { UpgradeStats, ZeroUpgrade, UpgradeSummary } from "../types";
-import Summary from "../components/upgrade/Summary";
-import { HealthCountDown } from "../components/CountDown";
+} from "@/app/components/icons/Icons";
+import PurchaseHealth from "@/app/components/upgrade/PurchaseHealth";
+import MarketplaceScreen from "@/app/containers/MarketplaceScreen";
+import { UpgradeNav } from "@/app/components/upgrade/UpgradeNav";
+import { StatAttribute } from "@/app/components/upgrade/StatAttribute";
+import useUIStore from "@/app/hooks/useUIStore";
+import {
+  UpgradeStats,
+  ZeroUpgrade,
+  UpgradeSummary,
+  ItemPurchase,
+} from "@/app/types";
+import Summary from "@/app/components/upgrade/Summary";
+import { HealthCountDown } from "@/app/components/CountDown";
+import { calculateVitBoostRemoved } from "@/app/lib/utils";
+import { useQueriesStore } from "@/app/hooks/useQueryStore";
 
 interface UpgradeScreenProps {
-  upgrade: (...args: any[]) => any;
+  upgrade: (
+    upgrades: UpgradeStats,
+    purchaseItems: ItemPurchase[],
+    potionAmount: number,
+    upgradeTx?: any
+  ) => Promise<void>;
+  gameContract: Contract;
 }
 
 /**
  * @container
  * @description Provides the upgrade screen for the adventurer.
  */
-export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
-  const { gameContract, lordsContract } = useContracts();
+export default function UpgradeScreen({
+  upgrade,
+  gameContract,
+}: UpgradeScreenProps) {
   const adventurer = useAdventurerStore((state) => state.adventurer);
   const loading = useLoadingStore((state) => state.loading);
-  const txAccepted = useLoadingStore((state) => state.txAccepted);
+  const estimatingFee = useUIStore((state) => state.estimatingFee);
   const resetNotification = useLoadingStore((state) => state.resetNotification);
   const addToCalls = useTransactionCartStore((state) => state.addToCalls);
   const removeEntrypointFromCalls = useTransactionCartStore(
@@ -55,6 +69,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
     (state) => state.computed.hasStatUpgrades
   );
   const [selected, setSelected] = useState("");
+  const [nonBoostedStats, setNonBoostedStats] = useState<any | null>(null);
   const upgradeScreen = useUIStore((state) => state.upgradeScreen);
   const setUpgradeScreen = useUIStore((state) => state.setUpgradeScreen);
   const potionAmount = useUIStore((state) => state.potionAmount);
@@ -63,7 +78,6 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
   const setUpgrades = useUIStore((state) => state.setUpgrades);
   const purchaseItems = useUIStore((state) => state.purchaseItems);
   const setPurchaseItems = useUIStore((state) => state.setPurchaseItems);
-  const setScreen = useUIStore((state) => state.setScreen);
   const pendingMessage = useLoadingStore((state) => state.pendingMessage);
   const [summary, setSummary] = useState<UpgradeSummary>({
     Stats: { ...ZeroUpgrade },
@@ -72,11 +86,6 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
   });
 
   const gameData = new GameData();
-
-  // useCustomQuery("latestMarketItemsQuery", getLatestMarketItems, {
-  //   adventurerId: adventurer?.id,
-  //   limit: 20 * (adventurer?.statUpgrades ?? 0),
-  // });
 
   const checkTransacting =
     typeof pendingMessage === "string" &&
@@ -89,6 +98,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
       description: "Strength increases attack damage by 10%",
       buttonText: "Upgrade Strength",
       abbrev: "STR",
+      nonBoostedStat: nonBoostedStats?.strength,
     },
     {
       name: "Dexterity",
@@ -96,6 +106,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
       description: "Dexterity increases chance of fleeing Beasts",
       buttonText: "Upgrade Dexterity",
       abbrev: "DEX",
+      nonBoostedStat: nonBoostedStats?.dexterity,
     },
     {
       name: "Vitality",
@@ -104,6 +115,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
       description: "Vitality increases max health and gives +10hp ",
       buttonText: "Upgrade Vitality",
       abbrev: "VIT",
+      nonBoostedStat: nonBoostedStats?.vitality,
     },
     {
       name: "Intelligence",
@@ -111,6 +123,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
       description: "Intelligence increases chance of avoiding Obstacles",
       buttonText: "Upgrade Intelligence",
       abbrev: "INT",
+      nonBoostedStat: nonBoostedStats?.intelligence,
     },
     {
       name: "Wisdom",
@@ -118,6 +131,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
       description: "Wisdom increases chance of avoiding a Beast ambush",
       buttonText: "Upgrade Wisdom",
       abbrev: "WIS",
+      nonBoostedStat: nonBoostedStats?.wisdom,
     },
     {
       name: "Charisma",
@@ -125,6 +139,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
       description: "Charisma provides discounts on the marketplace and potions",
       buttonText: "Upgrade Charisma",
       abbrev: "CHA",
+      nonBoostedStat: nonBoostedStats?.charisma,
     },
   ];
 
@@ -139,7 +154,7 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
     );
   }
 
-  function renderVerticalKeyboardControl() {
+  function renderButtonMenu() {
     const upgradeMenu = [
       {
         id: 1,
@@ -191,11 +206,13 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
       },
     ];
     return (
-      <div className="order-2 sm:order-1 sm:w-1/3 sm:border-r sm:border-terminal-green">
-        <VerticalKeyboardControl
+      <div className="order-2 sm:order-1 sm:w-1/3 sm:border-r sm:border-terminal-green h-full">
+        <ButtonMenu
           buttonsData={upgradeMenu}
           onSelected={setSelected}
           onEnterAction={true}
+          className="flex-col items-center justify-center h-full"
+          size="lg"
         />
       </div>
     );
@@ -221,43 +238,36 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
   const upgradeTotalCost = purchaseGoldAmount + itemsGoldSum;
 
   const handleAddUpgradeTx = (
-    currenUpgrades?: UpgradeStats,
+    currentUpgrades?: UpgradeStats,
     potions?: number,
-    items?: any[]
+    items?: ItemPurchase[]
   ) => {
-
-    console.log("currenUpgrades", currenUpgrades);
-    console.log("potions", potions);
-    console.log("items", items);
-    console.log("potionAmount",potionAmount)
-
-    removeEntrypointFromCalls("upgrade_adventurer");
-    removeEntrypointFromCalls("buff_adventurer");
+    removeEntrypointFromCalls("upgrade");
     const upgradeTx = {
       contractAddress: gameContract?.address ?? "",
-      entrypoint: "upgrade_adventurer",
+      entrypoint: "upgrade",
       calldata: [
         adventurer?.id?.toString() ?? "",
-        "0",
-        potions ? potions.toString() : potionAmount.toString(),
-        currenUpgrades
-          ? currenUpgrades["Strength"].toString()
+        potions !== undefined ? potions.toString() : potionAmount.toString(),
+        currentUpgrades
+          ? currentUpgrades["Strength"].toString()
           : upgrades["Strength"].toString(),
-        currenUpgrades
-          ? currenUpgrades["Dexterity"].toString()
+        currentUpgrades
+          ? currentUpgrades["Dexterity"].toString()
           : upgrades["Dexterity"].toString(),
-        currenUpgrades
-          ? currenUpgrades["Vitality"].toString()
+        currentUpgrades
+          ? currentUpgrades["Vitality"].toString()
           : upgrades["Vitality"].toString(),
-        currenUpgrades
-          ? currenUpgrades["Intelligence"].toString()
+        currentUpgrades
+          ? currentUpgrades["Intelligence"].toString()
           : upgrades["Intelligence"].toString(),
-        currenUpgrades
-          ? currenUpgrades["Wisdom"].toString()
+        currentUpgrades
+          ? currentUpgrades["Wisdom"].toString()
           : upgrades["Wisdom"].toString(),
-        currenUpgrades
-          ? currenUpgrades["Charisma"].toString()
+        currentUpgrades
+          ? currentUpgrades["Charisma"].toString()
           : upgrades["Charisma"].toString(),
+        "0",
         items ? items.length.toString() : purchaseItems.length.toString(),
         ...(items
           ? items.flatMap(Object.values)
@@ -265,15 +275,51 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
       ],
     };
     addToCalls(upgradeTx);
+    return upgradeTx;
   };
 
   const handleSubmitUpgradeTx = async () => {
     renderSummary();
     resetNotification();
-    await upgrade(upgrades, purchaseItems, potionAmount);
-    setPotionAmount(0);
-    setPurchaseItems([]);
-    setUpgrades({ ...ZeroUpgrade });
+    // Handle for vitBoostRemoval
+    const vitBoostRemoved = calculateVitBoostRemoved(
+      purchaseItems,
+      adventurer!,
+      adventurerItems
+    );
+    let upgradeTx: any;
+    if (potionAmount > 0) {
+      // Check whether health + pots is within vitBoostRemoved of the maxHealth
+      const maxHealth = 100 + totalVitality * 10;
+      const newMaxHealth = 100 + (totalVitality - vitBoostRemoved) * 10;
+      const currentHealth = adventurer?.health! + selectedVitality * 10;
+      const healthPlusPots = Math.min(
+        currentHealth! + potionAmount * 10,
+        maxHealth
+      );
+      const healthOverflow = healthPlusPots > newMaxHealth;
+      if (healthOverflow) {
+        const newUpgradeTx = handleAddUpgradeTx(
+          undefined,
+          Math.max(potionAmount - vitBoostRemoved, 0),
+          undefined
+        );
+        upgradeTx = newUpgradeTx;
+      }
+    }
+    try {
+      await upgrade(
+        upgrades,
+        purchaseItems,
+        Math.max(potionAmount - vitBoostRemoved, 0),
+        upgradeTx
+      );
+      setPotionAmount(0);
+      setPurchaseItems([]);
+      setUpgrades({ ...ZeroUpgrade });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const upgradesTotal = Object.values(upgrades)
@@ -312,20 +358,95 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
     maxHealth
   );
 
+  const getNoBoostedStats = async () => {
+    const stats = await gameContract?.call(
+      "get_base_stats",
+      CallData.compile({ token_id: adventurer?.id! })
+    ); // check whether player can use the current token
+    setNonBoostedStats(stats);
+  };
+
+  useEffect(() => {
+    getNoBoostedStats();
+  }, []);
+
+  const adventurerItems = useQueriesStore(
+    (state) => state.data.itemsByAdventurerQuery?.items || []
+  );
+
   return (
     <>
       {hasStatUpgrades ? (
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2">
-          <div className="w-1/3 hidden sm:block">
-            <Info adventurer={adventurer} upgradeCost={upgradeTotalCost} />
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 h-full">
+          <div className="w-1/3 hidden sm:flex h-full">
+            <Info
+              adventurer={adventurer}
+              upgradeCost={upgradeTotalCost}
+              gameContract={gameContract}
+            />
           </div>
           {!checkTransacting ? (
-            <div className="w-full sm:w-2/3 xl:h-[500px] xl:overflow-y-auto 2xl:h-full">
-              <div className="flex flex-col gap-2 xl:gap-0 xl:h-[300px] 2xl:h-full">
-                <div className="justify-center text-terminal-green">
-                  <div className="text-center text-2xl 2xl:text-4xl xl:text-xl sm:p-2 xl:p-0 animate-pulse uppercase">
-                    Level up!
+            <div className="w-full sm:w-2/3 h-full">
+              <div className="flex flex-col gap-2 xl:gap-0 h-full">
+                <div className="flex flex-col gap-2 sm:gap-0 justify-center text-terminal-green h-1/3 sm:h-1/4">
+                  <div className="w-full flex flex-row gap-2 mx-auto border border-terminal-green justify-between">
+                    <Button
+                      variant={"outline"}
+                      onClick={() => setUpgradeScreen(upgradeScreen - 1)}
+                      disabled={upgradeScreen == 1}
+                    >
+                      {"<"} Back
+                    </Button>
+
+                    {upgradeScreen != 3 && (
+                      <div className="sm:hidden flex-grow text-center uppercase text-2xl self-center">
+                        Level up!
+                      </div>
+                    )}
+
+                    {upgradeScreen != 3 && upgradeScreen != 2 && (
+                      <div className=" flex-grow text-center uppercase text-2xl self-center hidden sm:block">
+                        Level up!
+                      </div>
+                    )}
+
+                    <Button
+                      className={` ${
+                        upgradeScreen == 2
+                          ? "hidden sm:block"
+                          : upgradeScreen == 3
+                          ? "sm:hidden"
+                          : "hidden"
+                      } w-full`}
+                      onClick={() => {
+                        handleSubmitUpgradeTx();
+                        setUpgradeScreen(1);
+                      }}
+                      disabled={nextDisabled || loading || estimatingFee}
+                    >
+                      {loading ? (
+                        <span>Upgrading...</span>
+                      ) : (
+                        <span>Upgrade</span>
+                      )}
+                    </Button>
+                    <Button
+                      className={` ${
+                        upgradeScreen == 2
+                          ? "sm:hidden"
+                          : upgradeScreen == 3
+                          ? "hidden"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setUpgradeScreen(upgradeScreen + 1);
+                      }}
+                      disabled={nextDisabled || loading || estimatingFee}
+                    >
+                      <span>Next {">"}</span>
+                    </Button>
                   </div>
+
                   <div className="flex flex-row gap-2 xl:gap-0 justify-center text-lg 2xl:text-2xl text-shadow-none">
                     <span>
                       {totalStatUpgrades > 0
@@ -334,12 +455,12 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
                     </span>
                   </div>
                   <UpgradeNav activeSection={upgradeScreen} />
-                  <div className="flex flex-col text-sm sm:text-base items-center justify-center">
-                    <div className="flex flex-row gap-3">
+                  <div className="flex flex-col text-sm sm:text-base items-center justify-center border border-terminal-green">
+                    <div className="flex flex-row gap-3 border-b border-terminal-green w-full justify-center">
                       <span className="flex flex-row gap-1 items-center">
-                        <p className="uppercase">Cost:</p>
+                        <p>Cost:</p>
                         <span className="flex flex-row items-center text-xl">
-                          <CoinIcon className="self-center w-5 h-5 fill-current text-terminal-yellow" />
+                          <CoinIcon className="self-center w-5 h-5 fill-current text-terminal-yellow self-center ml-1" />
                           <p
                             className={
                               upgradeTotalCost > (adventurer?.gold ?? 0)
@@ -352,19 +473,19 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
                         </span>
                       </span>
                       <span className="flex flex-row gap-1 items-center">
-                        <p className="uppercase">Potions:</p>
+                        <p>Potions:</p>
                         <span className="flex text-xl text-terminal-yellow">
                           {potionAmount?.toString() ?? 0}
                         </span>
                       </span>
                       <span className="flex flex-row gap-1 items-center">
-                        <p className="uppercase text-lg">Items:</p>
+                        <p>Items:</p>
                         <span className="flex text-xl text-terminal-yellow">
                           {purchaseItems?.length}
                         </span>
                       </span>
                     </div>
-                    <div className="sm:hidden flex flex-row gap-3 items-center text-lg">
+                    <div className="sm:hidden flex flex-row gap-3 py-2 items-center text-lg">
                       <span className="flex flex-row">
                         Gold:{" "}
                         <span className="flex flex-row text-terminal-yellow">
@@ -373,7 +494,6 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
                         </span>
                       </span>
                       <span className="relative flex flex-row items-center">
-                        Health:{" "}
                         <span className="flex items-center ">
                           <HeartIcon className="self-center mt-1 w-5 h-5 fill-current" />{" "}
                           <HealthCountDown health={totalHealth || 0} />
@@ -394,22 +514,22 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col h-2/3 sm:h-3/4">
                   {upgradeScreen === 1 && (
-                    <div className="flex flex-col sm:gap-2 items-center w-full">
-                      <div className="flex flex-col gap-0 sm:flex-row w-full border-terminal-green border sm:items-center">
+                    <div className="flex flex-col sm:gap-2 items-center w-full h-full">
+                      <div className="flex flex-col gap-0 sm:flex-row w-full border-terminal-green border sm:items-center h-full">
                         {renderContent()}
-                        {renderVerticalKeyboardControl()}
+                        {renderButtonMenu()}
                       </div>
                     </div>
                   )}
 
                   {upgradeScreen === 2 && (
                     <div
-                      className="flex flex-col gap-5 sm:gap-2
-                     sm:flex-row items-center justify-center flex-wrap"
+                      className="flex
+                     sm:flex-row items-center justify-center flex-wrap border border-terminal-green p-2 h-full sm:h-1/6"
                     >
-                      <p className="text-sm 2xl:text-2xl">Potions</p>
+                      {/* <h4>Potions</h4> */}
                       <PurchaseHealth
                         upgradeTotalCost={upgradeTotalCost}
                         potionAmount={potionAmount}
@@ -422,78 +542,29 @@ export default function UpgradeScreen({ upgrade }: UpgradeScreenProps) {
                   )}
 
                   {upgradeScreen === 2 && (
-                    <div className="hidden sm:flex flex-col items-center sm:gap-2 w-full">
-                      <p className="text-xl text-center lg:text-2xl sm:hidden">
-                        Loot Fountain
-                      </p>
+                    <div className="hidden sm:flex items-center w-full h-5/6">
                       <MarketplaceScreen
                         upgradeTotalCost={upgradeTotalCost}
                         purchaseItems={purchaseItems}
                         setPurchaseItems={setPurchaseItems}
                         upgradeHandler={handleAddUpgradeTx}
                         totalCharisma={totalCharisma}
+                        adventurerItems={adventurerItems}
                       />
                     </div>
                   )}
                   {upgradeScreen === 3 && (
-                    <div className="sm:hidden flex-col items-center sm:gap-2 w-full">
-                      {/* <p className="text-xl text-center lg:text-2xl sm:hidden">
-                        Loot Fountain
-                      </p> */}
+                    <div className="sm:hidden flex-col items-center sm:gap-2 w-full h-full">
                       <MarketplaceScreen
                         upgradeTotalCost={upgradeTotalCost}
                         purchaseItems={purchaseItems}
                         setPurchaseItems={setPurchaseItems}
                         upgradeHandler={handleAddUpgradeTx}
                         totalCharisma={totalCharisma}
+                        adventurerItems={adventurerItems}
                       />
                     </div>
                   )}
-                  <div className="w-1/2 flex flex-row gap-2 mx-auto">
-                    <Button
-                      className="w-1/2"
-                      variant={"outline"}
-                      onClick={() => setUpgradeScreen(upgradeScreen - 1)}
-                      disabled={upgradeScreen == 1}
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      className={` ${
-                        upgradeScreen == 2
-                          ? "hidden sm:block"
-                          : upgradeScreen == 3
-                          ? "sm:hidden"
-                          : "hidden"
-                      } w-1/2`}
-                      onClick={() => {
-                        handleSubmitUpgradeTx();
-                        setUpgradeScreen(1);
-                      }}
-                      disabled={nextDisabled || loading}
-                    >
-                      {loading ? (
-                        <span>Upgrading...</span>
-                      ) : (
-                        <span>Upgrade</span>
-                      )}
-                    </Button>
-                    <Button
-                      className={` ${
-                        upgradeScreen == 2
-                          ? "sm:hidden"
-                          : upgradeScreen == 3
-                          ? "hidden"
-                          : ""
-                      } w-1/2`}
-                      onClick={() => {
-                        setUpgradeScreen(upgradeScreen + 1);
-                      }}
-                      disabled={nextDisabled || loading}
-                    >
-                      <span>Next</span>
-                    </Button>
-                  </div>
                 </div>
               </div>
             </div>
