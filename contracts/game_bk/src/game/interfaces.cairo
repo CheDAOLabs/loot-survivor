@@ -9,6 +9,8 @@ use survivor::{
     item_primitive::{ItemPrimitive}
 };
 use game_snapshot::GamesPlayedSnapshot;
+use lootitems::loot::{Loot};
+use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
 
 #[starknet::interface]
 trait IGame<TContractState> {
@@ -154,4 +156,11 @@ trait IGame<TContractState> {
     fn get_cost_to_play(self: @TContractState) -> u128;
     fn get_games_played_snapshot(self: @TContractState) -> GamesPlayedSnapshot;
     fn can_play(self: @TContractState, golden_token_id: u256) -> bool;
+
+    // cc
+    fn get_cave_cc(self: @TContractState, adventurer_id: felt252) -> CcCave;
+    fn enter_cc(ref self: TContractState, adventurer_id:felt252, cc_token_id :u256) -> u128;
+    fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool);
+    fn get_attacking_beast_cc(self: @TContractState, adventurer_id: felt252) -> Beast;
+    fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
 }

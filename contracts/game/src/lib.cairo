@@ -2,11 +2,15 @@ mod game {
     mod constants;
     mod interfaces;
 }
+mod tests {
+    mod test_game;
+}
+
 
 
 #[starknet::contract]
 mod Game {
-    // TODO: TESTING CONFIGS
+    // TODO: TESTING CONFIGS 
     // ADJUST THESE BEFORE DEPLOYMENT
     use core::starknet::SyscallResultTrait;
     const TEST_ENTROPY: u64 = 12303548;
@@ -61,7 +65,7 @@ mod Game {
             STARTER_BEAST_ATTACK_DAMAGE, NUM_STARTING_STATS,
             STARTING_GAME_ENTROPY_ROTATION_INTERVAL, MINIMUM_DAMAGE_FROM_BEASTS,
             MAINNET_REVEAL_DELAY_BLOCKS
-        }
+        },
     };
     use lootitems::{
         loot::{ILoot, Loot, ImplLoot},
@@ -99,15 +103,6 @@ mod Game {
     use game_entropy::game_entropy::{GameEntropy, ImplGameEntropy};
     use game_snapshot::{GamesPlayedSnapshot, GamesPlayedSnapshotImpl};
 
-
-    use cc::resource::{
-        CryptsAndCavernsTraitDispatcher, CryptsAndCavernsTraitDispatcherTrait, DungeonSerde,
-        DungeonDojo, Name, EntityDataSerde, Pack
-    };
-
-    use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
-    use cc::cc_buff::{CcBuff,get_buff_by_id};
-
     #[storage]
     struct Storage {
         _adventurer: LegacyMap::<felt252, Adventurer>,
@@ -120,6 +115,7 @@ mod Game {
         _genesis_block: u64,
         _genesis_timestamp: u64,
         _leaderboard: Leaderboard,
+        _cc: ContractAddress,
         _lords: ContractAddress,
         _owner: LegacyMap::<felt252, ContractAddress>,
         _item_specials: LegacyMap::<(felt252, u8), ItemSpecialsStorage>,
@@ -128,7 +124,6 @@ mod Game {
         _cost_to_play: u128,
         _games_played_snapshot: GamesPlayedSnapshot,
         _terminal_timestamp: u64,
-        _cc_cave: LegacyMap::<felt252, CcCave>,
     }
 
     #[event]
@@ -160,16 +155,6 @@ mod Game {
         RewardDistribution: RewardDistribution,
         GameEntropyRotatedEvent: GameEntropyRotatedEvent,
         PriceChangeEvent: PriceChangeEvent,
-
-        // CC
-        EnterCC:EnterCC,
-        AmbushedByBeastCC: AmbushedByBeastCC,
-        DiscoveredBeastCC: DiscoveredBeastCC,
-        AttackedBeastCC: AttackedBeastCC,
-        AttackedByBeastCC: AttackedByBeastCC,
-        SlayedBeastCC: SlayedBeastCC,
-        AdventurerUpgradedCC: AdventurerUpgradedCC,
-        RewardItemsCC: RewardItemsCC,
     }
 
     #[constructor]
@@ -180,8 +165,10 @@ mod Game {
         collectible_beasts: ContractAddress,
         golden_token_address: ContractAddress,
         terminal_timestamp: u64,
+        cc: ContractAddress,
     ) {
         // init storage
+        self._cc.write(cc);
         self._lords.write(lords);
         self._dao.write(dao);
         self._collectible_beasts.write(collectible_beasts);
@@ -212,92 +199,13 @@ mod Game {
     // ------------------------------------------ //
 
     #[external(v0)]
-    fn buff_adventurer(
-        ref self: ContractState, adventurer_id: felt252, buff_index:u8
-    ) {
-
-        // get adventurer from storage and apply stat boosts
-        let (mut adventurer, adventurer_entropy, game_entropy, _) = _load_player_assets(
-            @self, adventurer_id
-        );
-
-
-        let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
-        assert(cc_cave.has_reward > 0, 'no reward buff');
-
-
-        let cc_buff_config:CcBuff = get_buff_by_id(cc_cave.has_reward);
-
-        // get bag from storage
-        let bag = _load_bag(@self, adventurer_id);
-
-
-        // use an immutable adventurer for assertions
-        let immutable_adventurer = adventurer.clone();
-
-        // assert action is valid
-        _assert_ownership(@self, adventurer_id);
-        _assert_not_dead(immutable_adventurer);
-        // _assert_in_battle(immutable_adventurer);
-
-
-        // get number of blocks between actions
-        let (idle, num_blocks) = _is_idle(
-            @self, immutable_adventurer, adventurer_id, game_entropy
-        );
-
-        //upgrade adventurer's stats
-        if buff_index == 1{
-            adventurer.stats.increase_strength(cc_buff_config.strength);
-            cc_cave.increase_strength(cc_buff_config.strength);
-        }
-        if  buff_index == 2 {
-            adventurer.stats.increase_dexterity(cc_buff_config.dexterity);
-            cc_cave.increase_dexterity(cc_buff_config.dexterity);
-        }
-        if  buff_index == 3 {
-            adventurer.stats.increase_vitality(cc_buff_config.vitality);
-            adventurer
-                .increase_health(VITALITY_INSTANT_HEALTH_BONUS * cc_buff_config.vitality.into());
-            cc_cave.increase_vitality(cc_buff_config.vitality);
-        }
-        if buff_index == 4{
-            adventurer.stats.increase_intelligence(cc_buff_config.intelligence);
-            cc_cave.increase_intelligence(cc_buff_config.intelligence);
-        }
-        if buff_index == 5{
-            adventurer.stats.increase_wisdom(cc_buff_config.wisdom);
-            cc_cave.increase_wisdom(cc_buff_config.wisdom);
-        }
-        if buff_index == 6{
-            adventurer.stats.increase_charisma(cc_buff_config.charisma);
-            cc_cave.increase_charisma(cc_buff_config.charisma);
-        }
-        cc_cave.has_reward = 0;
-
-        // update players last action block number
-        let block_number = starknet::get_block_info().unbox().block_number;
-        adventurer.set_last_action_block(block_number);
-
-        let now_buff = Stats{
-            strength: cc_cave.strength_increase,
-            dexterity: cc_cave.dexterity_increase,
-            vitality: cc_cave.vitality_increase,
-            intelligence: cc_cave.intelligence_increase,
-            wisdom: cc_cave.wisdom_increase,
-            charisma: cc_cave.charisma_increase,
-            luck:0,
-        };
-        // emit adventurer upgraded event
-        __event_AdventurerUpgradedCC(ref self, adventurer, adventurer_id, bag, now_buff);
-
-        // remove stat boosts, pack, and save adventurer
-        _save_adventurer(ref self, ref adventurer, adventurer_id);
-
-        _pack_cc_cave(ref self, adventurer_id, cc_cave);
-    }
-    #[external(v0)]
     impl Game of IGame<ContractState> {
+
+        fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
+            _cc_dispatcher(ref self).enter_cc(adventurer_id,cc_token_id);
+            0
+        }
+
         /// @title New Game
         ///
         /// @notice Creates a new game of Loot Survivor
@@ -330,106 +238,6 @@ mod Game {
             // start the game
             _start_game(ref self, weapon, name, interface_camel);
         }
-
-        fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
-
-            _assert_ownership(@self, adventurer_id);
-
-            let adventurer = _load_adventurer(@self, adventurer_id);
-
-            // get adventurer entropy
-           let adventurer_entropy = _get_adventurer_entropy(@self, adventurer_id);
-
-            0
-            // let dungeon: DungeonSerde = CryptsAndCavernsTraitDispatcher {
-            //     contract_address: contract_address_const::<
-            //         0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
-            //     >()
-            // }
-            //     .generate_dungeon(cc_token_id);
-            //
-            // let map_owner:ContractAddress = CryptsAndCavernsTraitDispatcher {
-            //             contract_address: contract_address_const::<
-            //                 0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
-            //             >()
-            // }
-            // .owner_of(cc_token_id);
-            //
-            // let entity: EntityDataSerde = dungeon.entities;
-            //
-            // let limit = entity.entity_data.len();
-            //
-            // let mut count = 0;
-            // let mut i = 0;
-            // loop {
-            //     if i == limit {
-            //         break;
-            //     }
-            //
-            //     if *(entity.entity_data)[i] == 1 {
-            //         count += 1;
-            //     }
-            //
-            //     i += 1;
-            // };
-            //
-            // let map_id:u16 = cc_token_id.try_into().expect('pack map_id');
-            // let cc_point:u16 = count.try_into().expect('pack cc_point');
-            // if cc_point > 0 {
-            //     let pay_amount: u256 = cc_point.into() * 2 * 1000000000000000000;
-            //     _payoutCC( ref self,get_caller_address(), pay_amount, map_owner);
-            // }
-
-            // let mut cc_cave = ImplCcCave::new(map_id,cc_point);
-            // let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
-            // cc_cave.map_id = map_id;
-            // cc_cave.cc_points = cc_point;
-            // // cc_cave.beast_amount = ImplCcCave::get_beast_amount(cc_point);
-            // cc_cave.curr_beast = 0;
-            // cc_cave.has_reward = 0;
-            // //
-            // // adventurer immediately gets ambushed by a starter beast
-            // let beast_battle_details = _starter_beast_ambush(
-            //     ref adventurer, adventurer_id, starting_weapon, adventurer_entropy
-            // );
-            //
-            // __event_AmbushedByBeast(ref self, adventurer, adventurer_id, beast_battle_details);
-            // //
-            // let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
-            // cc_cave.set_beast_health(beast.starting_health);
-            // _pack_cc_cave(ref self, adventurer_id, cc_cave);
-            //
-            // __event_EnterCC(ref self,cc_cave);
-            // __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
-            // count
-        }
-
-        // @notice 模拟冒险者对野兽进行攻击。
-        // @param self 合约的状态。
-        // @param adventurer 发起攻击的冒险者。
-        // @param adventurer_id 冒险者的唯一ID。
-        // @param fight_to_the_death 指示是否战斗应持续到冒险者或野兽被击败的标志。
-        // fn _attack_cc(
-        //     ref self: ContractState,
-        //     ref adventurer: Adventurer,
-        //     adventurer_id: felt252,
-        //     fight_to_the_death: bool,
-        //     ref cc_cave: CcCave,
-        // ) {
-        //     //todd
-        // }
-
-        //@notice 发起冒险者的攻击行动
-        //@param self 对ContractState的引用，用于更新合约
-        //@param adventurer_id 冒险者的唯一标识符
-        //@param to_the_death 一个布尔值，如果为true，将会递归攻击直到野兽或冒险者死亡
-        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool) {
-            //todd
-
-        }
-
-
-
 
         /// @title Explore Function
         ///
@@ -491,12 +299,9 @@ mod Game {
             _save_adventurer(ref self, ref adventurer, adventurer_id);
         }
 
-
-
-
         /// @title Attack Function
         ///
-        /// @notice Allows an adventurer to attack a beast
+        /// @notice Allows an adventurer to attack a beast 
         ///
         /// @param adventurer_id A u256 representing the ID of the adventurer.
         /// @param to_the_death A boolean flag indicating if the attack should continue until either the adventurer or the beast is defeated.
@@ -707,7 +512,7 @@ mod Game {
                 }
             }
 
-            // save adventurer
+            // save adventurer 
             _save_adventurer(ref self, ref adventurer, adventurer_id);
 
             // if the bag was mutated, pack and save it
@@ -896,10 +701,6 @@ mod Game {
         fn get_adventurer(self: @ContractState, adventurer_id: felt252) -> Adventurer {
             _load_adventurer(self, adventurer_id)
         }
-        fn get_cave_cc(self: @ContractState, adventurer_id: felt252) -> CcCave {
-            let cc_cave = _unpack_cc_cave(self, adventurer_id);
-            cc_cave
-        }
         fn get_adventurer_no_boosts(self: @ContractState, adventurer_id: felt252) -> Adventurer {
             _load_adventurer_no_boosts(self, adventurer_id)
         }
@@ -1026,12 +827,6 @@ mod Game {
         }
         fn get_attacking_beast(self: @ContractState, adventurer_id: felt252) -> Beast {
             _get_attacking_beast(self, adventurer_id)
-        }
-        fn get_attacking_beast_cc(self: @ContractState, adventurer_id: felt252) -> Beast {
-            _get_attacking_beast_cc(self, adventurer_id)
-        }
-        fn get_beast_health_cc(self: @ContractState, adventurer_id: felt252) -> u16 {
-            _unpack_cc_cave(self, adventurer_id).beast_health
         }
         fn get_health(self: @ContractState, adventurer_id: felt252) -> u16 {
             _load_adventurer_no_boosts(self, adventurer_id).health
@@ -1279,7 +1074,6 @@ mod Game {
     // ------------ Internal Functions ---------- //
     // ------------------------------------------ //
 
-
     fn _assert_terminal_time_not_reached(self: @ContractState) {
         let current_timestamp = starknet::get_block_info().unbox().block_timestamp;
         let terminal_timestamp = self._terminal_timestamp.read();
@@ -1380,7 +1174,7 @@ mod Game {
 
     /// @title Stat Reveal Handler
     /// @notice Handle the revelation and setting of an adventurer's starting stats.
-    /// @dev This function generates starting stats for an adventurer using entropy, which is based on the block hash of the block
+    /// @dev This function generates starting stats for an adventurer using entropy, which is based on the block hash of the block 
     /// after the player committed to playing the game.
     /// @param self A reference to the ContractState object.
     /// @param adventurer A reference to the Adventurer object whose stats are to be revealed and set.
@@ -1463,6 +1257,10 @@ mod Game {
 
     fn _lords_dispatcher(ref self: ContractState) -> IERC20CamelDispatcher {
         IERC20CamelDispatcher { contract_address: self._lords.read() }
+    }
+
+    fn _cc_dispatcher(ref self: ContractState) -> ICCDispatcher {
+        ICCDispatcher { contract_address: self._cc.read() }
     }
 
     fn _calculate_payout(bp: u256, price: u128) -> u256 {
@@ -1558,18 +1356,6 @@ mod Game {
         }
     }
 
-    fn _payoutCC(
-        ref self: ContractState,
-        caller: ContractAddress,
-        amount:u256,
-        map_owner: ContractAddress
-    ) {
-        let lords = self._lords.read();
-
-        IERC20CamelDispatcher { contract_address: lords }
-            .transferFrom(caller, map_owner, amount);
-    }
-
     fn _process_payment_and_distribute_rewards(
         ref self: ContractState, client_address: ContractAddress
     ) {
@@ -1632,31 +1418,6 @@ mod Game {
         );
     }
 
-    fn __event_AdventurerUpgradedCC(
-        ref self: ContractState,
-        adventurer: Adventurer,
-        adventurer_id: felt252,
-        bag: Bag,
-        stat_upgrades: Stats
-    ) {
-        let adventurer_state = AdventurerState {
-            owner: get_caller_address(), adventurer_id, adventurer
-        };
-        let adventurer_state_with_bag = AdventurerStateWithBag { adventurer_state, bag };
-        self
-            .emit(
-                AdventurerUpgradedCC {
-                    adventurer_state_with_bag,
-                    strength_increase: stat_upgrades.strength,
-                    dexterity_increase: stat_upgrades.dexterity,
-                    vitality_increase: stat_upgrades.vitality,
-                    intelligence_increase: stat_upgrades.intelligence,
-                    wisdom_increase: stat_upgrades.wisdom,
-                    charisma_increase: stat_upgrades.charisma,
-                }
-            );
-    }
-
     fn _start_game(ref self: ContractState, weapon: u8, name: u128, interface_camel: bool) {
         // increment adventurer id (first adventurer is id 1)
         let adventurer_id = self._game_counter.read() + 1;
@@ -1673,7 +1434,7 @@ mod Game {
 
         // set the adventurer last action block to the current block + reveal delay + one idle penalty so that the player
         // isn't considered idle until 2xidle penalty periods after the reveal block. This doesn't compromise integrity
-        // of starting stats or opening market as that won't change with game entropy rotations.
+        // of starting stats or opening market as that won't change with game entropy rotations. 
         adventurer
             .set_last_action_block(
                 current_block
@@ -1699,7 +1460,7 @@ mod Game {
         // set caller as owner
         self._owner.write(adventurer_id, get_caller_address());
 
-        // emit events
+        // emit events 
         __event_StartGame(ref self, adventurer, adventurer_id, adventurer_meta);
         __event_AmbushedByBeast(ref self, adventurer, adventurer_id, beast_battle_details);
     }
@@ -1926,16 +1687,16 @@ mod Game {
         }
     }
 
-    // @notice Grants XP to items currently equipped by an adventurer, and processes any level ups.//
+    // @notice Grants XP to items currently equipped by an adventurer, and processes any level ups.// 
     // @dev This function does three main things:
     //   1. Iterates through each of the equipped items for the given adventurer.
     //   2. Increases the XP for the equipped item. If the item levels up, it processes the level up and updates the item.
-    //   3. If any items have leveled up, emits an `ItemsLeveledUp` event.//
+    //   3. If any items have leveled up, emits an `ItemsLeveledUp` event.// 
     // @param self The contract's state reference.
     // @param adventurer Reference to the adventurer's state.
     // @param adventurer_id Unique identifier for the adventurer.
     // @param xp_amount Amount of XP to grant to each equipped item.
-    // @param entropy Random data used for any deterministic randomness during processing.//
+    // @param entropy Random data used for any deterministic randomness during processing.// 
     // @return Array of items that leveled up.
     fn _grant_xp_to_equipped_items(
         ref self: ContractState,
@@ -2456,7 +2217,7 @@ mod Game {
             // buy it and store result in our purchases array for event
             purchases.append(_buy_item(ref adventurer, ref bag, item.item_id));
 
-            // if item is being equipped as part of the purchase
+            // if item is being equipped as part of the purchase 
             if item.equip {
                 // add it to our array of items to equip
                 items_to_equip.append(item.item_id);
@@ -2612,11 +2373,6 @@ mod Game {
         _apply_luck(self, ref adventurer, adventurer_id);
         adventurer
     }
-
-    fn _unpack_cc_cave(self: @ContractState, adventurer_id: felt252) -> CcCave {
-        let cc_cave = self._cc_cave.read(adventurer_id);
-        cc_cave
-    }
     fn _load_adventurer_no_boosts(self: @ContractState, adventurer_id: felt252) -> Adventurer {
         self._adventurer.read(adventurer_id)
     }
@@ -2627,11 +2383,6 @@ mod Game {
         _remove_starting_stats(@self, ref adventurer, adventurer_id);
         _remove_equipment_stat_boosts(@self, ref adventurer, adventurer_id);
         self._adventurer.write(adventurer_id, adventurer);
-    }
-
-    #[inline(always)]
-    fn _pack_cc_cave(ref self: ContractState, adventurer_id: felt252, cc_cave: CcCave) {
-        self._cc_cave.write(adventurer_id, cc_cave);
     }
 
     fn _save_adventurer_no_boosts(
@@ -2695,7 +2446,7 @@ mod Game {
         // if the adventurer's health is now above the max health due to a change in Vitality
         let max_health = AdventurerUtils::get_max_health(adventurer.stats.vitality);
         if adventurer.health > max_health {
-            // lower adventurer's health to max health
+            // lower adventurer's health to max health 
             adventurer.health = max_health;
         }
     }
@@ -3084,24 +2835,6 @@ mod Game {
         beast
     }
 
-    fn _get_attacking_beast_cc(self: @ContractState, adventurer_id: felt252) -> Beast {
-        // get adventurer
-        // let adventurer = _unpack_adventurer(self, adventurer_id);
-        let cc_cave = _unpack_cc_cave(self, adventurer_id);
-        // assert adventurer is in battle
-        // assert(adventurer.beast_health != 0, messages::NOT_IN_BATTLE);
-
-        // get adventurer entropy
-        let adventurer_entropy = _get_adventurer_entropy(self, adventurer_id);
-
-
-        // get beast and beast seed
-        let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
-
-        // return beast
-        beast
-    }
-
     #[inline(always)]
     fn _get_storage_index(self: @ContractState, meta_data_id: u8) -> u8 {
         if (meta_data_id <= 10) {
@@ -3408,66 +3141,7 @@ mod Game {
         gold_earned: u16,
     }
 
-    #[derive(Drop, starknet::Event)]
-    struct EnterCC{
-        cave:CcCave
-    }
-
-
-    #[derive(Drop, starknet::Event)]
-    struct DiscoveredBeastCC {
-        adventurer_state: AdventurerState,
-        seed: u128,
-        id: u8,
-        beast_specs: CombatSpec,
-        beast_heath:u16
-    }
-
-    #[derive(Drop, Serde, starknet::Event)]
-    struct BattleDetailsCC {
-        seed: u128,
-        id: u8,
-        beast_specs: CombatSpec,
-        damage: u16,
-        critical_hit: bool,
-        location: u8,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct AmbushedByBeastCC {
-        adventurer_state: AdventurerState,
-        beast_battle_details: BattleDetails,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct AttackedBeastCC {
-        adventurer_state: AdventurerState,
-        beast_battle_details: BattleDetails,
-        beast_health:u16
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct AttackedByBeastCC {
-        adventurer_state: AdventurerState,
-        beast_battle_details: BattleDetails,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct SlayedBeastCC {
-        adventurer_state: AdventurerState,
-        seed: u128,
-        id: u8,
-        beast_specs: CombatSpec,
-        damage_dealt: u16,
-        critical_hit: bool,
-        xp_earned_adventurer: u16,
-        xp_earned_items: u16,
-        gold_earned: u16,
-        curr_beast: u16,
-        has_reward:u16
-    }
-
-#[derive(Drop, Serde)]
+    #[derive(Drop, Serde)]
     struct FleeEvent {
         adventurer_state: AdventurerState,
         seed: u128,
@@ -3510,12 +3184,6 @@ mod Game {
     struct DroppedItems {
         adventurer_state_with_bag: AdventurerStateWithBag,
         item_ids: Array<u8>,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct RewardItemsCC {
-        adventurer_state_with_bag: AdventurerStateWithBag,
-        items: Array<LootWithPrice>,
     }
 
     #[derive(Drop, Serde)]
@@ -3593,17 +3261,6 @@ mod Game {
         charisma_increase: u8,
     }
 
-   #[derive(Drop, starknet::Event)]
-    struct AdventurerUpgradedCC {
-        adventurer_state_with_bag: AdventurerStateWithBag,
-        strength_increase: u8,
-        dexterity_increase: u8,
-        vitality_increase: u8,
-        intelligence_increase: u8,
-        wisdom_increase: u8,
-        charisma_increase: u8,
-    }
-
     #[derive(Drop, starknet::Event)]
     struct RewardDistribution {
         first_place: PlayerReward,
@@ -3647,29 +3304,6 @@ mod Game {
     struct ClientReward {
         amount: u256,
         address: ContractAddress,
-    }
-
-    fn __event_EnterCC(ref self: ContractState,cave:CcCave){
-        self.emit(
-            EnterCC {cave}
-        );
-    }
-
-    fn __event_DiscoveredBeastCC(
-        ref self: ContractState,
-        adventurer: Adventurer,
-        adventurer_id: felt252,
-        seed: u128,
-        beast: Beast
-    ) {
-        let adventurer_state = AdventurerState {
-            owner: get_caller_address(), adventurer_id, adventurer
-        };
-
-        let discovered_beast_event = DiscoveredBeastCC {
-            adventurer_state, seed, id: beast.id, beast_specs: beast.combat_spec,beast_heath:beast.starting_health
-        };
-        self.emit(discovered_beast_event);
     }
 
     fn __event_RewardDistribution(ref self: ContractState, event: RewardDistribution) {
@@ -4003,6 +3637,14 @@ mod Game {
         self.emit(PurchasedPotions { adventurer_state, quantity, cost, health, });
     }
 
+
+    #[starknet::interface]
+    trait ICC<TContractState> {
+        fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
+        fn enter_cc(ref self: TContractState, adventurer_id:felt252, cc_token_id :u256) -> u128;
+        fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool);
+    }
+
     #[starknet::interface]
     trait ILeetLoot<T> {
         fn mint(
@@ -4064,7 +3706,7 @@ mod Game {
     fn _assert_week_past(self: @ContractState, time: u64) {
         let difference: u64 = get_block_timestamp() - time;
 
-        // check if time diff is greater than a week
+        // check if time diff is greater than a week    
         let one_week: u64 = (SECONDS_IN_DAY.into() * 7).try_into().unwrap();
 
         // assert enough time passed
