@@ -229,7 +229,7 @@ export function syscalls({
     const Tx = {
       contractAddress: gameContract?.address ?? "",
       entrypoint: "enter_cc",
-      calldata: [adventureId.toString(), "0", tokenId.toString(), "0"]
+      calldata: [adventureId.toString(), tokenId.toString(), "0"]
     };
 
     addToCalls(Tx);

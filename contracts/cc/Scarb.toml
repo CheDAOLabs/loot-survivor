@@ -5,11 +5,19 @@ version = "0.1.0"
 # See more keys and their definitions at https://docs.swmansion.com/scarb/docs/reference/manifest
 
 [dependencies]
+starknet = "2.1.0"
 lootitems = { path = "../loot" }
-obstacles = { path = "../obstacles" }
-combat = { path = "../combat" }
+survivor = { path = "../adventurer" }
 market = { path = "../market" }
-beasts = { path = "../beasts" }
+obstacles = { path = "../obstacles" }
+game_entropy = { path = "../game_entropy" }
+game_snapshot = { path = "../game_snapshot" }
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.7.0" }
 
 # foo = { path = "vendor/foo" }
-# combat will have no dependecies? 
+# combat will have no dependecies?
+
+[[target.starknet-contract]]
+allowed-libfuncs-list.name = "experimental"
+allowed-libfuncs = true
+casm=true
