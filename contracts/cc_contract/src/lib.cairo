@@ -2,9 +2,11 @@ mod interfaces;
 mod resource;
 mod cc_cave;
 mod cc_buff;
+mod cc_interfaces;
 
 #[starknet::contract]
 mod cc {
+
 
     use core::{
         array::{SpanTrait, ArrayTrait}, integer::u256_try_as_non_zero, traits::{TryInto, Into},
@@ -20,6 +22,8 @@ mod cc {
         item_meta::{ItemSpecials, ItemSpecialsStorage}, leaderboard::Leaderboard,
         item_primitive::{ItemPrimitive}
     };
+
+    use beasts::beast::{Beast, IBeast, ImplBeast};
 
     use combat::{
         combat::{CombatSpec, SpecialPowers, ImplCombat},
@@ -38,6 +42,8 @@ mod cc {
 
     use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
     use cc::cc_buff::{CcBuff,get_buff_by_id};
+    use cc::cc_interfaces::ICC;
+
 
     #[storage]
     struct Storage {
@@ -56,7 +62,6 @@ mod cc {
         AdventurerUpgradedCC: AdventurerUpgradedCC,
         RewardItemsCC: RewardItemsCC,
     }
-
 
     #[derive(Copy, Drop, Serde, starknet::Event)]
     struct AdventurerState {
@@ -148,9 +153,61 @@ mod cc {
         charisma_increase: u8,
     }
 
-    fn get_cave_cc(self: @ContractState, adventurer_id: felt252) -> CcCave {
-        let cc_cave = _unpack_cc_cave(self, adventurer_id);
-        cc_cave
+    #[constructor]
+    fn constructor(
+        ref self: ContractState,
+    )
+    {
+
+    }
+
+    #[external(v0)]
+    impl CC of ICC<ContractState> {
+
+        fn get_cave_cc(self: @ContractState, adventurer_id: felt252) -> CcCave {
+            let cc_cave = _unpack_cc_cave(self, adventurer_id);
+            cc_cave
+        }
+
+        fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
+            //let cc_cave = _unpack_cc_cave(@self, adventurer_id);
+             //__event_EnterCC(ref self,cc_cave);
+            0
+        }
+
+        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool) {
+            //todd
+
+        }
+    }
+
+
+    // ------------------------------------------ //
+    // ------------ Internal Functions ---------- //
+    // ------------------------------------------ //
+
+
+    fn __event_EnterCC(ref self: ContractState,cave:CcCave){
+        self.emit(
+            EnterCC {cave}
+        );
+    }
+
+    fn __event_DiscoveredBeastCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: felt252,
+        seed: u128,
+        beast: Beast
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+
+        let discovered_beast_event = DiscoveredBeastCC {
+            adventurer_state, seed, id: beast.id, beast_specs: beast.combat_spec,beast_heath:beast.starting_health
+        };
+        self.emit(discovered_beast_event);
     }
 
     fn _unpack_cc_cave(self: @ContractState, adventurer_id: felt252) -> CcCave {
