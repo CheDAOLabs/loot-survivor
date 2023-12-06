@@ -18,5 +18,3 @@ arcade_account = { git = "https://github.com/ArichiMasaomi/arcade-account" }
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"
 allowed-libfuncs = true
-casm = true
-sierra = true

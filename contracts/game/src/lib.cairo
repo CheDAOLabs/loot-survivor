@@ -316,21 +316,21 @@ mod Game {
             golden_token_id: u256,
             interface_camel: bool
         ) {
-            // assert game terminal time has not been reached
-            _assert_terminal_time_not_reached(@self);
-
-            // assert provided weapon
-            _assert_valid_starter_weapon(weapon);
-
-            // process payment for game and distribute rewards
-            if (golden_token_id != 0) {
-                _play_with_token(ref self, golden_token_id, interface_camel);
-            } else {
-                _process_payment_and_distribute_rewards(ref self, client_reward_address);
-            }
-
-            // start the game
-            _start_game(ref self, weapon, name, interface_camel);
+            // // assert game terminal time has not been reached
+            // _assert_terminal_time_not_reached(@self);
+            //
+            // // assert provided weapon
+            // _assert_valid_starter_weapon(weapon);
+            //
+            // // process payment for game and distribute rewards
+            // if (golden_token_id != 0) {
+            //     _play_with_token(ref self, golden_token_id, interface_camel);
+            // } else {
+            //     _process_payment_and_distribute_rewards(ref self, client_reward_address);
+            // }
+            //
+            // // start the game
+            // _start_game(ref self, weapon, name, interface_camel);
         }
 
         fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
