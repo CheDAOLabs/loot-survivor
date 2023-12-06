@@ -202,8 +202,11 @@ mod Game {
     impl Game of IGame<ContractState> {
 
         fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
-            _cc_dispatcher(ref self).enter_cc(adventurer_id,cc_token_id);
-            0
+            _assert_ownership(@self, adventurer_id);
+            let adventurer = _load_adventurer(@self, adventurer_id);
+            // get adventurer entropy
+            let adventurer_entropy = _get_adventurer_entropy(@self, adventurer_id);
+            _cc_dispatcher(ref self).enter_cc(adventurer_id,cc_token_id,adventurer,adventurer_entropy)
         }
 
         /// @title New Game
@@ -3641,7 +3644,7 @@ mod Game {
     #[starknet::interface]
     trait ICC<TContractState> {
         fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
-        fn enter_cc(ref self: TContractState, adventurer_id:felt252, cc_token_id :u256) -> u128;
+        fn enter_cc(ref self: TContractState, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> u128;
         fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool);
     }
 
