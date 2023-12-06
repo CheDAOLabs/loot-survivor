@@ -1,18 +1,24 @@
 export STARKNET_KEYSTORE="~/StarkLiWallet/key.json"
 export STARKNET_ACCOUNT="~/StarkLiWallet/account.json"
 export STARKNET_NETWORK="goerli-1"
-export STARKNET_RPC="https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a"
+
+export STARKNET_RPC="https://goerli1-juno.rpc.nethermind.io/"
+
+//export STARKNET_RPC="https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a"
 
 
 
 
-scarb --release build  
+scarb0.7.0 --release build  
 starkli declare ./target/dev/game_Game.sierra.json  --rpc https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a
 
 
-export LORDS_ADDRESS=0x059dac5df32cbce17b081399e97d90be5fba726f97f00638f838613d088e5a47;
+
+export LORDS_ADDRESS=0x05e367ac160e5f90c5775089b582dfc987dd148a5a2f977c49def2a6644f724b;
 export DAO_ADDRESS=0x020b96923a9e60f63a1829d440a03cf680768cadbc8fe737f71380258817d85b;
 export ARG=0x000f4dbfe5d15792aa91025e42ee1d74c22bdeb1eef0b9bc19a37216377290c1;
-export CLASS_HASH=0x05745856d0b50c3a22b9a256e6c3ece8d0d2af3990224a2593f82b912a3ae508;
-starkli deploy $CLASS_HASH $LORDS_ADDRESS $DAO_ADDRESS $ARG  --rpc https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a
+export CLASS_HASH=0x03a29e6666eb0ac844d5bd9f358212bd3fee0ad778ce82985596a1235e1f6b94;
+../starkli0.1.15  deploy $CLASS_HASH $LORDS_ADDRESS $DAO_ADDRESS $ARG
+
+--rpc https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a
 
