@@ -17,14 +17,28 @@ mod cc {
         },
     };
 
-    use openzeppelin::token::erc20::interface::{
-        IERC20Camel, IERC20CamelDispatcher, IERC20CamelDispatcherTrait, IERC20CamelLibraryDispatcher
-    };
+    // use openzeppelin::token::erc20::interface::{
+    //     IERC20Camel, IERC20CamelDispatcher, IERC20CamelDispatcherTrait, IERC20CamelLibraryDispatcher
+    // };
 
     use survivor::{
-        bag::Bag, adventurer::{Adventurer, Stats}, adventurer_meta::AdventurerMetadata,
-        item_meta::{ItemSpecials, ItemSpecialsStorage}, leaderboard::Leaderboard,
-        item_primitive::{ItemPrimitive}
+        adventurer::{Adventurer, ImplAdventurer, IAdventurer}, stats::{Stats, StatUtils},
+        item_primitive::{ImplItemPrimitive, ItemPrimitive}, bag::{Bag, IBag, ImplBag},
+        adventurer_meta::{AdventurerMetadata, ImplAdventurerMetadata}, exploration::ExploreUtils,
+        constants::{
+            discovery_constants::DiscoveryEnums::{ExploreResult, DiscoveryType},
+            adventurer_constants::{
+                POTION_HEALTH_AMOUNT, ITEM_XP_MULTIPLIER_BEASTS, ITEM_XP_MULTIPLIER_OBSTACLES,
+                ITEM_MAX_GREATNESS, MAX_GREATNESS_STAT_BONUS, StatisticIndex,
+                VITALITY_INSTANT_HEALTH_BONUS, BEAST_SPECIAL_NAME_LEVEL_UNLOCK, XP_FOR_DISCOVERIES,
+                STARTING_GOLD, STARTING_HEALTH, POTION_PRICE, MINIMUM_POTION_PRICE,
+                CHARISMA_POTION_DISCOUNT, CHARISMA_ITEM_DISCOUNT, MINIMUM_ITEM_PRICE,
+                MINIMUM_DAMAGE_TO_BEASTS, MINIMUM_DAMAGE_FROM_OBSTACLES,
+                OBSTACLE_CRITICAL_HIT_CHANCE, MAX_STAT_UPGRADE_POINTS
+            }
+        },
+        item_meta::{ImplItemSpecials, ItemSpecials, IItemSpecials, ItemSpecialsStorage},
+        adventurer_utils::AdventurerUtils, leaderboard::{Score, Leaderboard},
     };
 
     use beasts::beast::{Beast, IBeast, ImplBeast};
@@ -307,16 +321,74 @@ mod cc {
         self._cc_cave.write(adventurer_id, cc_cave);
     }
 
-    fn _payoutCC(
-        ref self: ContractState,
-        caller: ContractAddress,
-        amount:u256,
-        map_owner: ContractAddress
-    ) {
+    // fn _payoutCC(
+    //     ref self: ContractState,
+    //     caller: ContractAddress,
+    //     amount:u256,
+    //     map_owner: ContractAddress
+    // ) {
+    //
+    //     let lords:ContractAddress = "0x05e367ac160e5f90c5775089b582dfc987dd148a5a2f977c49def2a6644f724b";
+    //     IERC20CamelDispatcher { contract_address: lords }
+    //         .transferFrom(caller, map_owner, amount);
+    // }
 
-        let lords:ContractAddress = "0x05e367ac160e5f90c5775089b582dfc987dd148a5a2f977c49def2a6644f724b";
-        IERC20CamelDispatcher { contract_address: lords }
-            .transferFrom(caller, map_owner, amount);
+    // @notice 模拟冒险者对野兽进行攻击。
+    // @param self 合约的状态。
+    // @param adventurer 发起攻击的冒险者。
+    // @param adventurer_id 冒险者的唯一ID。
+    // @param fight_to_the_death 指示是否战斗应持续到冒险者或野兽被击败的标志。
+    fn _attack_cc(
+        ref self: ContractState,
+        ref adventurer: Adventurer,
+        weapon_combat_spec: CombatSpec,
+        adventurer_id: felt252,
+        adventurer_entropy: felt252,
+        beast: Beast,
+        beast_seed: u128,
+        game_entropy: felt252,
+        fight_to_the_death: bool,
+        ref cc_cave:CcCave
+    ) {
+        let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
+
+        // get two random numbers using adventurer xp and health as part of entropy
+        let (rnd1, rnd2) = AdventurerUtils::get_randomness_with_health(
+            adventurer.xp, adventurer.health, adventurer_entropy, game_entropy
+        );
+
+        // attack beast and get combat result that provides damage breakdown
+        let combat_result = adventurer.attack(weapon_combat_spec, beast, rnd1);
+
+        // provide critical hit as a boolean for events
+        let is_critical_hit = combat_result.critical_hit_bonus > 0;
+
+        if (combat_result.total_damage >= cc_cave.beast_health) {
+            //todo
+            //            _process_beast_death_cc
+        }else{
+            cc_cave.beast_health -= combat_result.total_damage;
+
+            //todo
+
+            // if the adventurer is still alive and fighting to the death
+            if fight_to_the_death {
+                // attack again
+                _attack_cc(
+                    ref self,
+                    ref adventurer,
+                    weapon_combat_spec,
+                    adventurer_id,
+                    adventurer_entropy,
+                    beast,
+                    beast_seed,
+                    game_entropy,
+                    true,
+                    ref cc_cave
+                );
+            }
+
+        }
     }
 
 }

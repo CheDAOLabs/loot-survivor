@@ -12,7 +12,7 @@ market = { path = "../market" }
 obstacles = { path = "../obstacles" }
 game_entropy = { path = "../game_entropy" }
 game_snapshot = { path = "../game_snapshot" }
-openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.7.0" }
+#openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.7.0" }
 
 # foo = { path = "vendor/foo" }
 # combat will have no dependecies?
