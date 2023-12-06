@@ -8,7 +8,7 @@ use core::{
 use combat::{
     combat::{ImplCombat, CombatSpec, SpecialPowers}, constants::CombatEnums::{Type, Tier, Slot},
 };
-use beasts::{beast::{ImplBeast, Beast}, constants::BeastSetti};
+use beasts::{beast::{ImplBeast, Beast}, constants::BeastSettings};
 
 const U128_MAX: u128 = 340282366920938463463374607431768211455;
 const TWO_POW_9: u256 = 0x200; // 2^9
