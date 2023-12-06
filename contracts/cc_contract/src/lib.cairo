@@ -169,6 +169,16 @@ mod cc {
             cc_cave
         }
 
+        fn get_attacking_beast_cc(self: @ContractState, adventurer_id: felt252, adventurer_entropy:felt252) -> Beast{
+            let cc_cave = _unpack_cc_cave(self, adventurer_id);
+            let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
+            beast
+        }
+
+        fn get_beast_health_cc(self: @ContractState, adventurer_id: felt252) -> u16 {
+            _unpack_cc_cave(self, adventurer_id).beast_health
+        }
+
         fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
             //let cc_cave = _unpack_cc_cave(@self, adventurer_id);
              //__event_EnterCC(ref self,cc_cave);

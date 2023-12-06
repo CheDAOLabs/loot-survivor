@@ -101,14 +101,6 @@ mod Game {
     use game_entropy::game_entropy::{GameEntropy, ImplGameEntropy};
     use game_snapshot::{GamesPlayedSnapshot, GamesPlayedSnapshotImpl};
 
-    use cc::resource::{
-        CryptsAndCavernsTraitDispatcher, CryptsAndCavernsTraitDispatcherTrait, DungeonSerde,
-        DungeonDojo, Name, EntityDataSerde, Pack
-    };
-
-    use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
-    use cc::cc_buff::{CcBuff,get_buff_by_id};
-
     #[storage]
     struct Storage {
         _adventurer: LegacyMap::<felt252, Adventurer>,
@@ -129,7 +121,6 @@ mod Game {
         _cost_to_play: u128,
         _games_played_snapshot: GamesPlayedSnapshot,
         _terminal_timestamp: u64,
-        _cc_cave: LegacyMap::<felt252, CcCave>,
     }
 
     #[event]
@@ -161,15 +152,6 @@ mod Game {
         RewardDistribution: RewardDistribution,
         GameEntropyRotatedEvent: GameEntropyRotatedEvent,
         PriceChangeEvent: PriceChangeEvent,
-        // CC
-        EnterCC:EnterCC,
-        AmbushedByBeastCC: AmbushedByBeastCC,
-        DiscoveredBeastCC: DiscoveredBeastCC,
-        AttackedBeastCC: AttackedBeastCC,
-        AttackedByBeastCC: AttackedByBeastCC,
-        SlayedBeastCC: SlayedBeastCC,
-        AdventurerUpgradedCC: AdventurerUpgradedCC,
-        RewardItemsCC: RewardItemsCC,
     }
 
     #[constructor]
@@ -305,29 +287,6 @@ mod Game {
 
             _save_adventurer(ref self, ref adventurer, adventurer_id);
         }
-
-
-        fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
-
-            _assert_ownership(@self, adventurer_id);
-
-            let adventurer = _load_adventurer(@self, adventurer_id);
-
-            // get adventurer entropy
-            let adventurer_entropy = _get_adventurer_entropy(@self, adventurer_id);
-
-
-
-
-
-            0
-        }
-
-        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool) {
-            //todd
-
-        }
-
 
         /// @title Attack Function
         ///
@@ -730,10 +689,6 @@ mod Game {
         // ------------------------------------------ //
         fn get_adventurer(self: @ContractState, adventurer_id: felt252) -> Adventurer {
             _load_adventurer(self, adventurer_id)
-        }
-        fn get_cave_cc(self: @ContractState, adventurer_id: felt252) -> CcCave {
-            let cc_cave = _unpack_cc_cave(self, adventurer_id);
-            cc_cave
         }
         fn get_adventurer_no_boosts(self: @ContractState, adventurer_id: felt252) -> Adventurer {
             _load_adventurer_no_boosts(self, adventurer_id)
@@ -3171,7 +3126,6 @@ mod Game {
         gold_earned: u16,
     }
 
-
     #[derive(Drop, Serde)]
     struct FleeEvent {
         adventurer_state: AdventurerState,
@@ -3754,7 +3708,6 @@ mod Game {
         self._games_played_snapshot.write(game_snapshot);
     }
 
-
     fn _update_cost_to_play(ref self: ContractState) {
         // get the current games played snapshot
         let snapshot = self._games_played_snapshot.read();
@@ -3806,10 +3759,5 @@ mod Game {
                     }
                 );
         }
-    }
-
-    fn _unpack_cc_cave(self: @ContractState, adventurer_id: felt252) -> CcCave {
-        let cc_cave = self._cc_cave.read(adventurer_id);
-        cc_cave
     }
 }

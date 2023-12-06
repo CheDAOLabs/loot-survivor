@@ -17,6 +17,8 @@ use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
 #[starknet::interface]
 trait ICC<TContractState> {
     fn get_cave_cc(self: @TContractState, adventurer_id: felt252) -> CcCave;
+    fn get_attacking_beast_cc(self: @TContractState, adventurer_id: felt252, adventurer_entropy:felt252) -> Beast;
+    fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
     fn enter_cc(ref self: TContractState, adventurer_id:felt252, cc_token_id :u256) -> u128;
     fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool);
 }
