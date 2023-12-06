@@ -17,6 +17,10 @@ mod cc {
         },
     };
 
+    use openzeppelin::token::erc20::interface::{
+        IERC20Camel, IERC20CamelDispatcher, IERC20CamelDispatcherTrait, IERC20CamelLibraryDispatcher
+    };
+
     use survivor::{
         bag::Bag, adventurer::{Adventurer, Stats}, adventurer_meta::AdventurerMetadata,
         item_meta::{ItemSpecials, ItemSpecialsStorage}, leaderboard::Leaderboard,
@@ -180,8 +184,8 @@ mod cc {
         }
 
         fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
-            //let cc_cave = _unpack_cc_cave(@self, adventurer_id);
-             //__event_EnterCC(ref self,cc_cave);
+            let cc_cave = _unpack_cc_cave(@self, adventurer_id);
+             __event_EnterCC(ref self,cc_cave);
             0
         }
 
@@ -220,8 +224,46 @@ mod cc {
         self.emit(discovered_beast_event);
     }
 
+    fn __event_AdventurerUpgradedCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: felt252,
+        bag: Bag,
+        stat_upgrades: Stats
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        let adventurer_state_with_bag = AdventurerStateWithBag { adventurer_state, bag };
+        self
+            .emit(
+                AdventurerUpgradedCC {
+                    adventurer_state_with_bag,
+                    strength_increase: stat_upgrades.strength,
+                    dexterity_increase: stat_upgrades.dexterity,
+                    vitality_increase: stat_upgrades.vitality,
+                    intelligence_increase: stat_upgrades.intelligence,
+                    wisdom_increase: stat_upgrades.wisdom,
+                    charisma_increase: stat_upgrades.charisma,
+                }
+            );
+    }
+
     fn _unpack_cc_cave(self: @ContractState, adventurer_id: felt252) -> CcCave {
         let cc_cave = self._cc_cave.read(adventurer_id);
         cc_cave
     }
+
+    fn _payoutCC(
+        ref self: ContractState,
+        lords:ContractAddress,
+        caller: ContractAddress,
+        amount:u256,
+        map_owner: ContractAddress
+    ) {
+
+        IERC20CamelDispatcher { contract_address: lords }
+            .transferFrom(caller, map_owner, amount);
+    }
+
 }
