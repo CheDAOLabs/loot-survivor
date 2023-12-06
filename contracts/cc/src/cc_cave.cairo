@@ -5,22 +5,10 @@ use core::{
     starknet::{StorePacking}, traits::{TryInto, Into}
 };
 
-// use super::{
-//     item_meta::{ItemSpecials, ItemSpecialsStorage, ImplItemSpecials}, adventurer_stats::Stats,
-//     item_primitive::ItemPrimitive, adventurer_utils::{AdventurerUtils}, exploration::ExploreUtils,
-//     bag::{Bag, IBag, ImplBag},
-//
-// };
-
-use lootitems::{
-    loot::{Loot, ILoot, ImplLoot},
-    constants::{ItemSuffix, ItemId, NamePrefixLength, NameSuffixLength},
-};
 use combat::{
     combat::{ImplCombat, CombatSpec, SpecialPowers}, constants::CombatEnums::{Type, Tier, Slot},
 };
-use obstacles::obstacle::{ImplObstacle, Obstacle};
-use beasts::{beast::{ImplBeast, Beast}, constants::BeastSettings};
+use beasts::{beast::{ImplBeast, Beast}, constants::BeastSetti};
 
 const U128_MAX: u128 = 340282366920938463463374607431768211455;
 const TWO_POW_9: u256 = 0x200; // 2^9

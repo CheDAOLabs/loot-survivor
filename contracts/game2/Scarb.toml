@@ -18,3 +18,4 @@ cc = { path = "../cc" }
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"
 allowed-libfuncs = true
+casm=true
