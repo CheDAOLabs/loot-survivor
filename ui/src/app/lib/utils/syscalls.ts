@@ -808,6 +808,7 @@ export function syscalls({
       interfaceCamel = providerInterfaceCamel(connector!.id);
     }
 
+    console.log("spawn",formData,goldenTokenId);
     const approveLordsSpendingTx = {
       contractAddress: lordsContract?.address ?? "",
       entrypoint: "approve",
