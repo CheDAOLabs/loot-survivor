@@ -340,45 +340,45 @@ mod Game {
             // get adventurer entropy
            let adventurer_entropy = _get_adventurer_entropy(@self, adventurer_id);
 
-
-            let dungeon: DungeonSerde = CryptsAndCavernsTraitDispatcher {
-                contract_address: contract_address_const::<
-                    0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
-                >()
-            }
-                .generate_dungeon(cc_token_id);
-
-            let map_owner:ContractAddress = CryptsAndCavernsTraitDispatcher {
-                        contract_address: contract_address_const::<
-                            0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
-                        >()
-            }
-            .owner_of(cc_token_id);
-
-            let entity: EntityDataSerde = dungeon.entities;
-
-            let limit = entity.entity_data.len();
-
-            let mut count = 0;
-            let mut i = 0;
-            loop {
-                if i == limit {
-                    break;
-                }
-
-                if *(entity.entity_data)[i] == 1 {
-                    count += 1;
-                }
-
-                i += 1;
-            };
-
-            let map_id:u16 = cc_token_id.try_into().expect('pack map_id');
-            let cc_point:u16 = count.try_into().expect('pack cc_point');
-            if cc_point > 0 {
-                let pay_amount: u256 = cc_point.into() * 2 * 1000000000000000000;
-                _payoutCC( ref self,get_caller_address(), pay_amount, map_owner);
-            }
+            0
+            // let dungeon: DungeonSerde = CryptsAndCavernsTraitDispatcher {
+            //     contract_address: contract_address_const::<
+            //         0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
+            //     >()
+            // }
+            //     .generate_dungeon(cc_token_id);
+            //
+            // let map_owner:ContractAddress = CryptsAndCavernsTraitDispatcher {
+            //             contract_address: contract_address_const::<
+            //                 0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
+            //             >()
+            // }
+            // .owner_of(cc_token_id);
+            //
+            // let entity: EntityDataSerde = dungeon.entities;
+            //
+            // let limit = entity.entity_data.len();
+            //
+            // let mut count = 0;
+            // let mut i = 0;
+            // loop {
+            //     if i == limit {
+            //         break;
+            //     }
+            //
+            //     if *(entity.entity_data)[i] == 1 {
+            //         count += 1;
+            //     }
+            //
+            //     i += 1;
+            // };
+            //
+            // let map_id:u16 = cc_token_id.try_into().expect('pack map_id');
+            // let cc_point:u16 = count.try_into().expect('pack cc_point');
+            // if cc_point > 0 {
+            //     let pay_amount: u256 = cc_point.into() * 2 * 1000000000000000000;
+            //     _payoutCC( ref self,get_caller_address(), pay_amount, map_owner);
+            // }
 
             // let mut cc_cave = ImplCcCave::new(map_id,cc_point);
             // let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
@@ -401,7 +401,7 @@ mod Game {
             //
             // __event_EnterCC(ref self,cc_cave);
             // __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
-            count
+            // count
         }
 
         // @notice 模拟冒险者对野兽进行攻击。

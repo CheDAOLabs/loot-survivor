@@ -129,6 +129,7 @@ mod Game {
         _cost_to_play: u128,
         _games_played_snapshot: GamesPlayedSnapshot,
         _terminal_timestamp: u64,
+        _cc_cave: LegacyMap::<felt252, CcCave>,
     }
 
     #[event]
@@ -160,6 +161,15 @@ mod Game {
         RewardDistribution: RewardDistribution,
         GameEntropyRotatedEvent: GameEntropyRotatedEvent,
         PriceChangeEvent: PriceChangeEvent,
+        // CC
+        EnterCC:EnterCC,
+        AmbushedByBeastCC: AmbushedByBeastCC,
+        DiscoveredBeastCC: DiscoveredBeastCC,
+        AttackedBeastCC: AttackedBeastCC,
+        AttackedByBeastCC: AttackedByBeastCC,
+        SlayedBeastCC: SlayedBeastCC,
+        AdventurerUpgradedCC: AdventurerUpgradedCC,
+        RewardItemsCC: RewardItemsCC,
     }
 
     #[constructor]
@@ -298,8 +308,26 @@ mod Game {
 
 
         fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256) -> u128 {
-        0
+
+            _assert_ownership(@self, adventurer_id);
+
+            let adventurer = _load_adventurer(@self, adventurer_id);
+
+            // get adventurer entropy
+            let adventurer_entropy = _get_adventurer_entropy(@self, adventurer_id);
+
+
+
+
+
+            0
         }
+
+        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool) {
+            //todd
+
+        }
+
 
         /// @title Attack Function
         ///
@@ -702,6 +730,10 @@ mod Game {
         // ------------------------------------------ //
         fn get_adventurer(self: @ContractState, adventurer_id: felt252) -> Adventurer {
             _load_adventurer(self, adventurer_id)
+        }
+        fn get_cave_cc(self: @ContractState, adventurer_id: felt252) -> CcCave {
+            let cc_cave = _unpack_cc_cave(self, adventurer_id);
+            cc_cave
         }
         fn get_adventurer_no_boosts(self: @ContractState, adventurer_id: felt252) -> Adventurer {
             _load_adventurer_no_boosts(self, adventurer_id)
@@ -3139,6 +3171,82 @@ mod Game {
         gold_earned: u16,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct EnterCC{
+        cave:CcCave
+    }
+
+
+    #[derive(Drop, starknet::Event)]
+    struct DiscoveredBeastCC {
+        adventurer_state: AdventurerState,
+        seed: u128,
+        id: u8,
+        beast_specs: CombatSpec,
+        beast_heath:u16
+    }
+
+    #[derive(Drop, Serde, starknet::Event)]
+    struct BattleDetailsCC {
+        seed: u128,
+        id: u8,
+        beast_specs: CombatSpec,
+        damage: u16,
+        critical_hit: bool,
+        location: u8,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct AmbushedByBeastCC {
+        adventurer_state: AdventurerState,
+        beast_battle_details: BattleDetails,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct AttackedBeastCC {
+        adventurer_state: AdventurerState,
+        beast_battle_details: BattleDetails,
+        beast_health:u16
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct AttackedByBeastCC {
+        adventurer_state: AdventurerState,
+        beast_battle_details: BattleDetails,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct SlayedBeastCC {
+        adventurer_state: AdventurerState,
+        seed: u128,
+        id: u8,
+        beast_specs: CombatSpec,
+        damage_dealt: u16,
+        critical_hit: bool,
+        xp_earned_adventurer: u16,
+        xp_earned_items: u16,
+        gold_earned: u16,
+        curr_beast: u16,
+        has_reward:u16
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct RewardItemsCC {
+        adventurer_state_with_bag: AdventurerStateWithBag,
+        items: Array<LootWithPrice>,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct AdventurerUpgradedCC {
+        adventurer_state_with_bag: AdventurerStateWithBag,
+        strength_increase: u8,
+        dexterity_increase: u8,
+        vitality_increase: u8,
+        intelligence_increase: u8,
+        wisdom_increase: u8,
+        charisma_increase: u8,
+    }
+
     #[derive(Drop, Serde)]
     struct FleeEvent {
         adventurer_state: AdventurerState,
@@ -3775,5 +3883,8 @@ mod Game {
         }
     }
 
-
+    fn _unpack_cc_cave(self: @ContractState, adventurer_id: felt252) -> CcCave {
+        let cc_cave = self._cc_cave.read(adventurer_id);
+        cc_cave
+    }
 }
