@@ -273,6 +273,14 @@ mod cc {
             let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
             let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
 
+            adventurer.stats.strength = adventurer.stats.strength + cc_cave.strength_increase;
+            adventurer.stats.strength = adventurer.stats.dexterity + cc_cave.dexterity_increase;
+            adventurer.stats.strength = adventurer.stats.vitality + cc_cave.vitality_increase;
+            adventurer.stats.strength = adventurer.stats.intelligence + cc_cave.intelligence_increase;
+            adventurer.stats.strength = adventurer.stats.wisdom + cc_cave.wisdom_increase;
+            adventurer.stats.strength = adventurer.stats.charisma + cc_cave.charisma_increase;
+
+
             //todo
             let weapon_specials = ItemSpecials { special1: 0, special2: 0, special3: 0 };//_get_item_specials(@self, adventurer_id, adventurer.weapon);
 
@@ -680,17 +688,17 @@ mod cc {
         cc_cave.beast_health = 0;
 
 
-        let gold_earned = beast.get_gold_reward(beast_seed);
-        let ring_bonus = adventurer.ring.jewelry_gold_bonus(gold_earned);
-        adventurer.increase_gold(gold_earned + ring_bonus);
+        // let gold_earned = beast.get_gold_reward(beast_seed);
+        // let ring_bonus = adventurer.ring.jewelry_gold_bonus(gold_earned);
+        // adventurer.increase_gold(gold_earned + ring_bonus);
 
 
         // get xp reward and increase adventurers xp
-        let xp_earned_adventurer = beast.get_xp_reward();
-        let (previous_level, new_level) = adventurer.increase_adventurer_xp(xp_earned_adventurer);
+        // let xp_earned_adventurer = beast.get_xp_reward();
+        // let (previous_level, new_level) = adventurer.increase_adventurer_xp(xp_earned_adventurer);
 
         // items use adventurer xp with an item multplier so they level faster than Adventurer
-        let xp_earned_items = xp_earned_adventurer * ITEM_XP_MULTIPLIER_BEASTS;
+        // let xp_earned_items = xp_earned_adventurer * ITEM_XP_MULTIPLIER_BEASTS;
         // assigning xp to items is more complex so we delegate to an internal function
         //todo
         // let items_leveled_up = _grant_xp_to_equipped_items(
@@ -714,9 +722,9 @@ mod cc {
             beast,
             damage_dealt,
             critical_hit,
-            xp_earned_adventurer,
-            xp_earned_items,
-            gold_earned,
+            0,
+            0,
+            0,
             cc_cave.curr_beast,
             cc_cave.has_reward,
         );
