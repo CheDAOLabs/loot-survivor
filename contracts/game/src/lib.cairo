@@ -206,7 +206,13 @@ mod Game {
             let adventurer = _load_adventurer(@self, adventurer_id);
             // get adventurer entropy
             let adventurer_entropy = _get_adventurer_entropy(@self, adventurer_id);
-            _cc_dispatcher(ref self).enter_cc(adventurer_id,cc_token_id,adventurer,adventurer_entropy)
+            let enter_result = _cc_dispatcher(ref self).enter_cc(adventurer_id,cc_token_id,adventurer,adventurer_entropy);
+            if enter_result.cc_point > 0 {
+                let caller = get_caller_address();
+                let amount = enter_result.cc_point.into() * 2 * 1000000000000000000;
+                _lords_dispatcher(ref self).transferFrom(caller, enter_result.map_owner, amount);
+            }
+            enter_result.cc_point
         }
 
         fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool) {
@@ -216,7 +222,9 @@ mod Game {
                 @self, adventurer_id
             );
 
-            _cc_dispatcher(ref self).attack_cc(adventurer_id,to_the_death,adventurer,adventurer_entropy,bag);
+           let result:AttackResultCC=  _cc_dispatcher(ref self).attack_cc(adventurer_id,to_the_death,adventurer,adventurer_entropy,bag);
+            adventurer.health = result.adventurer_health;
+            _save_adventurer(ref self, ref adventurer, adventurer_id);
         }
 
         fn buff_adventurer_cc(ref self: ContractState, adventurer_id: felt252, buff_index:u8){
@@ -3664,12 +3672,23 @@ mod Game {
         self.emit(PurchasedPotions { adventurer_state, quantity, cost, health, });
     }
 
+    #[derive(Drop, Copy, Serde)]
+    struct EnterResultCC {
+        cc_point: u128,
+        map_owner:ContractAddress
+    }
+
+    #[derive(Drop, Copy, Serde)]
+    struct AttackResultCC {
+        adventurer_health: u16, // 9 bits
+        bag:Bag
+    }
 
     #[starknet::interface]
     trait ICC<TContractState> {
         fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
-        fn enter_cc(ref self: TContractState, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> u128;
-        fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252, bag:Bag);
+        fn enter_cc(ref self: TContractState, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> EnterResultCC;
+        fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252, bag:Bag) -> AttackResultCC;
         fn buff_adventurer_cc(ref self: TContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252);
     }
 

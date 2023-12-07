@@ -1193,8 +1193,9 @@ export function processData(
       return [slayedBeastAdventurerDataCC, slayedBeastDataCC, slayedBeastItemsXPCC];
     case "AdventurerUpgradedCC":
       const adventurerUpgradedEventCC = event as AdventurerUpgradedEventCC;
+      console.log("adventurerUpgradedEventCC.adventurerState,",adventurerUpgradedEventCC.adventurerState);
       const upgreadeCCAdventurerData=  processAdventurerState(
-          adventurerUpgradedEventCC.adventurerState,
+          adventurerUpgradedEventCC,
           currentAdventurer
       );
       return [upgreadeCCAdventurerData,

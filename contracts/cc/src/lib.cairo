@@ -67,7 +67,7 @@ mod cc {
 
     use cc::cc_cave::{CcCave, ImplCcCave, ICcCave};
     use cc::cc_buff::{CcBuff,get_buff_by_id};
-    use cc::cc_interfaces::ICC;
+    use cc::cc_interfaces::{ICC,EnterResultCC,AttackResultCC};
 
 
     #[storage]
@@ -204,7 +204,7 @@ mod cc {
             _unpack_cc_cave(self, adventurer_id).beast_health
         }
 
-        fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256,adventurer: Adventurer,adventurer_entropy:felt252) -> u128 {
+        fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256,adventurer: Adventurer,adventurer_entropy:felt252) -> EnterResultCC {
             let dungeon: DungeonSerde = CryptsAndCavernsTraitDispatcher {
                 contract_address: contract_address_const::<
                     0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
@@ -257,10 +257,11 @@ mod cc {
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
             __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
             __event_EnterCC(ref self,cc_cave);
-            count
+
+            EnterResultCC{cc_point:count,map_owner:map_owner}
         }
 
-        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252,bag:Bag) {
+        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252,bag:Bag) -> AttackResultCC {
 
             let mut adventurer = adv.clone();
             let mut bag_mutable = bag.clone();
@@ -306,9 +307,12 @@ mod cc {
 
             // 保存CC
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
+
+            AttackResultCC{ adventurer_health : adventurer.health,bag:bag_mutable}
+
         }
 
-        fn buff_adventurer_cc(ref self: ContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252) {
+        fn buff_adventurer_cc(ref self: ContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252) -> Stats {
 
             let mut adventurer = adv.clone();
 
@@ -361,6 +365,7 @@ mod cc {
 
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
 
+            now_buff
         }
 
 }
