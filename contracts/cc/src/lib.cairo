@@ -21,6 +21,13 @@ mod cc {
     //     IERC20Camel, IERC20CamelDispatcher, IERC20CamelDispatcherTrait, IERC20CamelLibraryDispatcher
     // };
 
+    use game_entropy::game_entropy::{GameEntropy, ImplGameEntropy, GameEntropyPacking};
+
+    use lootitems::{
+        loot::{ILoot, Loot, ImplLoot},
+        constants::{ItemId, NamePrefixLength, NameSuffixLength, SUFFIX_UNLOCK_GREANTESS}
+    };
+
     use survivor::{
         adventurer::{Adventurer, ImplAdventurer, IAdventurer}, stats::{Stats, StatUtils},
         item_primitive::{ImplItemPrimitive, ItemPrimitive}, bag::{Bag, IBag, ImplBag},
@@ -241,6 +248,7 @@ mod cc {
             let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
             cc_cave.map_id = map_id;
             cc_cave.cc_points = cc_point;
+            cc_cave.beast_amount = ImplCcCave::get_beast_amount(cc_point);
             cc_cave.curr_beast = 0;
             cc_cave.has_reward = 0;
 
@@ -252,8 +260,46 @@ mod cc {
             count
         }
 
-        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool) {
-            //todd
+        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252) {
+
+            let mut adventurer = adv.clone();
+
+            //todo
+            let game_entropy: GameEntropy = ImplGameEntropy::new(0,0,0);
+
+
+            let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
+            let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+
+            //todo
+            let weapon_specials = ItemSpecials { special1: 0, special2: 0, special3: 0 };//_get_item_specials(@self, adventurer_id, adventurer.weapon);
+
+
+            // get weapon details
+            let weapon = ImplLoot::get_item(adventurer.weapon.id);
+            let weapon_combat_spec = CombatSpec {
+                tier: weapon.tier,
+                item_type: weapon.item_type,
+                level: adventurer.weapon.get_greatness().into(),
+                specials: SpecialPowers {
+                    special1: weapon_specials.special1,
+                    special2: weapon_specials.special2,
+                    special3: weapon_specials.special3
+                }
+            };
+
+            _attack_cc(
+                ref self,
+                ref adventurer,
+                weapon_combat_spec,
+                adventurer_id,
+                adventurer_entropy,
+                beast,
+                beast_seed,
+                game_entropy.hash,
+                to_the_death,
+                ref cc_cave
+            );
 
         }
     }

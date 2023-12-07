@@ -171,6 +171,7 @@ export default function BeastScreen({attack, exit, buffAdventurer,  beastsContra
     }
 
     useEffect(() => {
+        console.log("ccCaveData",ccCaveData)
         setHasBeast(ccCaveData.curr_beast < ccCaveData.beast_amount);
         setIsClearance(ccCaveData.curr_beast == ccCaveData.beast_amount);
         // setIsClearance(true);
