@@ -965,5 +965,270 @@ export function processData(
         timestamp: new Date(),
       };
       return [penaltyAdventurerData, penaltyBattleData, penaltyDiscoveryData];
+    //CC
+    case "EnterCC":
+      const enterCCEvent = event as EnterCCEvent;
+      // curr_beast:u16,
+      //     cc_points:u16,
+      //   beast_health:u16, // 9 bits
+      //   beast_amount:u16,
+      //   beast_id: u16, // 9 bits
+      const enterCCData = {
+        txHash: txHash,
+        map_id: enterCCEvent.map_id,
+        curr_beast: enterCCEvent.curr_beast,
+        cc_points: enterCCEvent.cc_points,
+        beast_health: enterCCEvent.beast_health,
+        beast_amount: enterCCEvent.beast_amount,
+        has_reward:enterCCEvent.has_reward,
+        strength_increase: enterCCEvent.strength_increase,
+        dexterity_increase: enterCCEvent.dexterity_increase,
+        vitality_increase: enterCCEvent.vitality_increase,
+        intelligence_increase: enterCCEvent.intelligence_increase,
+        wisdom_increase: enterCCEvent.wisdom_increase,
+        charisma_increase: enterCCEvent.charisma_increase,
+      }
+      return [
+        enterCCData
+      ];
+    case "DiscoveredBeastCC":
+      console.log("processData DiscoveredBeastCC");
+      const discoveredBeastEventCC = event as DiscoveredBeastEventCC;
+      const discoveredBeastAdventurerDataCC = processAdventurerState(
+          discoveredBeastEventCC,
+          currentAdventurer
+      );
+      const discoveredBeastDataCC = {
+        txHash: txHash,
+        adventurerId: discoveredBeastEventCC.adventurerState["adventurerId"],
+        adventurerHealth:
+            discoveredBeastEventCC.adventurerState["adventurer"]["health"],
+        discoveryType: gameData.DISCOVERY_TYPES[1],
+        subDiscoveryType: null,
+        outputAmount: 0,
+        obstacle: null,
+        obstacleLevel: null,
+        dodgedObstacle: 0,
+        damageTaken: 0,
+        damageLocation: null,
+        xpEarnedAdventurer: null,
+        xpEarnedItems: null,
+        entity: gameData.BEASTS[discoveredBeastEventCC.id],
+        entityLevel: discoveredBeastEventCC.beastSpecs["level"],
+        entityHealth:
+            discoveredBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        special1:
+            gameData.ITEM_SUFFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special1"]
+                ],
+        special2:
+            gameData.ITEM_NAME_PREFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special2"]
+                ],
+        special3:
+            gameData.ITEM_NAME_SUFFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special3"]
+                ],
+        ambushed: false,
+        seed: discoveredBeastEventCC.seed,
+        discoveryTime: new Date(),
+        timestamp: new Date(),
+      };
+      const discoveredBeastBeastDataCC = {
+        beast: gameData.BEASTS[discoveredBeastEventCC.id],
+        health:discoveredBeastEventCC.beastHealth,
+        level: discoveredBeastEventCC.beastSpecs["level"],
+        special1:
+            gameData.ITEM_SUFFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special1"]
+                ],
+        special2:
+            gameData.ITEM_NAME_PREFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special2"]
+                ],
+        special3:
+            gameData.ITEM_NAME_SUFFIXES[
+                discoveredBeastEventCC.beastSpecs["specials"]["special3"]
+                ],
+        seed: discoveredBeastEventCC.seed,
+        adventurerId: discoveredBeastEventCC.adventurerState["adventurerId"],
+        slainOnTime: null,
+        createdTime: new Date(),
+        lastUpdatedTime: new Date(),
+        timestamp: new Date(),
+      };
+      return [
+        discoveredBeastAdventurerDataCC,
+        discoveredBeastDataCC,
+        discoveredBeastBeastDataCC,
+      ];
+    case "AttackedBeastCC":
+      const attackedBeastEventCC = event as AttackedBeastEventCC;
+      const attackedBeastAdventurerDataCC = processAdventurerState(
+          attackedBeastEventCC,
+          currentAdventurer
+      );
+      const attackedBeastDataCC = {
+        txHash: txHash,
+        beast: gameData.BEASTS[attackedBeastEventCC.id],
+        beastHealth:attackedBeastEventCC.beastHealth,
+        //attackedBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        beastLevel: attackedBeastEventCC.beastSpecs["level"],
+        special1:
+            gameData.ITEM_NAME_PREFIXES[
+                attackedBeastEventCC.beastSpecs["specials"]["special1"]
+                ],
+        special2:
+            gameData.ITEM_NAME_SUFFIXES[
+                attackedBeastEventCC.beastSpecs["specials"]["special2"]
+                ],
+        special3:
+            gameData.ITEM_SUFFIXES[
+                attackedBeastEventCC.beastSpecs["specials"]["special3"]
+                ],
+        seed: attackedBeastEventCC.seed,
+        adventurerId: attackedBeastEventCC.adventurerState["adventurerId"],
+        adventurerHealth:
+            attackedBeastEventCC.adventurerState["adventurer"]["health"],
+        attacker: "Adventurer",
+        fled: null,
+        damageDealt: attackedBeastEventCC.damage,
+        criticalHit: attackedBeastEventCC.criticalHit,
+        damageTaken: 0,
+        damageLocation: gameData.SLOTS[attackedBeastEventCC.location],
+        xpEarnedAdventurer: 0,
+        xpEarnedItems: 0,
+        goldEarned: 0,
+        discoveryTime: new Date(),
+        blockTime: new Date(),
+        timestamp: new Date(),
+      };
+      return [attackedBeastAdventurerDataCC, attackedBeastDataCC];
+    case "AttackedByBeastCC":
+      const attackedByBeastEventCC = event as AttackedByBeastEventCC;
+      const attackedByBeastAdventurerDataCC = processAdventurerState(
+          attackedByBeastEventCC,
+          currentAdventurer
+      );
+      const attackedByBeastDataCC = {
+        txHash: txHash,
+        beast: gameData.BEASTS[attackedByBeastEventCC.id],
+        beastHealth:
+            attackedByBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        beastLevel: attackedByBeastEventCC.beastSpecs["level"],
+        special1:
+            gameData.ITEM_NAME_PREFIXES[
+                attackedByBeastEventCC.beastSpecs["specials"]["special1"]
+                ],
+        special2:
+            gameData.ITEM_NAME_SUFFIXES[
+                attackedByBeastEventCC.beastSpecs["specials"]["special2"]
+                ],
+        special3:
+            gameData.ITEM_SUFFIXES[
+                attackedByBeastEventCC.beastSpecs["specials"]["special3"]
+                ],
+        seed: attackedByBeastEventCC.seed,
+        adventurerId: attackedByBeastEventCC.adventurerState["adventurerId"],
+        adventurerHealth:
+            attackedByBeastEventCC.adventurerState["adventurer"]["health"],
+        attacker: "Beast",
+        fled: null,
+        damageDealt: 0,
+        criticalHit: attackedByBeastEventCC.criticalHit,
+        damageTaken: attackedByBeastEventCC.damage,
+        damageLocation: gameData.SLOTS[attackedByBeastEventCC.location],
+        xpEarnedAdventurer: 0,
+        xpEarnedItems: 0,
+        goldEarned: 0,
+        discoveryTime: new Date(),
+        blockTime: new Date(),
+        timestamp: new Date(),
+      };
+      return [attackedByBeastAdventurerDataCC, attackedByBeastDataCC];
+    case "SlayedBeastCC":
+      const slayedBeastEventCC = event as SlayedBeastEventCC;
+      const slayedBeastAdventurerDataCC = processAdventurerState(
+          slayedBeastEventCC,
+          currentAdventurer
+      );
+      const slayedBeastDataCC = {
+        txHash: txHash,
+        beast: gameData.BEASTS[slayedBeastEventCC.id],
+        beastHealth:
+            slayedBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        beastLevel: slayedBeastEventCC.beastSpecs["level"],
+        special1:
+            gameData.ITEM_NAME_PREFIXES[
+                slayedBeastEventCC.beastSpecs["specials"]["special1"]
+                ],
+        special2:
+            gameData.ITEM_NAME_SUFFIXES[
+                slayedBeastEventCC.beastSpecs["specials"]["special2"]
+                ],
+        special3:
+            gameData.ITEM_SUFFIXES[
+                slayedBeastEventCC.beastSpecs["specials"]["special3"]
+                ],
+        seed: slayedBeastEventCC.seed,
+        adventurerId: slayedBeastEventCC.adventurerState["adventurerId"],
+        adventurerHealth:
+            slayedBeastEventCC.adventurerState["adventurer"]["health"],
+        attacker: "Adventurer",
+        fled: null,
+        damageDealt: slayedBeastEventCC.damageDealt,
+        criticalHit: slayedBeastEventCC.criticalHit,
+        damageTaken: 0,
+        damageLocation: null,
+        xpEarnedAdventurer: slayedBeastEventCC.xpEarnedAdventurer,
+        xpEarnedItems: slayedBeastEventCC.xpEarnedItems,
+        goldEarned: slayedBeastEventCC.goldEarned,
+        discoveryTime: new Date(),
+        blockTime: new Date(),
+        timestamp: new Date(),
+        curr_beast: slayedBeastEventCC.curr_beast,
+        has_reward: slayedBeastEventCC.has_reward,
+      };
+      const slayedBeastItemsXPCC = processItemsXP(slayedBeastEventCC);
+      return [slayedBeastAdventurerDataCC, slayedBeastDataCC, slayedBeastItemsXPCC];
+    case "AdventurerUpgradedCC":
+      const adventurerUpgradedEventCC = event as AdventurerUpgradedEventCC;
+      const upgreadeCCAdventurerData=  processAdventurerState(
+          adventurerUpgradedEventCC.adventurerStateWithBag,
+          currentAdventurer
+      );
+      return [upgreadeCCAdventurerData,
+        {
+          strengthIncrease:adventurerUpgradedEventCC.strengthIncrease,
+          dexterityIncrease:adventurerUpgradedEventCC.dexterityIncrease,
+          vitalityIncrease:adventurerUpgradedEventCC.vitalityIncrease,
+          intelligenceIncrease:adventurerUpgradedEventCC.intelligenceIncrease,
+          wisdomIncrease:adventurerUpgradedEventCC.wisdomIncrease,
+          charismaIncrease:adventurerUpgradedEventCC.charismaIncrease,
+        }
+      ];
+    case "RewardItemsCC":
+      const rewardItemsEvent = event as RewardItemsEventCC;
+      const rewardItemsAdventurerData = processAdventurerState(
+          rewardItemsEvent.adventurerStateWithBag,
+          currentAdventurer
+      );
+      const formattedRewardItems = [];
+      for (let i = 0; i < rewardItemsEvent.items.length; i++) {
+        formattedRewardItems.push(
+            gameData.ITEMS[rewardItemsEvent.items[i].item.id]
+        );
+      }
+      console.log("rewardItemsAdventurerData",rewardItemsAdventurerData);
+
+
+
+
+      const bag = processPurchases(
+          rewardItemsEvent.items,
+          rewardItemsEvent.adventurerStateWithBag.adventurerState
+      );
+
+      return [rewardItemsAdventurerData, formattedRewardItems, bag];
   }
 }
