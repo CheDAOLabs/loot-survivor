@@ -861,26 +861,26 @@ export async function parseEvents(
       case "SlayedBeastCC":
         console.log("parseEvent SlayedBeastEventCC");
         const slayedBeastDataCC: SlayedBeastEventCC = {
-          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
-          seed: parseInt(raw.data[40]),
-          id: parseInt(raw.data[41]),
+          adventurerState: parseAdventurerState(raw.data.slice(0, 40)),
+          seed: parseInt(raw.data[41]),
+          id: parseInt(raw.data[42]),
           beastSpecs: {
-            tier: parseInt(raw.data[42]),
-            itemType: parseInt(raw.data[43]),
-            level: parseInt(raw.data[44]),
+            tier: parseInt(raw.data[43]),
+            itemType: parseInt(raw.data[44]),
+            level: parseInt(raw.data[45]),
             specials: {
-              special1: parseInt(raw.data[45]),
-              special2: parseInt(raw.data[46]),
-              special3: parseInt(raw.data[47]),
+              special1: parseInt(raw.data[46]),
+              special2: parseInt(raw.data[47]),
+              special3: parseInt(raw.data[48]),
             },
           },
-          damageDealt: parseInt(raw.data[48]),
-          criticalHit: convertToBoolean(parseInt(raw.data[49])),
-          xpEarnedAdventurer: parseInt(raw.data[50]),
-          xpEarnedItems: parseInt(raw.data[51]),
-          goldEarned: parseInt(raw.data[52]),
-          curr_beast: parseInt(raw.data[53]),
-          has_reward: parseInt(raw.data[54]),
+          damageDealt: parseInt(raw.data[49]),
+          criticalHit: convertToBoolean(parseInt(raw.data[50])),
+          xpEarnedAdventurer: parseInt(raw.data[51]),
+          xpEarnedItems: parseInt(raw.data[52]),
+          goldEarned: parseInt(raw.data[53]),
+          curr_beast: parseInt(raw.data[54]),
+          has_reward: parseInt(raw.data[55]),
         };
         const slayedBeastEventCC = processData(
             slayedBeastDataCC,
