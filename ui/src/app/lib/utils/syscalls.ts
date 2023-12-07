@@ -398,7 +398,7 @@ export function syscalls({
 
         setData(
             "beastQueryCC",
-            attackedBeastEvent.data[0].beastHealth,
+            attackedBeastEvent.data[1].beastHealth,
             "health",
             0
         );
