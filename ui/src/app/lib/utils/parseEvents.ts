@@ -28,6 +28,14 @@ import {
   IdleDeathPenaltyEvent,
   AdventurerUpgradedEvent,
   ERC721TransferEvent,
+  //cc
+  EnterCCEvent,
+  DiscoveredBeastEventCC,
+  AttackedBeastEventCC,
+  AttackedByBeastEventCC,
+  SlayedBeastEventCC,
+  RewardItemsEventCC,
+  AdventurerUpgradedEventCC,
 } from "@/app/types/events";
 import { processData } from "@/app/lib/utils/processData";
 import { AdventurerClass } from "../classes";
@@ -744,6 +752,183 @@ export async function parseEvents(
           },
         };
         events.push({ name: eventName, data: beastTransferData });
+        break;
+      case "EnterCC":
+        const enterCCData: EnterCCEvent = {
+          map_id: parseInt(raw.data[0]),
+          curr_beast:parseInt(raw.data[1]),
+          cc_points:parseInt(raw.data[2]),
+          beast_health:parseInt(raw.data[3]), // 9 bits
+          beast_amount:parseInt(raw.data[4]),
+          has_reward: parseInt(raw.data[5]), // 9 bits
+          strength_increase: parseInt(raw.data[6]), // 9 bits
+          dexterity_increase: parseInt(raw.data[7]), // 9 bits
+          vitality_increase: parseInt(raw.data[8]), // 9 bits
+          intelligence_increase: parseInt(raw.data[9]), // 9 bits
+          wisdom_increase: parseInt(raw.data[10]), // 9 bits
+          charisma_increase: parseInt(raw.data[11]), // 9 bits
+        }
+        console.log("parseEvent EnterCC",enterCCData);
+        const enterCCEvent = processData(
+            enterCCData,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: enterCCEvent });
+        break;
+      case "DiscoveredBeastCC":
+        const discoveredBeastDataCC: DiscoveredBeastEventCC = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+          seed: parseInt(raw.data[40]),
+          id: parseInt(raw.data[41]),
+          beastSpecs: {
+            tier: parseInt(raw.data[42]),
+            itemType: parseInt(raw.data[43]),
+            level: parseInt(raw.data[44]),
+            specials: {
+              special1: parseInt(raw.data[45]),
+              special2: parseInt(raw.data[46]),
+              special3: parseInt(raw.data[47]),
+            },
+          },
+          beastHealth: parseInt(raw.data[48]),
+        };
+        const discoveredBeastEventCC = processData(
+            discoveredBeastDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: discoveredBeastEventCC });
+        break;
+      case "AttackedBeastCC":
+        const attackedBeastDataCC: AttackedBeastEventCC = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+          seed: parseInt(raw.data[40]),
+          id: parseInt(raw.data[41]),
+          beastSpecs: {
+            tier: parseInt(raw.data[42]),
+            itemType: parseInt(raw.data[43]),
+            level: parseInt(raw.data[44]),
+            specials: {
+              special1: parseInt(raw.data[45]),
+              special2: parseInt(raw.data[46]),
+              special3: parseInt(raw.data[47]),
+            },
+          },
+          damage: parseInt(raw.data[48]),
+          criticalHit: convertToBoolean(parseInt(raw.data[49])),
+          location: parseInt(raw.data[50]),
+          beastHealth: parseInt(raw.data[51]),
+        };
+        const attackedBeastEventCC = processData(
+            attackedBeastDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: attackedBeastEventCC });
+        break;
+      case "AttackedByBeastCC":
+        console.log("parseEvent AttackedByBeastEventCC");
+        const attackedByBeastDataCC: AttackedByBeastEventCC = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+          seed: parseInt(raw.data[40]),
+          id: parseInt(raw.data[41]),
+          beastSpecs: {
+            tier: parseInt(raw.data[42]),
+            itemType: parseInt(raw.data[43]),
+            level: parseInt(raw.data[44]),
+            specials: {
+              special1: parseInt(raw.data[45]),
+              special2: parseInt(raw.data[46]),
+              special3: parseInt(raw.data[47]),
+            },
+          },
+          damage: parseInt(raw.data[48]),
+          criticalHit: convertToBoolean(parseInt(raw.data[49])),
+          location: parseInt(raw.data[50]),
+        };
+        const attackedByBeastEventCC = processData(
+            attackedByBeastDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: attackedByBeastEventCC });
+        break;
+      case "SlayedBeastCC":
+        console.log("parseEvent SlayedBeastEventCC");
+        const slayedBeastDataCC: SlayedBeastEventCC = {
+          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+          seed: parseInt(raw.data[40]),
+          id: parseInt(raw.data[41]),
+          beastSpecs: {
+            tier: parseInt(raw.data[42]),
+            itemType: parseInt(raw.data[43]),
+            level: parseInt(raw.data[44]),
+            specials: {
+              special1: parseInt(raw.data[45]),
+              special2: parseInt(raw.data[46]),
+              special3: parseInt(raw.data[47]),
+            },
+          },
+          damageDealt: parseInt(raw.data[48]),
+          criticalHit: convertToBoolean(parseInt(raw.data[49])),
+          xpEarnedAdventurer: parseInt(raw.data[50]),
+          xpEarnedItems: parseInt(raw.data[51]),
+          goldEarned: parseInt(raw.data[52]),
+          curr_beast: parseInt(raw.data[53]),
+          has_reward: parseInt(raw.data[54]),
+        };
+        const slayedBeastEventCC = processData(
+            slayedBeastDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: slayedBeastEventCC });
+        break
+      case "AdventurerUpgradedCC":
+        const upgradeAvailableDataCC: AdventurerUpgradedEventCC = {
+          adventurerStateWithBag: {
+            adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+            bag: parseBag(raw.data.slice(40, 73)),
+          },
+          strengthIncrease: parseInt(raw.data[74]),
+          dexterityIncrease: parseInt(raw.data[75]),
+          vitalityIncrease: parseInt(raw.data[76]),
+          intelligenceIncrease: parseInt(raw.data[77]),
+          wisdomIncrease: parseInt(raw.data[78]),
+          charismaIncrease: parseInt(raw.data[79]),
+        };
+        console.log("upgradeAvailableDataCC",upgradeAvailableDataCC)
+        const upgradeAvailableEventCC = processData(
+            upgradeAvailableDataCC,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: upgradeAvailableEventCC });
+        break;
+      case "RewardItemsCC":
+        console.log("parseEvent RewardItemsCC");
+
+        const ItemsData: RewardItemsEventCC = {
+          adventurerStateWithBag: {
+            adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
+            bag: parseBag(raw.data.slice(40, 73)),
+          },
+          items: parseItems(raw.data.slice(75)),
+        };
+        const rewardItemsEvent = processData(
+            ItemsData,
+            eventName,
+            receipt.transaction_hash,
+            currentAdventurer
+        );
+        events.push({ name: eventName, data: rewardItemsEvent });
         break;
     }
   }

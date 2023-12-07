@@ -25,6 +25,11 @@ import {
   UpgradesAvailableEvent,
   IdleDeathPenaltyEvent,
   AdventurerUpgradedEvent,
+  EnterCCEvent,
+  DiscoveredBeastEventCC,
+  AttackedBeastEventCC,
+  AttackedByBeastEventCC,
+  SlayedBeastEventCC, AdventurerUpgradedEventCC, RewardItemsEventCC,
 } from "@/app/types/events";
 import {
   Adventurer,
@@ -63,7 +68,16 @@ type EventData =
   | AdventurerLeveledUpEvent
   | UpgradesAvailableEvent
   | IdleDeathPenaltyEvent
-  | AdventurerUpgradedEvent;
+  | AdventurerUpgradedEvent
+  //CC
+  | EnterCCEvent
+  | DiscoveredBeastEventCC
+  | AttackedBeastEventCC
+  | AttackedByBeastEventCC
+  | SlayedBeastEventCC
+  | AdventurerUpgradedEventCC
+  | RewardItemsEventCC
+  ;
 
 function processAdventurerState(
   data: any,
