@@ -218,6 +218,18 @@ mod Game {
             _cc_dispatcher(ref self).attack_cc(adventurer_id,to_the_death,adventurer,adventurer_entropy)
         }
 
+        fn buff_adventurer_cc(ref self: ContractState, adventurer_id: felt252, buff_index:u8){
+
+            _assert_ownership(@self, adventurer_id);
+
+            let (mut adventurer, adventurer_entropy, game_entropy, _) = _load_player_assets(
+                @self, adventurer_id
+            );
+            _cc_dispatcher(ref self).buff_adventurer_cc(adventurer_id,buff_index,adventurer,adventurer_entropy)
+
+        }
+
+
         /// @title New Game
         ///
         /// @notice Creates a new game of Loot Survivor
@@ -3657,6 +3669,7 @@ mod Game {
         fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
         fn enter_cc(ref self: TContractState, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> u128;
         fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252);
+        fn buff_adventurer_cc(ref self: TContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252);
     }
 
     #[starknet::interface]

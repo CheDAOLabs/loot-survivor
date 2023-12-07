@@ -158,5 +158,5 @@ trait IGame<TContractState> {
     //cc
     fn enter_cc(ref self: TContractState, adventurer_id:felt252, cc_token_id :u256) -> u128;
     fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool);
-
+    fn buff_adventurer_cc(ref self: TContractState, adventurer_id: felt252, buff_index:u8);
 }
