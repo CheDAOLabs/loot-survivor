@@ -260,9 +260,10 @@ mod cc {
             count
         }
 
-        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252) {
+        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252,bag:Bag) {
 
             let mut adventurer = adv.clone();
+            let mut bag_mutable = bag.clone();
 
             //todo
             let game_entropy: GameEntropy = ImplGameEntropy::new(0,0,0);
@@ -298,7 +299,8 @@ mod cc {
                 beast_seed,
                 game_entropy.hash,
                 to_the_death,
-                ref cc_cave
+                ref cc_cave,
+                ref bag_mutable
             );
 
 
@@ -473,6 +475,22 @@ mod cc {
         self.emit(AttackedByBeastCC { adventurer_state, beast_battle_details });
     }
 
+
+    fn __event_RewardItemsCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: felt252,
+        bag: Bag,
+        items: Array<LootWithPrice>
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        let adventurer_state_with_bag = AdventurerStateWithBag { adventurer_state, bag };
+        self.emit(RewardItemsCC { adventurer_state_with_bag, items });
+    }
+
+
     fn _unpack_cc_cave(self: @ContractState, adventurer_id: felt252) -> CcCave {
         let cc_cave = self._cc_cave.read(adventurer_id);
         cc_cave
@@ -559,7 +577,8 @@ mod cc {
         beast_seed: u128,
         game_entropy: felt252,
         fight_to_the_death: bool,
-        ref cc_cave:CcCave
+        ref cc_cave: CcCave,
+        ref bag: Bag
     ) {
         let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
 
@@ -585,7 +604,8 @@ mod cc {
                  combat_result.total_damage,
                  is_critical_hit,
                  ref cc_cave,
-                 adventurer_entropy
+                 adventurer_entropy,
+                 ref bag
              );
         }else{
             cc_cave.beast_health -= combat_result.total_damage;
@@ -630,7 +650,8 @@ mod cc {
                     beast_seed,
                     game_entropy,
                     true,
-                    ref cc_cave
+                    ref cc_cave,
+                    ref bag
                 );
             }
 
@@ -647,7 +668,8 @@ mod cc {
         damage_dealt: u16,
         critical_hit: bool,
         ref cc_cave: CcCave,
-        adventurer_entropy:felt252
+        adventurer_entropy:felt252,
+        ref bag:Bag,
     ) {
         // zero out beast health
         cc_cave.beast_health = 0;
@@ -706,6 +728,27 @@ mod cc {
         //     _emit_level_up_events(ref self, adventurer, adventurer_id, previous_level, new_level);
         // }
 
+        if cc_cave.curr_beast == cc_cave.beast_amount {
+            let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
+            if item_awards_number > 0 {
+                let mut items = ArrayTrait::<LootWithPrice>::new();
+                let mut index: u8 = 0;
+                loop {
+                    if (index >= item_awards_number || bag.is_full()) {
+                        break;
+                    }
+                    let reward_seed: u128 = cc_cave.get_reward_seed(adventurer_entropy, index);
+                    let item_reward_level: u8 = cc_cave.get_item_level(reward_seed);
+                    let item_reward_id: u8 = cc_cave.get_item_id(item_reward_level, reward_seed);
+                    bag.add_new_item(adventurer, item_reward_id);
+
+                    let item = ImplLoot::get_item(item_reward_id);
+                    items.append(LootWithPrice { item: item, price: 0 });
+                    index = index + 1;
+                };
+                __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
+            }
+        }
 
     }
 

@@ -493,7 +493,7 @@ impl ImplCcCave of ICcCave {
         }
     }
 
-    fn get_reward_seed(self: CcCave, adventurer_entropy: u128,index:u8) -> u128 {
+    fn get_reward_seed(self: CcCave, adventurer_entropy: felt252 ,index:u8) -> u128 {
             let mut hash_span = ArrayTrait::new();
             hash_span.append(self.map_id.into());
             hash_span.append(self.curr_beast.into());
