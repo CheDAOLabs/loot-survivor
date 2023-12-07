@@ -301,6 +301,9 @@ mod cc {
                 ref cc_cave
             );
 
+
+            // 保存CC
+            _pack_cc_cave(ref self, adventurer_id, cc_cave);
         }
 
         fn buff_adventurer_cc(ref self: ContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252) {
@@ -581,7 +584,8 @@ mod cc {
                  rnd2,
                  combat_result.total_damage,
                  is_critical_hit,
-                 ref cc_cave
+                 ref cc_cave,
+                 adventurer_entropy
              );
         }else{
             cc_cave.beast_health -= combat_result.total_damage;
@@ -642,7 +646,8 @@ mod cc {
         attack_rnd_2: u128,
         damage_dealt: u16,
         critical_hit: bool,
-        ref cc_cave: CcCave
+        ref cc_cave: CcCave,
+        adventurer_entropy:felt252
     ) {
         // zero out beast health
         cc_cave.beast_health = 0;
@@ -664,6 +669,14 @@ mod cc {
         // let items_leveled_up = _grant_xp_to_equipped_items(
         //     ref self, ref adventurer, adventurer_id, xp_earned_items, attack_rnd_2
         // );
+
+
+        let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+        cc_cave.curr_beast = cc_cave.curr_beast + 1;
+        cc_cave.set_beast_health(beast.starting_health);
+        cc_cave.has_reward = cc_cave.get_buff_seed(adventurer_entropy, 1);
+
+        __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
 
         // emit slayed beast event
         __event_SlayedBeastCC(
