@@ -757,6 +757,8 @@ mod cc {
             let item_reward_level: u8 = cc_cave.get_item_level(reward_seed);
             reward_item_id = cc_cave.get_item_id(item_reward_level, reward_seed);
             bag.add_new_item(adventurer, reward_item_id);
+            let item = ImplLoot::get_item(reward_item_id);
+            items.append(LootWithPrice { item: item, price: 0 });
             __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
         }
 

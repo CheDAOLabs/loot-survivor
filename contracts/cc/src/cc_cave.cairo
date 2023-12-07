@@ -290,43 +290,43 @@ impl ImplCcCave of ICcCave {
         let selected=seed % 20;
         if selected == 0 {
             return 4;
-        }else if selected == 2{
+        }else if selected == 1{
             return 10;
-        }else if selected == 3{
+        }else if selected == 2{
             return 14;
-        }else if selected == 6{
+        }else if selected == 3{
             return 18;
-        }else if selected == 7{
+        }else if selected == 4{
             return 23;
-        }else if selected == 8{
+        }else if selected == 5{
             return 28;
-        } else if selected == 9 {
+        } else if selected == 6 {
             return 33;
-        } else if selected == 10{
+        } else if selected == 7{
             return 38;
-        } else if selected == 11{
+        } else if selected == 8{
             return 43;
-        } else if selected == 12{
+        } else if selected == 9{
             return 48;
-        } else if selected == 13{
+        } else if selected == 10{
             return 53;
-        } else if selected == 14{
+        } else if selected == 11{
             return 58;
-        } else if selected == 15{
+        } else if selected == 12{
             return 63;
-        } else if selected == 16{
+        } else if selected == 13{
             return 68;
-        } else if selected == 17{
+        } else if selected == 14{
             return 73;
-        } else if selected == 18{
+        } else if selected == 15{
             return 78;
-        } else if selected == 19{
+        } else if selected == 16{
             return 83;
-        } else if selected == 20{
+        } else if selected == 17{
             return 88;
-        } else if selected == 21{
+        } else if selected == 18{
             return 93;
-        } else if selected == 22{
+        } else if selected == 19{
             return 98;
         }
 
@@ -339,43 +339,43 @@ impl ImplCcCave of ICcCave {
         let selected=seed % 20;
         if selected == 0 {
             return 5;
-        }else if selected == 2{
+        }else if selected == 1{
             return 11;
-        }else if selected == 3{
+        }else if selected == 2{
             return 15;
-        }else if selected == 6{
+        }else if selected == 3{
             return 19;
-        }else if selected == 7{
+        }else if selected == 4{
             return 24;
-        }else if selected == 8{
+        }else if selected == 5{
             return 29;
-        } else if selected == 9 {
+        } else if selected == 6 {
             return 34;
-        } else if selected == 10{
+        } else if selected == 7{
             return 39;
-        } else if selected == 11{
+        } else if selected == 8{
             return 44;
-        } else if selected == 12{
+        } else if selected == 9{
             return 49;
-        } else if selected == 13{
+        } else if selected == 10{
             return 54;
-        } else if selected == 14{
+        } else if selected == 11{
             return 59;
-        } else if selected == 15{
+        } else if selected == 12{
             return 64;
-        } else if selected == 16{
+        } else if selected == 13{
             return 69;
-        } else if selected == 17{
+        } else if selected == 14{
             return 74;
-        } else if selected == 18{
+        } else if selected == 15{
             return 79;
-        } else if selected == 19{
+        } else if selected == 16{
             return 84;
-        } else if selected == 20{
+        } else if selected == 17{
             return 89;
-        } else if selected == 21{
+        } else if selected == 18{
             return 94;
-        } else if selected == 22{
+        } else if selected == 19{
             return 99;
         }
 
@@ -388,37 +388,37 @@ impl ImplCcCave of ICcCave {
         let selected=seed % 17;
         if selected == 0 {
             return 20;
-        }else if selected == 2{
+        }else if selected == 1{
             return 25;
-        }else if selected == 3{
+        }else if selected == 2{
             return 30;
-        }else if selected == 6{
+        }else if selected == 3{
             return 35;
-        }else if selected == 7{
+        }else if selected == 4{
             return 40;
-        }else if selected == 8{
+        }else if selected == 5{
             return 45;
-        } else if selected == 9 {
+        } else if selected == 6 {
             return 50;
-        } else if selected == 10{
+        } else if selected == 7{
             return 55;
-        } else if selected == 11{
+        } else if selected == 8{
             return 60;
-        } else if selected == 12{
+        } else if selected == 9{
             return 65;
-        } else if selected == 13{
+        } else if selected == 10{
             return 70;
-        } else if selected == 14{
+        } else if selected == 11{
             return 75;
-        } else if selected == 15{
+        } else if selected == 12{
             return 80;
-        } else if selected == 16{
+        } else if selected == 13{
             return 85;
-        } else if selected == 17{
+        } else if selected == 14{
             return 90;
-        } else if selected == 18{
+        } else if selected == 15{
             return 95;
-        } else if selected == 19{
+        } else if selected == 16{
             return 100;
         }
 
@@ -431,41 +431,41 @@ impl ImplCcCave of ICcCave {
         let selected=seed % 19;
         if selected == 0 {
             return 12;
-        }else if selected == 2{
+        }else if selected == 1{
             return 16;
-        }else if selected == 3{
+        }else if selected == 2{
             return 21;
-        }else if selected == 6{
+        }else if selected == 3{
             return 26;
-        }else if selected == 7{
+        }else if selected == 4{
             return 31;
-        }else if selected == 8{
+        }else if selected == 5{
             return 36;
-        } else if selected == 9 {
+        } else if selected == 6 {
             return 41;
-        } else if selected == 10{
+        } else if selected == 7{
             return 46;
-        } else if selected == 11{
+        } else if selected == 8{
             return 51;
-        } else if selected == 12{
+        } else if selected == 9{
             return 56;
-        } else if selected == 13{
+        } else if selected == 10{
             return 61;
-        } else if selected == 14{
+        } else if selected == 11{
             return 66;
-        } else if selected == 15{
+        } else if selected == 12{
             return 71;
-        } else if selected == 16{
+        } else if selected == 13{
             return 76;
-        } else if selected == 17{
+        } else if selected == 14{
             return 81;
-        } else if selected == 18{
+        } else if selected == 15{
             return 86;
-        } else if selected == 19{
+        } else if selected == 16{
             return 91;
-        } else if selected == 20{
+        } else if selected == 17{
             return 96;
-        } else if selected == 21{
+        } else if selected == 18{
             return 101;
         }
 
