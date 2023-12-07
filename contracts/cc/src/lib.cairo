@@ -312,6 +312,52 @@ mod cc {
             );
     }
 
+    fn __event_SlayedBeastCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: felt252,
+        seed: u128,
+        beast: Beast,
+        damage_dealt: u16,
+        critical_hit: bool,
+        xp_earned_adventurer: u16,
+        xp_earned_items: u16,
+        gold_earned: u16,
+        curr_beast: u16,
+        has_reward: u16
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        let slayed_beast_event = SlayedBeastCC {
+            adventurer_state,
+            seed,
+            id: beast.id,
+            beast_specs: beast.combat_spec,
+            damage_dealt,
+            critical_hit,
+            xp_earned_adventurer,
+            xp_earned_items,
+            gold_earned,
+            curr_beast,
+            has_reward,
+        };
+        self.emit(slayed_beast_event);
+    }
+
+    fn __event_AttackedBeastCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: felt252,
+        beast_battle_details: BattleDetails,
+        beast_health: u16
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        self.emit(AttackedBeastCC { adventurer_state, beast_battle_details, beast_health });
+    }
+
     fn _unpack_cc_cave(self: @ContractState, adventurer_id: felt252) -> CcCave {
         let cc_cave = self._cc_cave.read(adventurer_id);
         cc_cave
@@ -371,6 +417,24 @@ mod cc {
 
             //todo
 
+            // emit events
+            __event_AttackedBeastCC(
+                ref self,
+                adventurer,
+                adventurer_id,
+                BattleDetails {
+                    seed: beast_seed,
+                    id: beast.id,
+                    beast_specs: beast.combat_spec,
+                    damage: combat_result.total_damage,
+                    critical_hit: is_critical_hit,
+                    location: ImplCombat::slot_to_u8(Slot::None(())),
+                },
+                cc_cave.beast_health
+            );
+
+
+
             // if the adventurer is still alive and fighting to the death
             if fight_to_the_death {
                 // attack again
@@ -389,6 +453,69 @@ mod cc {
             }
 
         }
+    }
+
+    fn _process_beast_death_cc(
+        ref self: ContractState,
+        ref adventurer: Adventurer,
+        adventurer_id: felt252,
+        beast: Beast,
+        beast_seed: u128,
+        attack_rnd_2: u128,
+        damage_dealt: u16,
+        critical_hit: bool,
+        ref cc_cave: CcCave
+    ) {
+        // zero out beast health
+        cc_cave.beast_health = 0;
+
+
+        let gold_earned = beast.get_gold_reward(beast_seed);
+        let ring_bonus = adventurer.ring.jewelry_gold_bonus(gold_earned);
+        adventurer.increase_gold(gold_earned + ring_bonus);
+
+
+        // get xp reward and increase adventurers xp
+        let xp_earned_adventurer = beast.get_xp_reward();
+        let (previous_level, new_level) = adventurer.increase_adventurer_xp(xp_earned_adventurer);
+
+        // items use adventurer xp with an item multplier so they level faster than Adventurer
+        let xp_earned_items = xp_earned_adventurer * ITEM_XP_MULTIPLIER_BEASTS;
+        // assigning xp to items is more complex so we delegate to an internal function
+        //todo
+        // let items_leveled_up = _grant_xp_to_equipped_items(
+        //     ref self, ref adventurer, adventurer_id, xp_earned_items, attack_rnd_2
+        // );
+
+        // emit slayed beast event
+        __event_SlayedBeastCC(
+            ref self,
+            adventurer,
+            adventurer_id,
+            beast_seed,
+            beast,
+            damage_dealt,
+            critical_hit,
+            xp_earned_adventurer,
+            xp_earned_items,
+            gold_earned,
+            cc_cave.curr_beast,
+            cc_cave.has_reward,
+        );
+
+        // if any items leveled up
+        // if items_leveled_up.len() != 0 {
+        //     // emit event
+        //     __event_ItemsLeveledUp(ref self, adventurer, adventurer_id, items_leveled_up);
+        // }
+        //
+        // // if adventurer gained stat points
+        // if (adventurer.stat_points_available != 0) {
+        //     // emit events
+        //     _emit_level_up_events(ref self, adventurer, adventurer_id, previous_level, new_level);
+        // }
+
+
     }
 
 }

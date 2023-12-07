@@ -11,6 +11,6 @@ export STARKNET_RPC="https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a8
 
 ../scarb0.7.0  build  
 ../starkli0.1.15 declare ./target/dev/cc_cc.sierra.json
-../starkli0.1.15 deploy 0x02d4c31e7b9e5f4cebae27ea255fc6d944b30027cffa370bb950004a7129dd0b
+../starkli0.1.15 deploy 0x044ef2c3fe152e144156b4e6ee0df899d5c457aa663989b3e7e5de2dd7fe4228
 
 
