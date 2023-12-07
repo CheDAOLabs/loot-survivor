@@ -779,20 +779,20 @@ export async function parseEvents(
         break;
       case "DiscoveredBeastCC":
         const discoveredBeastDataCC: DiscoveredBeastEventCC = {
-          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
-          seed: parseInt(raw.data[40]),
-          id: parseInt(raw.data[41]),
+          adventurerState: parseAdventurerState(raw.data.slice(0, 40)),
+          seed: parseInt(raw.data[41]),
+          id: parseInt(raw.data[42]),
           beastSpecs: {
-            tier: parseInt(raw.data[42]),
-            itemType: parseInt(raw.data[43]),
-            level: parseInt(raw.data[44]),
+            tier: parseInt(raw.data[43]),
+            itemType: parseInt(raw.data[44]),
+            level: parseInt(raw.data[45]),
             specials: {
-              special1: parseInt(raw.data[45]),
-              special2: parseInt(raw.data[46]),
-              special3: parseInt(raw.data[47]),
+              special1: parseInt(raw.data[46]),
+              special2: parseInt(raw.data[47]),
+              special3: parseInt(raw.data[48]),
             },
           },
-          beastHealth: parseInt(raw.data[48]),
+          beastHealth: parseInt(raw.data[49]),
         };
         const discoveredBeastEventCC = processData(
             discoveredBeastDataCC,
@@ -804,23 +804,23 @@ export async function parseEvents(
         break;
       case "AttackedBeastCC":
         const attackedBeastDataCC: AttackedBeastEventCC = {
-          adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
-          seed: parseInt(raw.data[40]),
-          id: parseInt(raw.data[41]),
+          adventurerState: parseAdventurerState(raw.data.slice(0, 40)),
+          seed: parseInt(raw.data[41]),
+          id: parseInt(raw.data[42]),
           beastSpecs: {
-            tier: parseInt(raw.data[42]),
-            itemType: parseInt(raw.data[43]),
-            level: parseInt(raw.data[44]),
+            tier: parseInt(raw.data[43]),
+            itemType: parseInt(raw.data[44]),
+            level: parseInt(raw.data[45]),
             specials: {
-              special1: parseInt(raw.data[45]),
-              special2: parseInt(raw.data[46]),
-              special3: parseInt(raw.data[47]),
+              special1: parseInt(raw.data[46]),
+              special2: parseInt(raw.data[47]),
+              special3: parseInt(raw.data[48]),
             },
           },
-          damage: parseInt(raw.data[48]),
-          criticalHit: convertToBoolean(parseInt(raw.data[49])),
-          location: parseInt(raw.data[50]),
-          beastHealth: parseInt(raw.data[51]),
+          damage: parseInt(raw.data[49]),
+          criticalHit: convertToBoolean(parseInt(raw.data[50])),
+          location: parseInt(raw.data[51]),
+          beastHealth: parseInt(raw.data[52]),
         };
         const attackedBeastEventCC = processData(
             attackedBeastDataCC,
