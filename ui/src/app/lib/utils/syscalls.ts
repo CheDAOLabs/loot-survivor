@@ -632,11 +632,10 @@ export function syscalls({
 
     const upgradeCcTx = {
       contractAddress: gameContract?.address ?? "",
-      entrypoint: "buff_adventurer",
+      entrypoint: "buff_adventurer_cc",
       calldata: [
         // adventurerId
         adventurer?.id?.toString() ?? "",
-        "0",
         buff_index.toString()
       ],
     };

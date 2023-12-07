@@ -892,16 +892,13 @@ export async function parseEvents(
         break
       case "AdventurerUpgradedCC":
         const upgradeAvailableDataCC: AdventurerUpgradedEventCC = {
-          adventurerStateWithBag: {
-            adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
-            bag: parseBag(raw.data.slice(40, 73)),
-          },
-          strengthIncrease: parseInt(raw.data[74]),
-          dexterityIncrease: parseInt(raw.data[75]),
-          vitalityIncrease: parseInt(raw.data[76]),
-          intelligenceIncrease: parseInt(raw.data[77]),
-          wisdomIncrease: parseInt(raw.data[78]),
-          charismaIncrease: parseInt(raw.data[79]),
+          adventurerState: parseAdventurerState(raw.data.slice(0, 40)),
+          strengthIncrease: parseInt(raw.data[41]),
+          dexterityIncrease: parseInt(raw.data[42]),
+          vitalityIncrease: parseInt(raw.data[43]),
+          intelligenceIncrease: parseInt(raw.data[44]),
+          wisdomIncrease: parseInt(raw.data[45]),
+          charismaIncrease: parseInt(raw.data[46]),
         };
         console.log("upgradeAvailableDataCC",upgradeAvailableDataCC)
         const upgradeAvailableEventCC = processData(

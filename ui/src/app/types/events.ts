@@ -152,7 +152,7 @@ export type UpgradeAvailableEvent = {
 };
 
 export type AdventurerUpgradedEventCC = {
-  adventurerStateWithBag: AdventurerStateWithBag;
+  adventurerState: AdventurerState;
   strengthIncrease: u8;
   dexterityIncrease: u8;
   vitalityIncrease: u8;

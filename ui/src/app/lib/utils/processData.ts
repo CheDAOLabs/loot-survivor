@@ -1194,7 +1194,7 @@ export function processData(
     case "AdventurerUpgradedCC":
       const adventurerUpgradedEventCC = event as AdventurerUpgradedEventCC;
       const upgreadeCCAdventurerData=  processAdventurerState(
-          adventurerUpgradedEventCC.adventurerStateWithBag,
+          adventurerUpgradedEventCC.adventurerState,
           currentAdventurer
       );
       return [upgreadeCCAdventurerData,
