@@ -10,7 +10,7 @@ mod tests {
 
 #[starknet::contract]
 mod Game {
-    // TODO: TESTING CONFIGS 
+    // TODO: TESTING CONFIGS
     // ADJUST THESE BEFORE DEPLOYMENT
     use core::starknet::SyscallResultTrait;
     const TEST_ENTROPY: u64 = 12303548;
@@ -211,11 +211,12 @@ mod Game {
 
         fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool) {
             // load player assets
-            let (mut adventurer, adventurer_entropy, game_entropy, _) = _load_player_assets(
+            // load player assets
+            let (mut adventurer, adventurer_entropy, game_entropy, mut bag) = _load_player_assets(
                 @self, adventurer_id
             );
 
-            _cc_dispatcher(ref self).attack_cc(adventurer_id,to_the_death,adventurer,adventurer_entropy)
+            _cc_dispatcher(ref self).attack_cc(adventurer_id,to_the_death,adventurer,adventurer_entropy,bag);
         }
 
         fn buff_adventurer_cc(ref self: ContractState, adventurer_id: felt252, buff_index:u8){
@@ -327,7 +328,7 @@ mod Game {
 
         /// @title Attack Function
         ///
-        /// @notice Allows an adventurer to attack a beast 
+        /// @notice Allows an adventurer to attack a beast
         ///
         /// @param adventurer_id A u256 representing the ID of the adventurer.
         /// @param to_the_death A boolean flag indicating if the attack should continue until either the adventurer or the beast is defeated.
@@ -538,7 +539,7 @@ mod Game {
                 }
             }
 
-            // save adventurer 
+            // save adventurer
             _save_adventurer(ref self, ref adventurer, adventurer_id);
 
             // if the bag was mutated, pack and save it
@@ -1200,7 +1201,7 @@ mod Game {
 
     /// @title Stat Reveal Handler
     /// @notice Handle the revelation and setting of an adventurer's starting stats.
-    /// @dev This function generates starting stats for an adventurer using entropy, which is based on the block hash of the block 
+    /// @dev This function generates starting stats for an adventurer using entropy, which is based on the block hash of the block
     /// after the player committed to playing the game.
     /// @param self A reference to the ContractState object.
     /// @param adventurer A reference to the Adventurer object whose stats are to be revealed and set.
@@ -1460,7 +1461,7 @@ mod Game {
 
         // set the adventurer last action block to the current block + reveal delay + one idle penalty so that the player
         // isn't considered idle until 2xidle penalty periods after the reveal block. This doesn't compromise integrity
-        // of starting stats or opening market as that won't change with game entropy rotations. 
+        // of starting stats or opening market as that won't change with game entropy rotations.
         adventurer
             .set_last_action_block(
                 current_block
@@ -1486,7 +1487,7 @@ mod Game {
         // set caller as owner
         self._owner.write(adventurer_id, get_caller_address());
 
-        // emit events 
+        // emit events
         __event_StartGame(ref self, adventurer, adventurer_id, adventurer_meta);
         __event_AmbushedByBeast(ref self, adventurer, adventurer_id, beast_battle_details);
     }
@@ -1713,16 +1714,16 @@ mod Game {
         }
     }
 
-    // @notice Grants XP to items currently equipped by an adventurer, and processes any level ups.// 
+    // @notice Grants XP to items currently equipped by an adventurer, and processes any level ups.//
     // @dev This function does three main things:
     //   1. Iterates through each of the equipped items for the given adventurer.
     //   2. Increases the XP for the equipped item. If the item levels up, it processes the level up and updates the item.
-    //   3. If any items have leveled up, emits an `ItemsLeveledUp` event.// 
+    //   3. If any items have leveled up, emits an `ItemsLeveledUp` event.//
     // @param self The contract's state reference.
     // @param adventurer Reference to the adventurer's state.
     // @param adventurer_id Unique identifier for the adventurer.
     // @param xp_amount Amount of XP to grant to each equipped item.
-    // @param entropy Random data used for any deterministic randomness during processing.// 
+    // @param entropy Random data used for any deterministic randomness during processing.//
     // @return Array of items that leveled up.
     fn _grant_xp_to_equipped_items(
         ref self: ContractState,
@@ -2243,7 +2244,7 @@ mod Game {
             // buy it and store result in our purchases array for event
             purchases.append(_buy_item(ref adventurer, ref bag, item.item_id));
 
-            // if item is being equipped as part of the purchase 
+            // if item is being equipped as part of the purchase
             if item.equip {
                 // add it to our array of items to equip
                 items_to_equip.append(item.item_id);
@@ -2472,7 +2473,7 @@ mod Game {
         // if the adventurer's health is now above the max health due to a change in Vitality
         let max_health = AdventurerUtils::get_max_health(adventurer.stats.vitality);
         if adventurer.health > max_health {
-            // lower adventurer's health to max health 
+            // lower adventurer's health to max health
             adventurer.health = max_health;
         }
     }
@@ -3668,7 +3669,7 @@ mod Game {
     trait ICC<TContractState> {
         fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
         fn enter_cc(ref self: TContractState, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> u128;
-        fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252);
+        fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252, bag:Bag);
         fn buff_adventurer_cc(ref self: TContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252);
     }
 
@@ -3733,7 +3734,7 @@ mod Game {
     fn _assert_week_past(self: @ContractState, time: u64) {
         let difference: u64 = get_block_timestamp() - time;
 
-        // check if time diff is greater than a week    
+        // check if time diff is greater than a week
         let one_week: u64 = (SECONDS_IN_DAY.into() * 7).try_into().unwrap();
 
         // assert enough time passed
