@@ -20,4 +20,5 @@ trait ICC<TContractState> {
     fn get_beast_health_cc(self: @ TContractState, adventurer_id: felt252) -> u16;
     fn enter_cc(ref self: TContractState, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> u128;
     fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252);
+    fn buff_adventurer_cc(ref self: TContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252);
 }

@@ -169,7 +169,7 @@ mod cc {
 
     #[derive(Drop, starknet::Event)]
     struct AdventurerUpgradedCC {
-        adventurer_state_with_bag: AdventurerStateWithBag,
+        adventurer_state: AdventurerState,
         strength_increase: u8,
         dexterity_increase: u8,
         vitality_increase: u8,
@@ -302,7 +302,63 @@ mod cc {
             );
 
         }
-    }
+
+        fn buff_adventurer_cc(ref self: ContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252) {
+
+            let mut adventurer = adv.clone();
+
+            //todo
+            let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
+            assert(cc_cave.has_reward > 0, 'no reward buff');
+
+            let cc_buff_config:CcBuff = get_buff_by_id(cc_cave.has_reward);
+
+
+            if buff_index == 1{
+                adventurer.stats.increase_strength(cc_buff_config.strength);
+                cc_cave.increase_strength(cc_buff_config.strength);
+            }
+            if  buff_index == 2 {
+                adventurer.stats.increase_dexterity(cc_buff_config.dexterity);
+                cc_cave.increase_dexterity(cc_buff_config.dexterity);
+            }
+            if  buff_index == 3 {
+                adventurer.stats.increase_vitality(cc_buff_config.vitality);
+                adventurer
+                    .increase_health(VITALITY_INSTANT_HEALTH_BONUS * cc_buff_config.vitality.into());
+                cc_cave.increase_vitality(cc_buff_config.vitality);
+            }
+            if buff_index == 4{
+                adventurer.stats.increase_intelligence(cc_buff_config.intelligence);
+                cc_cave.increase_intelligence(cc_buff_config.intelligence);
+            }
+            if buff_index == 5{
+                adventurer.stats.increase_wisdom(cc_buff_config.wisdom);
+                cc_cave.increase_wisdom(cc_buff_config.wisdom);
+            }
+            if buff_index == 6{
+                adventurer.stats.increase_charisma(cc_buff_config.charisma);
+                cc_cave.increase_charisma(cc_buff_config.charisma);
+            }
+            cc_cave.has_reward = 0;
+
+            let now_buff = Stats{
+                strength: cc_cave.strength_increase,
+                dexterity: cc_cave.dexterity_increase,
+                vitality: cc_cave.vitality_increase,
+                intelligence: cc_cave.intelligence_increase,
+                wisdom: cc_cave.wisdom_increase,
+                charisma: cc_cave.charisma_increase,
+                luck:0//todo
+            };
+            // emit adventurer upgraded event
+            __event_AdventurerUpgradedCC(ref self, adventurer, adventurer_id, now_buff);
+
+            _pack_cc_cave(ref self, adventurer_id, cc_cave);
+
+        }
+
+}
 
 
     // ------------------------------------------ //
@@ -337,17 +393,15 @@ mod cc {
         ref self: ContractState,
         adventurer: Adventurer,
         adventurer_id: felt252,
-        bag: Bag,
         stat_upgrades: Stats
     ) {
         let adventurer_state = AdventurerState {
             owner: get_caller_address(), adventurer_id, adventurer
         };
-        let adventurer_state_with_bag = AdventurerStateWithBag { adventurer_state, bag };
         self
             .emit(
                 AdventurerUpgradedCC {
-                    adventurer_state_with_bag,
+                    adventurer_state,
                     strength_increase: stat_upgrades.strength,
                     dexterity_increase: stat_upgrades.dexterity,
                     vitality_increase: stat_upgrades.vitality,
