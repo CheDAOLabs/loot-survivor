@@ -177,38 +177,55 @@ impl ImplCcCave of ICcCave {
         // 当points（5|8），randomNumber=4|2
         // 当points（8|11），randomNumber=4|1
         // 当points（12），randomNumber=3|1
+        let mut level = 0;
         if self.cc_points < 3 {
-            return 5 - (seed % 2).try_into().unwrap();
+            level = 5 - (seed % 2).try_into().unwrap();
         } else if self.cc_points < 5 {
-            return 5 - (seed % 3).try_into().unwrap();
+            level =  5 - (seed % 3).try_into().unwrap();
         } else if self.cc_points < 8 {
-            return 4 - (seed % 3).try_into().unwrap();
+            level =  4 - (seed % 3).try_into().unwrap();
         } else if self.cc_points < 11 {
-            return 4 - (seed % 2).try_into().unwrap();
+            level =  4 - (seed % 2).try_into().unwrap();
         } else if self.cc_points < 12{
-            return 3 - (seed % 2).try_into().unwrap();
+            level =  3 - (seed % 2).try_into().unwrap();
         }
 
-        return 0;
+        if level == 0 {
+            level = 1;
+        }
+
+        if level > 5 {
+            level = 5;
+        }
+
+        return level;
     }
 
     fn get_item_id(self:CcCave, level:u8 , seed:u128)->u8{
+
+        assert(level == 1 || level == 2 || level == 3 || level == 4 || level == 5 , 'get_item_id2');
+
+        let mut id = 0;
+
         if level == 1 {
-            return self.get_item_id_t1(seed);
+            id = self.get_item_id_t1(seed);
         }
         if level == 2 {
-            return self.get_item_id_t2(seed);
+            id = self.get_item_id_t2(seed);
         }
         if level == 3 {
-           return self.get_item_id_t3(seed);
+            id = self.get_item_id_t3(seed);
         }
         if level == 4 {
-           return self.get_item_id_t4(seed);
+            id = self.get_item_id_t4(seed);
         }
         if level == 5 {
-           return self.get_item_id_t5(seed);
+            id = self.get_item_id_t5(seed);
         }
-        return 0;
+
+        assert(id!=0 , 'get_item_id 2');
+
+        id
     }
 
     fn get_item_id_t1(self:CcCave, seed:u128)->u8{

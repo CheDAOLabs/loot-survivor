@@ -238,7 +238,7 @@ mod Game {
             }
 
             if result.bag.mutated {
-                _save_bag(ref self, adventurer_id, bag);
+                _save_bag(ref self, adventurer_id, result.bag);
              }
 
             _save_adventurer(ref self, ref adventurer, adventurer_id);

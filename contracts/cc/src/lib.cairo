@@ -687,25 +687,6 @@ mod cc {
         // zero out beast health
         cc_cave.beast_health = 0;
 
-
-        // let gold_earned = beast.get_gold_reward(beast_seed);
-        // let ring_bonus = adventurer.ring.jewelry_gold_bonus(gold_earned);
-        // adventurer.increase_gold(gold_earned + ring_bonus);
-
-
-        // get xp reward and increase adventurers xp
-        // let xp_earned_adventurer = beast.get_xp_reward();
-        // let (previous_level, new_level) = adventurer.increase_adventurer_xp(xp_earned_adventurer);
-
-        // items use adventurer xp with an item multplier so they level faster than Adventurer
-        // let xp_earned_items = xp_earned_adventurer * ITEM_XP_MULTIPLIER_BEASTS;
-        // assigning xp to items is more complex so we delegate to an internal function
-        //todo
-        // let items_leveled_up = _grant_xp_to_equipped_items(
-        //     ref self, ref adventurer, adventurer_id, xp_earned_items, attack_rnd_2
-        // );
-
-
         let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
         cc_cave.curr_beast = cc_cave.curr_beast + 1;
         cc_cave.set_beast_health(beast.starting_health);
