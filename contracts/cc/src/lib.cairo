@@ -358,6 +358,18 @@ mod cc {
         self.emit(AttackedBeastCC { adventurer_state, beast_battle_details, beast_health });
     }
 
+    fn __event_AttackedByBeastCC(
+        ref self: ContractState,
+        adventurer: Adventurer,
+        adventurer_id: felt252,
+        beast_battle_details: BattleDetails
+    ) {
+        let adventurer_state = AdventurerState {
+            owner: get_caller_address(), adventurer_id, adventurer
+        };
+        self.emit(AttackedByBeastCC { adventurer_state, beast_battle_details });
+    }
+
     fn _unpack_cc_cave(self: @ContractState, adventurer_id: felt252) -> CcCave {
         let cc_cave = self._cc_cave.read(adventurer_id);
         cc_cave
@@ -378,6 +390,56 @@ mod cc {
     //     IERC20CamelDispatcher { contract_address: lords }
     //         .transferFrom(caller, map_owner, amount);
     // }
+
+
+    /// @notice Simulates an attack by a beast on an adventurer
+    /// @dev This function determines a random attack location on the adventurer, retrieves armor and specials from that location, processes the beast attack, and deducts the damage from the adventurer's health.
+    /// @param self The current contract state
+    /// @param adventurer The adventurer being attacked
+    /// @param adventurer_id The unique identifier of the adventurer
+    /// @param beast The beast that is attacking
+    /// @param beast_seed The seed associated with the beast
+    /// @param entropy A random value to determine certain random aspects of the combat
+    /// @param attack_location_rnd A random value used to determine the attack location on the adventurer
+    /// @return Returns a BattleDetails object containing details of the beast's attack, including the seed, beast ID, combat specifications of the beast, total damage dealt, whether a critical hit was made, and the location of the attack on the adventurer.
+    fn _beast_attack(
+        ref self: ContractState,
+        ref adventurer: Adventurer,
+        adventurer_id: felt252,
+        beast: Beast,
+        beast_seed: u128,
+        entropy: u128,
+        attack_location_rnd: u128,
+    ) -> BattleDetails {
+        // beasts attack random location on adventurer
+        let attack_location = AdventurerUtils::get_random_attack_location(
+            attack_location_rnd.into()
+        );
+
+        // get armor at attack location
+        let armor = adventurer.get_item_at_slot(attack_location);
+
+        // get armor specials
+        //todo
+        let armor_specials =  ItemSpecials { special1: 0, special2: 0, special3: 0 };//_get_item_specials(@self, adventurer_id, armor);
+
+        // process beast attack
+        let (combat_result, jewlery_armor_bonus) = adventurer
+            .defend(beast, armor, armor_specials, entropy);
+
+        // deduct damage taken from adventurer's health
+        adventurer.decrease_health(combat_result.total_damage);
+
+        // return beast battle details
+        BattleDetails {
+            seed: beast_seed,
+            id: beast.id,
+            beast_specs: beast.combat_spec,
+            damage: combat_result.total_damage,
+            critical_hit: combat_result.critical_hit_bonus > 0,
+            location: ImplCombat::slot_to_u8(attack_location),
+        }
+    }
 
     // @notice 模拟冒险者对野兽进行攻击。
     // @param self 合约的状态。
@@ -417,6 +479,11 @@ mod cc {
 
             //todo
 
+            // process beast counter attack
+            let attacked_by_beast_details = _beast_attack(
+                ref self, ref adventurer, adventurer_id, beast, beast_seed, rnd1, rnd2,
+            );
+
             // emit events
             __event_AttackedBeastCC(
                 ref self,
@@ -433,6 +500,8 @@ mod cc {
                 cc_cave.beast_health
             );
 
+
+            __event_AttackedByBeastCC(ref self, adventurer, adventurer_id, attacked_by_beast_details);
 
 
             // if the adventurer is still alive and fighting to the death
