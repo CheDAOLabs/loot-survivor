@@ -216,14 +216,31 @@ mod Game {
         }
 
         fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool) {
-            // load player assets
+            _assert_ownership(@self, adventurer_id);
             // load player assets
             let (mut adventurer, adventurer_entropy, game_entropy, mut bag) = _load_player_assets(
                 @self, adventurer_id
             );
 
+            let block_number = starknet::get_block_info().unbox().block_number;
+
+            // update players last action block number to reset idle counter
+            adventurer.set_last_action_block(block_number);
+
            let result:AttackResultCC=  _cc_dispatcher(ref self).attack_cc(adventurer_id,to_the_death,adventurer,adventurer_entropy,bag);
             adventurer.health = result.adventurer_health;
+            if adventurer.health  == 0 {
+                //_process_adventurer_death(ref self, adventurer, adventurer_id, beast.id, 0);
+                //todo beast.id
+                _process_adventurer_death(ref self, adventurer, adventurer_id, 0, 0);
+                _save_adventurer(ref self, ref adventurer, adventurer_id);
+                return;
+            }
+
+            if result.bag.mutated {
+                _save_bag(ref self, adventurer_id, bag);
+             }
+
             _save_adventurer(ref self, ref adventurer, adventurer_id);
         }
 
@@ -234,6 +251,12 @@ mod Game {
             let (mut adventurer, adventurer_entropy, game_entropy, _) = _load_player_assets(
                 @self, adventurer_id
             );
+
+            let block_number = starknet::get_block_info().unbox().block_number;
+
+            // update players last action block number to reset idle counter
+            adventurer.set_last_action_block(block_number);
+
             _cc_dispatcher(ref self).buff_adventurer_cc(adventurer_id,buff_index,adventurer,adventurer_entropy)
 
         }
