@@ -298,7 +298,7 @@ mod cc {
                 }
             };
 
-            _attack_cc(
+           let reward_item_id:u8 =  _attack_cc(
                 ref self,
                 ref adventurer,
                 weapon_combat_spec,
@@ -316,7 +316,11 @@ mod cc {
             // 保存CC
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
 
-            AttackResultCC{ adventurer_health : adventurer.health,bag:bag_mutable}
+            AttackResultCC{
+                    adventurer_health : adventurer.health,
+                    beast_id : beast.id,
+                    reward_item_id:reward_item_id,
+            }
 
         }
 
@@ -592,7 +596,8 @@ mod cc {
         fight_to_the_death: bool,
         ref cc_cave: CcCave,
         ref bag: Bag
-    ) {
+    ) -> u8
+    {
         let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
 
         // get two random numbers using adventurer xp and health as part of entropy
@@ -606,8 +611,9 @@ mod cc {
         // provide critical hit as a boolean for events
         let is_critical_hit = combat_result.critical_hit_bonus > 0;
 
+        let mut reward_item_id = 0;
         if (combat_result.total_damage >= cc_cave.beast_health) {
-             _process_beast_death_cc(
+            reward_item_id = _process_beast_death_cc(
                  ref self,
                  ref adventurer,
                  adventurer_id,
@@ -669,6 +675,8 @@ mod cc {
             }
 
         }
+
+        reward_item_id
     }
 
     fn _process_beast_death_cc(
@@ -683,7 +691,7 @@ mod cc {
         ref cc_cave: CcCave,
         adventurer_entropy:felt252,
         ref bag:Bag,
-    ) {
+    ) -> u8 {
         // zero out beast health
         cc_cave.beast_health = 0;
 
@@ -722,28 +730,37 @@ mod cc {
         //     _emit_level_up_events(ref self, adventurer, adventurer_id, previous_level, new_level);
         // }
 
+        let mut reward_item_id : u8 = 0;
         if cc_cave.curr_beast == cc_cave.beast_amount {
-            let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
-            if item_awards_number > 0 {
-                let mut items = ArrayTrait::<LootWithPrice>::new();
-                let mut index: u8 = 0;
-                loop {
-                    if (index >= item_awards_number || bag.is_full()) {
-                        break;
-                    }
-                    let reward_seed: u128 = cc_cave.get_reward_seed(adventurer_entropy, index);
-                    let item_reward_level: u8 = cc_cave.get_item_level(reward_seed);
-                    let item_reward_id: u8 = cc_cave.get_item_id(item_reward_level, reward_seed);
-                    bag.add_new_item(adventurer, item_reward_id);
+            // let item_awards_number:u8 = cc_cave.get_item_amount(cc_cave.get_beast_seed(adventurer_entropy));
+            // if item_awards_number > 0 {
+            //     let mut items = ArrayTrait::<LootWithPrice>::new();
+            //     let mut index: u8 = 0;
+            //     loop {
+            //         if (index >= item_awards_number || bag.is_full()) {
+            //             break;
+            //         }
+            //         let reward_seed: u128 = cc_cave.get_reward_seed(adventurer_entropy, index);
+            //         let item_reward_level: u8 = cc_cave.get_item_level(reward_seed);
+            //         let item_reward_id: u8 = cc_cave.get_item_id(item_reward_level, reward_seed);
+            //         bag.add_new_item(adventurer, item_reward_id);
+            //
+            //         let item = ImplLoot::get_item(item_reward_id);
+            //         items.append(LootWithPrice { item: item, price: 0 });
+            //         index = index + 1;
+            //     };
+            //     __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
+            // }
 
-                    let item = ImplLoot::get_item(item_reward_id);
-                    items.append(LootWithPrice { item: item, price: 0 });
-                    index = index + 1;
-                };
-                __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
-            }
+            let mut items = ArrayTrait::<LootWithPrice>::new();
+            let reward_seed: u128 = cc_cave.get_reward_seed(adventurer_entropy, 0);
+            let item_reward_level: u8 = cc_cave.get_item_level(reward_seed);
+            reward_item_id = cc_cave.get_item_id(item_reward_level, reward_seed);
+            bag.add_new_item(adventurer, reward_item_id);
+            __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
         }
 
+        reward_item_id
     }
 
 }

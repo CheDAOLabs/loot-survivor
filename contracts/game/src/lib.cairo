@@ -230,15 +230,14 @@ mod Game {
            let result:AttackResultCC=  _cc_dispatcher(ref self).attack_cc(adventurer_id,to_the_death,adventurer,adventurer_entropy,bag);
             adventurer.health = result.adventurer_health;
             if adventurer.health  == 0 {
-                //_process_adventurer_death(ref self, adventurer, adventurer_id, beast.id, 0);
-                //todo beast.id
-                _process_adventurer_death(ref self, adventurer, adventurer_id, 0, 0);
+                _process_adventurer_death(ref self, adventurer, adventurer_id, result.beast_id, 0);
                 _save_adventurer(ref self, ref adventurer, adventurer_id);
                 return;
             }
 
-            if result.bag.mutated {
-                _save_bag(ref self, adventurer_id, result.bag);
+            if result.reward_item_id != 0 {
+                bag.add_new_item(adventurer, result.reward_item_id);
+                _save_bag(ref self, adventurer_id, bag);
              }
 
             _save_adventurer(ref self, ref adventurer, adventurer_id);
@@ -3703,8 +3702,9 @@ mod Game {
 
     #[derive(Drop, Copy, Serde)]
     struct AttackResultCC {
-        adventurer_health: u16, // 9 bits
-        bag:Bag
+        adventurer_health: u16,
+        beast_id:u8,
+        reward_item_id:u8,
     }
 
     #[starknet::interface]

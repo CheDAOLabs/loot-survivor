@@ -2,7 +2,10 @@ use starknet::ContractAddress;
 
 use beasts::beast::Beast;
 use game_entropy::game_entropy::{GameEntropy};
-use market::market::{ItemPurchase};
+use market::{
+    market::{ImplMarket, LootWithPrice, ItemPurchase},
+    constants::{NUMBER_OF_ITEMS_PER_LEVEL, TIER_PRICE},
+};
 use survivor::{
     bag::Bag, adventurer::{Adventurer, Stats}, adventurer_meta::AdventurerMetadata,
     item_meta::{ItemSpecials, ItemSpecialsStorage}, leaderboard::Leaderboard,
@@ -22,7 +25,8 @@ struct EnterResultCC {
 #[derive(Drop, Copy, Serde)]
 struct AttackResultCC {
     adventurer_health: u16,
-    bag:Bag
+    beast_id: u8,
+    reward_item_id:u8,
 }
 
 #[starknet::interface]
