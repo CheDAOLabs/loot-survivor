@@ -572,8 +572,17 @@ mod cc {
         let is_critical_hit = combat_result.critical_hit_bonus > 0;
 
         if (combat_result.total_damage >= cc_cave.beast_health) {
-            //todo
-            //            _process_beast_death_cc
+             _process_beast_death_cc(
+                 ref self,
+                 ref adventurer,
+                 adventurer_id,
+                 beast,
+                 beast_seed,
+                 rnd2,
+                 combat_result.total_damage,
+                 is_critical_hit,
+                 ref cc_cave
+             );
         }else{
             cc_cave.beast_health -= combat_result.total_damage;
 
