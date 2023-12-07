@@ -55,6 +55,7 @@ export default function InventoryScreen({
     : [];
 
   const handleEquipItems = (item: string) => {
+    console.log("handleEquipItems",item);
     const newEquipItems = [
       ...equipItems,
       getKeyFromValue(gameData.ITEMS, item) ?? "",

@@ -914,10 +914,10 @@ export async function parseEvents(
 
         const ItemsData: RewardItemsEventCC = {
           adventurerStateWithBag: {
-            adventurerState: parseAdventurerState(raw.data.slice(0, 39)),
-            bag: parseBag(raw.data.slice(40, 73)),
+            adventurerState: parseAdventurerState(raw.data.slice(0, 40)),
+            bag: parseBag(raw.data.slice(41, 74)),
           },
-          items: parseItems(raw.data.slice(75)),
+          items: parseItems(raw.data.slice(76)),
         };
         const rewardItemsEvent = processData(
             ItemsData,

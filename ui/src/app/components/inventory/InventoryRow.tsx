@@ -43,6 +43,7 @@ export const InventoryRow = ({
   const gameData = new GameData();
 
   const handleEquipItems = (item: string) => {
+    console.log("handleEquipItems",item);
     setEquipItems([...equipItems, getKeyFromValue(gameData.ITEMS, item) ?? ""]);
     if (gameContract) {
       const equipItemTx = {
