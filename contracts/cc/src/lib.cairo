@@ -144,6 +144,7 @@ mod cc {
     struct AttackedByBeastCC {
         adventurer_state: AdventurerState,
         beast_battle_details: BattleDetails,
+        beast_health:u16
     }
 
     #[derive(Drop, starknet::Event)]
@@ -484,12 +485,13 @@ mod cc {
         ref self: ContractState,
         adventurer: Adventurer,
         adventurer_id: felt252,
-        beast_battle_details: BattleDetails
+        beast_battle_details: BattleDetails,
+        beast_health: u16
     ) {
         let adventurer_state = AdventurerState {
             owner: get_caller_address(), adventurer_id, adventurer
         };
-        self.emit(AttackedByBeastCC { adventurer_state, beast_battle_details });
+        self.emit(AttackedByBeastCC { adventurer_state, beast_battle_details,beast_health });
     }
 
 
@@ -653,7 +655,13 @@ mod cc {
             );
 
 
-            __event_AttackedByBeastCC(ref self, adventurer, adventurer_id, attacked_by_beast_details);
+            __event_AttackedByBeastCC(
+                ref self,
+                adventurer,
+                adventurer_id,
+                attacked_by_beast_details,
+                cc_cave.beast_health
+            );
 
 
             // if the adventurer is still alive and fighting to the death

@@ -260,6 +260,7 @@ export type AttackedByBeastEventCC = {
   damage: u16;
   criticalHit: boolean;
   location: u8;
+  beastHealth: u16;
 };
 
 export type SlayedBeastEvent = {

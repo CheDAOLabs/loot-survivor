@@ -1113,8 +1113,8 @@ export function processData(
       const attackedByBeastDataCC = {
         txHash: txHash,
         beast: gameData.BEASTS[attackedByBeastEventCC.id],
-        beastHealth:
-            attackedByBeastEventCC.adventurerState["adventurer"]["beastHealth"],
+        beastHealth:attackedByBeastEventCC.beastHealth,
+        // beastHealth: attackedByBeastEventCC.adventurerState["adventurer"]["beastHealth"],
         beastLevel: attackedByBeastEventCC.beastSpecs["level"],
         special1:
             gameData.ITEM_NAME_PREFIXES[

@@ -849,6 +849,7 @@ export async function parseEvents(
           damage: parseInt(raw.data[49]),
           criticalHit: convertToBoolean(parseInt(raw.data[50])),
           location: parseInt(raw.data[51]),
+          beastHealth: parseInt(raw.data[52]),
         };
         const attackedByBeastEventCC = processData(
             attackedByBeastDataCC,

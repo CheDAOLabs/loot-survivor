@@ -528,7 +528,7 @@ impl ImplCcCave of ICcCave {
         // @dev ideally this would be a setting but to minimize gas we're using hardcoded value so we can use cheaper equal operator
 
         let beast_id = ImplBeast::get_beast_id(beast_seed);
-        let starting_health = 1;//ImplBeast::get_starting_health(adventurer_level, beast_seed);
+        let starting_health = ImplBeast::get_starting_health(adventurer_level, beast_seed);
         let beast_tier = ImplBeast::get_tier(beast_id);
         let beast_type = ImplBeast::get_type(beast_id);
         let beast_level = self.get_beast_level(beast_seed);
