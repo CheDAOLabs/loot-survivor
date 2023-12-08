@@ -12,7 +12,7 @@ services:
       - indexer
       - graphql
       - --mongo
-      - mongodb://mongo:mongo@mongo:27017
+      - mongodb://mongo:mongo@172.31.18.62:27017
       - --port
       - "8080"
 
