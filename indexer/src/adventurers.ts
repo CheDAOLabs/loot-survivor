@@ -346,6 +346,7 @@ export default function transform({ header, events }: Block) {
       case ATTACKED_BEAST_CC: {
         console.log("ATTACKED_BEAST_CC", "->", "ADVENTURER UPDATES");
         const { value } = parseAttackedByBeast(event.data, 0);
+        console.log("value.adventurerState",value.adventurerState);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
@@ -356,6 +357,7 @@ export default function transform({ header, events }: Block) {
       case ATTACKED_BY_BEAST_CC: {
         console.log("ATTACKED_BY_BEAST_CC", "->", "ADVENTURER UPDATES");
         const { value } = parseAttackedByBeast(event.data, 0);
+        console.log("value.adventurerState",value.adventurerState);
         return [
           updateAdventurer({
             timestamp: new Date().toISOString(),
