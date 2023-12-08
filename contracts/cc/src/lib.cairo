@@ -72,13 +72,14 @@ mod cc {
 
     #[storage]
     struct Storage {
+        _game: ContractAddress,
         _cc_cave: LegacyMap::<felt252, CcCave>,
     }
 
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        EnterCC:EnterCC,
+        EnterCC: EnterCC,
         AmbushedByBeastCC: AmbushedByBeastCC,
         DiscoveredBeastCC: DiscoveredBeastCC,
         AttackedBeastCC: AttackedBeastCC,
@@ -203,6 +204,10 @@ mod cc {
 
         fn get_beast_health_cc(self: @ContractState, adventurer_id: felt252) -> u16 {
             _unpack_cc_cave(self, adventurer_id).beast_health
+        }
+
+        fn init_game_address(ref self: ContractState){
+            self._game.write(get_caller_address());
         }
 
         fn enter_cc(ref self: ContractState, caller: ContractAddress, adventurer_id: felt252, cc_token_id: u256,adventurer: Adventurer,adventurer_entropy:felt252) -> EnterResultCC {

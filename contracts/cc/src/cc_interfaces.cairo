@@ -31,6 +31,7 @@ struct AttackResultCC {
 
 #[starknet::interface]
 trait ICC<TContractState> {
+    fn init_game_address(ref self: TContractState);
     fn get_cave_cc(self: @ TContractState, adventurer_id: felt252) -> CcCave;
     fn get_attacking_beast_cc(self: @ TContractState, adventurer_id: felt252, adventurer_entropy: felt252) -> Beast;
     fn get_beast_health_cc(self: @ TContractState, adventurer_id: felt252) -> u16;

@@ -192,6 +192,8 @@ mod Game {
 
         // save game entropy
         _save_game_entropy(ref self, new_game_entropy);
+
+        _cc_dispatcher(ref self).init_game_address();
     }
 
     // ------------------------------------------ //
@@ -3709,6 +3711,7 @@ mod Game {
 
     #[starknet::interface]
     trait ICC<TContractState> {
+        fn init_game_address(ref self: TContractState);
         fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
         fn enter_cc(ref self: TContractState, caller: ContractAddress, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> EnterResultCC;
         fn attack_cc(ref self: TContractState, caller: ContractAddress, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy: felt252, bag: Bag) -> AttackResultCC;
