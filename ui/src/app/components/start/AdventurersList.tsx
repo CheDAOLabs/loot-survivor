@@ -8,6 +8,7 @@ import { SkullIcon } from "@/app/components/icons/Icons";
 import useUIStore from "@/app/hooks/useUIStore";
 import {QueryKey, useQueriesStore} from "@/app/hooks/useQueryStore";
 import LootIconLoader from "@/app/components/icons/Loader";
+import {load_cc} from "@/app/lib/cc";
 
 export interface AdventurerListProps {
   isActive: boolean;
@@ -108,30 +109,11 @@ export const AdventurersList = ({
                   setAdventurer(adventurer);
                   handleSwitchAdventurer(adventurer.id);
                   setSelectedIndex(index);
-
-                  const cave = {
-                    "map_id": 2,
-                    "curr_beast": 0,
-                    "cc_points": 0,
-                    "beast_health": 25,
-                    "beast_amount": 3,
-                    "has_reward": 0,
-                    "strength_increase": 0,
-                    "dexterity_increase": 0,
-                    "vitality_increase": 0,
-                    "intelligence_increase": 0,
-                    "wisdom_increase": 0,
-                    "charisma_increase": 0
-                  };
-                  setData("enterCC", {cc_cave: [cave]});
-                  const beast = {
-                    "beast": "DireWolf",
-                    "health": 25,
-                    "level": 5,
-                    "adventurerId": 5,
+                  if(adventurer.id) {
+                    const cc =  await load_cc(adventurer.id);
+                    setData("enterCC", {cc_cave: [cc.cave]});
+                    setData("beastQueryCC", {beasts: [cc.beast]});
                   }
-                  setData("beastQueryCC", {beasts: [beast]});
-
                 }}
                 disabled={adventurer?.health === 0}
               >
