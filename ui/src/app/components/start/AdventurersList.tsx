@@ -111,8 +111,12 @@ export const AdventurersList = ({
                   setSelectedIndex(index);
                   if(adventurer.id) {
                     const cc =  await load_cc(adventurer.id);
-                    setData("enterCC", {cc_cave: [cc.cave]});
-                    setData("beastQueryCC", {beasts: [cc.beast]});
+                    if(cc.cave) {
+                      setData("enterCC", {cc_cave: [cc.cave]});
+                    }
+                    if(cc.beast) {
+                      setData("beastQueryCC", {beasts: [cc.beast]});
+                    }
                   }
                 }}
                 disabled={adventurer?.health === 0}

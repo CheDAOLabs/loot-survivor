@@ -999,9 +999,16 @@ export const load_cc = async (adventurer_id: number) => {
     let cc_logic_contract = new Contract(abi, address, provider);
 
     let cave_result = await cc_logic_contract.get_cave_cc(adventurer_id);
-    const adventurer_entropy = 0;
 
-    let beast_result = await cc_logic_contract.get_attacking_beast_cc(adventurer_id, adventurer_entropy);
+    if(Number(cave_result.map_id)===0){
+        return {
+            cave: null,
+            beast: null
+        }
+    }
+
+
+    let beast_result = await cc_logic_contract.get_attacking_beast_cc(adventurer_id, adventurer_id);
     console.log(beast_result);
 
 
