@@ -211,6 +211,9 @@ mod cc {
         }
 
         fn enter_cc(ref self: ContractState, caller: ContractAddress, adventurer_id: felt252, cc_token_id: u256,adventurer: Adventurer,adventurer_entropy:felt252) -> EnterResultCC {
+
+            _assert_ownership(@self);
+
             let dungeon: DungeonSerde = CryptsAndCavernsTraitDispatcher {
                 contract_address: contract_address_const::<
                     0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
@@ -268,6 +271,9 @@ mod cc {
         }
 
         fn attack_cc(ref self: ContractState, caller: ContractAddress, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252,bag:Bag) -> AttackResultCC {
+
+
+            _assert_ownership(@self);
 
             let mut adventurer = adv.clone();
             let mut bag_mutable = bag.clone();
@@ -332,6 +338,8 @@ mod cc {
         }
 
         fn buff_adventurer_cc(ref self: ContractState, caller: ContractAddress, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252) -> Stats {
+
+            _assert_ownership(@self);
 
             let mut adventurer = adv.clone();
 
@@ -782,6 +790,10 @@ mod cc {
         }
 
         reward_item_id
+    }
+
+    fn _assert_ownership(self: @ContractState) {
+        assert(self._game.read() == get_caller_address(),'not game');
     }
 
 }
