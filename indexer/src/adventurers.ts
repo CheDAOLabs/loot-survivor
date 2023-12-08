@@ -43,6 +43,8 @@ import {
   parseUpgradesAvailable,
   DISCOVERED_BEAST,
   parseDiscoveredBeast,
+  ATTACKED_BEAST_CC,
+  ATTACKED_BY_BEAST_CC,
 } from "./utils/events.ts";
 import { insertAdventurer, updateAdventurer } from "./utils/helpers.ts";
 import { MONGO_CONNECTION_STRING } from "./utils/constants.ts";
@@ -76,6 +78,8 @@ const filter = {
     { fromAddress: GAME, keys: [FLEE_SUCCEEDED] },
     { fromAddress: GAME, keys: [ITEMS_LEVELED_UP] },
     { fromAddress: GAME, keys: [UPGRADES_AVAILABLE] },
+    { fromAddress: GAME, keys: [ATTACKED_BEAST_CC] },
+    { fromAddress: GAME, keys: [ATTACKED_BY_BEAST_CC] },
   ],
 };
 
@@ -338,6 +342,27 @@ export default function transform({ header, events }: Block) {
           }),
         ];
       }
+      case ATTACKED_BEAST_CC: {
+        console.log("ATTACKED_BEAST_CC", "->", "ADVENTURER UPDATES");
+        const { value } = parseAttackedByBeast(event.data, 0);
+        return [
+          updateAdventurer({
+            timestamp: new Date().toISOString(),
+            adventurerState: value.adventurerState,
+          }),
+        ];
+      }
+      case ATTACKED_BY_BEAST_CC: {
+        console.log("ATTACKED_BY_BEAST_CC", "->", "ADVENTURER UPDATES");
+        const { value } = parseAttackedByBeast(event.data, 0);
+        return [
+          updateAdventurer({
+            timestamp: new Date().toISOString(),
+            adventurerState: value.adventurerState,
+          }),
+        ];
+      }
+
       default: {
         console.warn("Unknown event", event.keys[0]);
         return [];

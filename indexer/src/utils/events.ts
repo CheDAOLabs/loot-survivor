@@ -48,6 +48,9 @@ export const NEW_HIGH_SCORE = eventKey("NewHighScore");
 export const REWARD_DISTRIBUTION = eventKey("RewardDistribution");
 export const GAME_ENTROPY_ROTATED = eventKey("GameEntropyRotatedEvent");
 
+export const ATTACKED_BEAST_CC = eventKey("AttackedBeastCC");
+export const ATTACKED_BY_BEAST_CC = eventKey("AttackedByBeastCC");
+
 export const parseStats = combineParsers({
   strength: { index: 0, parser: parseU8 },
   dexterity: { index: 1, parser: parseU8 },
