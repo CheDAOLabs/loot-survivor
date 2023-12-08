@@ -1,0 +1,18 @@
+version: '3.6'
+
+services:
+  graphql:
+    image: index-graphql
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app
+    command:
+      - indexer
+      - graphql
+      - --mongo
+      - mongodb://mongo:mongo@mongo:27017
+      - --port
+      - "8080"
+

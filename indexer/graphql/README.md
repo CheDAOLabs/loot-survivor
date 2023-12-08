@@ -41,3 +41,7 @@ You can change the id of the indexer by changing the value of the `indexer_id` v
 ## Running in production
 
 This template includes a `Dockerfile` that you can use to package the indexer for production usage.
+
+
+docker run -it --net=host --rm -v /Users/hhh/Documents/GitHub/loot-survivor/indexer/graphql/src:/app 0d8b6a0a9d01 bash 
+indexer graphql --mongo mongodb://mongo:mongo@54.246.178.155:27017 --port 8080
