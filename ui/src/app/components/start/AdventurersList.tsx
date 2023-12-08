@@ -6,7 +6,7 @@ import useAdventurerStore from "@/app/hooks/useAdventurerStore";
 import { Adventurer } from "@/app/types";
 import { SkullIcon } from "@/app/components/icons/Icons";
 import useUIStore from "@/app/hooks/useUIStore";
-import { useQueriesStore } from "@/app/hooks/useQueryStore";
+import {QueryKey, useQueriesStore} from "@/app/hooks/useQueryStore";
 import LootIconLoader from "@/app/components/icons/Loader";
 
 export interface AdventurerListProps {
@@ -15,6 +15,12 @@ export interface AdventurerListProps {
   adventurers: Adventurer[];
   handleSwitchAdventurer: (...args: any[]) => any;
   gameContract: Contract;
+  setData: (
+      queryKey: QueryKey,
+      data: any,
+      attribute?: string,
+      index?: number
+  ) => void;
 }
 
 export const AdventurersList = ({
@@ -23,6 +29,7 @@ export const AdventurersList = ({
   adventurers,
   handleSwitchAdventurer,
   gameContract,
+  setData
 }: AdventurerListProps) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showZeroHealth, setShowZeroHealth] = useState(true);
@@ -57,6 +64,7 @@ export const AdventurersList = ({
           );
           break;
         case "Enter":
+          console.log("filteredAdventurers",filteredAdventurers);
           setAdventurer(filteredAdventurers[selectedIndex]);
           break;
         case "Escape":
@@ -95,10 +103,35 @@ export const AdventurersList = ({
                 variant={
                   selectedIndex === index && isActive ? "default" : "ghost"
                 }
-                onClick={() => {
+                onClick={async () => {
+                  console.log("adventurer",adventurer);
                   setAdventurer(adventurer);
                   handleSwitchAdventurer(adventurer.id);
                   setSelectedIndex(index);
+
+                  const cave = {
+                    "map_id": 2,
+                    "curr_beast": 0,
+                    "cc_points": 0,
+                    "beast_health": 25,
+                    "beast_amount": 3,
+                    "has_reward": 0,
+                    "strength_increase": 0,
+                    "dexterity_increase": 0,
+                    "vitality_increase": 0,
+                    "intelligence_increase": 0,
+                    "wisdom_increase": 0,
+                    "charisma_increase": 0
+                  };
+                  setData("enterCC", {cc_cave: [cave]});
+                  const beast = {
+                    "beast": "DireWolf",
+                    "health": 25,
+                    "level": 5,
+                    "adventurerId": 5,
+                  }
+                  setData("beastQueryCC", {beasts: [beast]});
+
                 }}
                 disabled={adventurer?.health === 0}
               >

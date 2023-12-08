@@ -3,7 +3,7 @@ import { Contract } from "starknet";
 import { AdventurersList } from "@/app/components/start/AdventurersList";
 import { CreateAdventurer } from "@/app/components/start/CreateAdventurer";
 import ButtonMenu from "@/app/components/menu/ButtonMenu";
-import { useQueriesStore } from "@/app/hooks/useQueryStore";
+import {QueryKey, useQueriesStore} from "@/app/hooks/useQueryStore";
 import useAdventurerStore from "@/app/hooks/useAdventurerStore";
 import { NullAdventurer, FormData } from "@/app/types";
 import useUIStore from "@/app/hooks/useUIStore";
@@ -15,6 +15,12 @@ interface AdventurerScreenProps {
   gameContract: Contract;
   goldenTokenData: any;
   getBalances: () => Promise<void>;
+  setData: (
+      queryKey: QueryKey,
+      data: any,
+      attribute?: string,
+      index?: number
+  ) => void;
 }
 
 /**
@@ -28,6 +34,7 @@ export default function AdventurerScreen({
   gameContract,
   goldenTokenData,
   getBalances,
+  setData
 }: AdventurerScreenProps) {
   const [activeMenu, setActiveMenu] = useState(0);
   const setAdventurer = useAdventurerStore((state) => state.setAdventurer);
@@ -104,6 +111,7 @@ export default function AdventurerScreen({
             adventurers={adventurers}
             handleSwitchAdventurer={handleSwitchAdventurer}
             gameContract={gameContract}
+            setData={setData}
           />
         </div>
       )}

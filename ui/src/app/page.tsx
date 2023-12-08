@@ -585,6 +585,7 @@ function Home({ updateConnectors }: HomeProps) {
                       gameContract={gameContract!}
                       goldenTokenData={goldenTokenData}
                       getBalances={getBalances}
+                      setData={setData}
                     />
                   )}
                   {screen === "play" && (

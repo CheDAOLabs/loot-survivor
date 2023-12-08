@@ -286,7 +286,9 @@ export function syscalls({
         });
         setAdventurer(discovery.data[0]);
         // discoveries.unshift(discovery.data[1]);
-        setData("beastQueryCC", {beasts: [discovery.data[2]]});
+        const beast = discovery.data[2];
+        console.log("beast",beast)
+        setData("beastQueryCC", {beasts: [beast]});
       }
     }
 
@@ -298,7 +300,9 @@ export function syscalls({
 
     if (filteredEnterCCs.length > 0) {
       for (let enterCC of filteredEnterCCs) {
-        setData("enterCC", {cc_cave: [enterCC.data[0]]});
+        const cave = enterCC.data[0];
+        console.log("cave",cave)
+        setData("enterCC", {cc_cave: [cave]});
       }
 
     }
