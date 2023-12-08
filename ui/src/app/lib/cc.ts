@@ -984,8 +984,8 @@ const abi = [
         ]
     }
 ] as Abi;
-const address = "0x077cd2645b2d3f9574facf0677747f7861e949c5e2afaef6c0a81ed5d453d79e";
 
+const address = "0x060ab8abb42665a75134381cf0e04452363fd702e9bf883e0c1214517f67bc77";
 
 export const load_cc = async (adventurer_id: number) => {
 

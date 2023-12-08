@@ -197,7 +197,7 @@ mod cc {
 
         fn get_attacking_beast_cc(self: @ContractState, adventurer_id: felt252, adventurer_entropy:felt252) -> Beast{
             let cc_cave = _unpack_cc_cave(self, adventurer_id);
-            let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
+            let (beast, beast_seed) = cc_cave.get_beast(adventurer_id);
             beast
         }
 
@@ -253,7 +253,7 @@ mod cc {
             cc_cave.curr_beast = 0;
             cc_cave.has_reward = 0;
 
-            let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+            let (beast,beast_seed) = cc_cave.get_beast(adventurer_id);
             cc_cave.set_beast_health(beast.starting_health);
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
             __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
@@ -272,7 +272,7 @@ mod cc {
 
 
             let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
-            let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+            let (beast,beast_seed) = cc_cave.get_beast(adventurer_id);
 
             adventurer.stats.strength = adventurer.stats.strength + cc_cave.strength_increase;
             adventurer.stats.strength = adventurer.stats.dexterity + cc_cave.dexterity_increase;
@@ -600,7 +600,7 @@ mod cc {
         ref bag: Bag
     ) -> u8
     {
-        let (beast, beast_seed) = cc_cave.get_beast(adventurer_entropy);
+        let (beast, beast_seed) = cc_cave.get_beast(adventurer_id);
 
         // get two random numbers using adventurer xp and health as part of entropy
         let (rnd1, rnd2) = AdventurerUtils::get_randomness_with_health(
@@ -703,7 +703,7 @@ mod cc {
         // zero out beast health
         cc_cave.beast_health = 0;
 
-        let (beast,beast_seed) = cc_cave.get_beast(adventurer_entropy);
+        let (beast,beast_seed) = cc_cave.get_beast(adventurer_id);
         cc_cave.curr_beast = cc_cave.curr_beast + 1;
         cc_cave.set_beast_health(beast.starting_health);
         cc_cave.has_reward = cc_cave.get_buff_seed(adventurer_entropy, 1);
