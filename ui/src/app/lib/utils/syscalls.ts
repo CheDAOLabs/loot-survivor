@@ -216,13 +216,13 @@ export function syscalls({
     }
 
 
-    let approveLordsTx;
-    if(fee>0) {
-      approveLordsTx = {
+
+     const approveLordsTx = {
         contractAddress: lordsContract?.address ?? "",
         entrypoint: "approve",
         calldata: [gameContract?.address ?? "", (fee * 10 ** 18).toString(), "0"],
       };
+    if(fee>0) {
       addToCalls(approveLordsTx);
     }
 
@@ -235,12 +235,7 @@ export function syscalls({
 
     addToCalls(Tx);
 
-    let enterCalls = [];
-    if(fee>0) {
-      enterCalls = [...calls,approveLordsTx,Tx];
-    }else{
-      enterCalls = [...calls,Tx];
-    }
+    const enterCalls = fee >0 ? [...calls,approveLordsTx,Tx]:[...calls,Tx] ;
 
     startLoading(
         "Enter CC",
