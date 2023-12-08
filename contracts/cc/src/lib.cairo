@@ -205,7 +205,7 @@ mod cc {
             _unpack_cc_cave(self, adventurer_id).beast_health
         }
 
-        fn enter_cc(ref self: ContractState,adventurer_id: felt252, cc_token_id: u256,adventurer: Adventurer,adventurer_entropy:felt252) -> EnterResultCC {
+        fn enter_cc(ref self: ContractState, caller: ContractAddress, adventurer_id: felt252, cc_token_id: u256,adventurer: Adventurer,adventurer_entropy:felt252) -> EnterResultCC {
             let dungeon: DungeonSerde = CryptsAndCavernsTraitDispatcher {
                 contract_address: contract_address_const::<
                     0x056834208d6a7cc06890a80ce523b5776755d68e960273c9ef3659b5f74fa494
@@ -262,7 +262,7 @@ mod cc {
             EnterResultCC{cc_point:count,map_owner:map_owner}
         }
 
-        fn attack_cc(ref self: ContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252,bag:Bag) -> AttackResultCC {
+        fn attack_cc(ref self: ContractState, caller: ContractAddress, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252,bag:Bag) -> AttackResultCC {
 
             let mut adventurer = adv.clone();
             let mut bag_mutable = bag.clone();
@@ -310,7 +310,8 @@ mod cc {
                 game_entropy.hash,
                 to_the_death,
                 ref cc_cave,
-                ref bag_mutable
+                ref bag_mutable,
+                caller
             );
 
 
@@ -325,11 +326,10 @@ mod cc {
 
         }
 
-        fn buff_adventurer_cc(ref self: ContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252) -> Stats {
+        fn buff_adventurer_cc(ref self: ContractState, caller: ContractAddress, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252) -> Stats {
 
             let mut adventurer = adv.clone();
 
-            //todo
             let mut cc_cave = _unpack_cc_cave(@self, adventurer_id);
             assert(cc_cave.has_reward > 0, 'no reward buff');
 
@@ -473,10 +473,11 @@ mod cc {
         adventurer: Adventurer,
         adventurer_id: felt252,
         beast_battle_details: BattleDetails,
-        beast_health: u16
+        beast_health: u16,
+        caller: ContractAddress
     ) {
         let adventurer_state = AdventurerState {
-            owner: get_caller_address(), adventurer_id, adventurer
+            owner: caller, adventurer_id, adventurer
         };
         self.emit(AttackedBeastCC { adventurer_state, beast_battle_details, beast_health });
     }
@@ -486,10 +487,11 @@ mod cc {
         adventurer: Adventurer,
         adventurer_id: felt252,
         beast_battle_details: BattleDetails,
-        beast_health: u16
+        beast_health: u16,
+        caller: ContractAddress
     ) {
         let adventurer_state = AdventurerState {
-            owner: get_caller_address(), adventurer_id, adventurer
+            owner: caller, adventurer_id, adventurer
         };
         self.emit(AttackedByBeastCC { adventurer_state, beast_battle_details,beast_health });
     }
@@ -597,7 +599,8 @@ mod cc {
         game_entropy: felt252,
         fight_to_the_death: bool,
         ref cc_cave: CcCave,
-        ref bag: Bag
+        ref bag: Bag,
+        caller: ContractAddress
     ) -> u8
     {
         let (beast, beast_seed) = cc_cave.get_beast(adventurer_id);
@@ -651,7 +654,8 @@ mod cc {
                     critical_hit: is_critical_hit,
                     location: ImplCombat::slot_to_u8(Slot::None(())),
                 },
-                cc_cave.beast_health
+                cc_cave.beast_health,
+                caller
             );
 
 
@@ -660,7 +664,8 @@ mod cc {
                 adventurer,
                 adventurer_id,
                 attacked_by_beast_details,
-                cc_cave.beast_health
+                cc_cave.beast_health,
+                caller
             );
 
 
@@ -678,7 +683,8 @@ mod cc {
                     game_entropy,
                     true,
                     ref cc_cave,
-                    ref bag
+                    ref bag,
+                    caller
                 );
             }
 

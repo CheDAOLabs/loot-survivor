@@ -206,7 +206,7 @@ mod Game {
             let adventurer = _load_adventurer(@self, adventurer_id);
             // get adventurer entropy
             let adventurer_entropy = _get_adventurer_entropy(@self, adventurer_id);
-            let enter_result = _cc_dispatcher(ref self).enter_cc(adventurer_id,cc_token_id,adventurer,adventurer_entropy);
+            let enter_result = _cc_dispatcher(ref self).enter_cc(get_caller_address(), adventurer_id,cc_token_id,adventurer,adventurer_entropy);
             if enter_result.cc_point > 0 {
                 let caller = get_caller_address();
                 let amount = enter_result.cc_point.into() * 2 * 1000000000000000000;
@@ -227,7 +227,7 @@ mod Game {
             // update players last action block number to reset idle counter
             adventurer.set_last_action_block(block_number);
 
-           let result:AttackResultCC=  _cc_dispatcher(ref self).attack_cc(adventurer_id,to_the_death,adventurer,adventurer_entropy,bag);
+           let result:AttackResultCC=  _cc_dispatcher(ref self).attack_cc(get_caller_address(), adventurer_id,to_the_death,adventurer,adventurer_entropy,bag);
             adventurer.health = result.adventurer_health;
             if adventurer.health  == 0 {
                 _process_adventurer_death(ref self, adventurer, adventurer_id, result.beast_id, 0);
@@ -256,7 +256,7 @@ mod Game {
             // update players last action block number to reset idle counter
             adventurer.set_last_action_block(block_number);
 
-            _cc_dispatcher(ref self).buff_adventurer_cc(adventurer_id,buff_index,adventurer,adventurer_entropy)
+            _cc_dispatcher(ref self).buff_adventurer_cc(get_caller_address(), adventurer_id,buff_index,adventurer,adventurer_entropy);
 
         }
 
@@ -3710,9 +3710,9 @@ mod Game {
     #[starknet::interface]
     trait ICC<TContractState> {
         fn get_beast_health_cc(self: @TContractState, adventurer_id: felt252) -> u16;
-        fn enter_cc(ref self: TContractState, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> EnterResultCC;
-        fn attack_cc(ref self: TContractState, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy:felt252, bag:Bag) -> AttackResultCC;
-        fn buff_adventurer_cc(ref self: TContractState, adventurer_id: felt252, buff_index:u8,adv: Adventurer, adventurer_entropy:felt252);
+        fn enter_cc(ref self: TContractState, caller: ContractAddress, adventurer_id: felt252, cc_token_id: u256, adventurer: Adventurer, adventurer_entropy: felt252) -> EnterResultCC;
+        fn attack_cc(ref self: TContractState, caller: ContractAddress, adventurer_id: felt252, to_the_death: bool, adv: Adventurer, adventurer_entropy: felt252, bag: Bag) -> AttackResultCC;
+        fn buff_adventurer_cc(ref self: TContractState, caller: ContractAddress, adventurer_id: felt252, buff_index: u8, adv: Adventurer, adventurer_entropy: felt252) -> Stats;
     }
 
     #[starknet::interface]
