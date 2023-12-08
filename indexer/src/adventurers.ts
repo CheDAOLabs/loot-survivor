@@ -53,6 +53,7 @@ const GAME = Deno.env.get("GAME");
 const START = +(Deno.env.get("START") || 0);
 const STREAM_URL = Deno.env.get("STREAM_URL");
 const MONGO_DB = Deno.env.get("MONGO_DB");
+const CC = Deno.env.get("CC");
 
 const filter = {
   header: { weak: true },
@@ -78,8 +79,8 @@ const filter = {
     { fromAddress: GAME, keys: [FLEE_SUCCEEDED] },
     { fromAddress: GAME, keys: [ITEMS_LEVELED_UP] },
     { fromAddress: GAME, keys: [UPGRADES_AVAILABLE] },
-    { fromAddress: GAME, keys: [ATTACKED_BEAST_CC] },
-    { fromAddress: GAME, keys: [ATTACKED_BY_BEAST_CC] },
+    { fromAddress: CC, keys: [ATTACKED_BEAST_CC] },
+    { fromAddress: CC, keys: [ATTACKED_BY_BEAST_CC] },
   ],
 };
 
