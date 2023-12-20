@@ -242,16 +242,16 @@ export default function BeastScreen({attack, exit, buffAdventurer,  beastsContra
                         <div className="flex flex-row gap-2 sm:flex-col items-center justify-center">
                             <h3>BUFF</h3>
                             <div className="flex gap-2 ">
-                                <p>STRENGTH:{ccCaveData.strength_increase}</p>
-                                <p>DEXTERITY:{ccCaveData.dexterity_increase}</p>
-                                <p>VITALITY:{ccCaveData.vitality_increase}</p>
+                                <p>STR:{ccCaveData.strength_increase}</p>
+                                <p>DEX:{ccCaveData.dexterity_increase}</p>
+                                <p>VIT:{ccCaveData.vitality_increase}</p>
                             </div>
                             <div className="flex  gap-2 border-b border-terminal-green">
-                                <p>INTELLIGENCE:{ccCaveData.intelligence_increase}</p>
-                                <p>WISDOM:{ccCaveData.wisdom_increase}</p>
-                                <p>CHARISMA:{ccCaveData.charisma_increase}</p>
+                                <p>INT:{ccCaveData.intelligence_increase}</p>
+                                <p>WIS:{ccCaveData.wisdom_increase}</p>
+                                <p>CHA:{ccCaveData.charisma_increase}</p>
                             </div>
-                            {/*<div className="flex  gap-2 border-b border-terminal-green">*/}
+                            {/*<div className="flex  gap-2 borde r-b border-terminal-green">*/}
                             {/*    <p>LUCK:0</p>*/}
                             {/*    <p>HP:0</p>*/}
                             {/*</div>*/}
