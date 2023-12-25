@@ -6,6 +6,7 @@ mod cc_interfaces;
 
 #[starknet::contract]
 mod cc {
+    const TWO_POW_128: u256 = 0x100000000000000000000000000000000;
 
 
     use core::{
@@ -74,6 +75,7 @@ mod cc {
     struct Storage {
         _game: ContractAddress,
         _cc_cave: LegacyMap::<felt252, CcCave>,
+        _cc_cave_key: LegacyMap::<u256,bool>,
     }
 
     #[event]
@@ -722,10 +724,15 @@ mod cc {
         // zero out beast health
         cc_cave.beast_health = 0;
 
+
         let (beast,beast_seed) = cc_cave.get_beast(adventurer_id);
         cc_cave.curr_beast = cc_cave.curr_beast + 1;
         cc_cave.set_beast_health(beast.starting_health);
-        cc_cave.has_reward = cc_cave.get_buff_seed(adventurer_entropy, 1);
+
+        let cave_key :u256 = cc_cave.map_id.into() + adventurer_id.into() * TWO_POW_128;
+        if self._cc_cave_key.read(cave_key) == false {
+            cc_cave.has_reward = cc_cave.get_buff_seed(adventurer_entropy, 1);
+        }
 
         __event_DiscoveredBeastCC(ref self, adventurer, adventurer_id, beast_seed, beast);
 
@@ -787,6 +794,8 @@ mod cc {
             let item = ImplLoot::get_item(reward_item_id);
             items.append(LootWithPrice { item: item, price: 0 });
             __event_RewardItemsCC(ref self, adventurer, adventurer_id, bag, items);
+
+            self._cc_cave_key.write(cave_key,true);
         }
 
         reward_item_id

@@ -249,7 +249,7 @@ mod Game {
 
             _assert_ownership(@self, adventurer_id);
 
-            let (mut adventurer, adventurer_entropy, game_entropy, _) = _load_player_assets(
+            let (mut adventurer, adventurer_entropy, game_entropy, mut bag) = _load_player_assets(
                 @self, adventurer_id
             );
 
@@ -258,9 +258,28 @@ mod Game {
             // update players last action block number to reset idle counter
             adventurer.set_last_action_block(block_number);
 
-            _cc_dispatcher(ref self).buff_adventurer_cc(get_caller_address(), adventurer_id,buff_index,adventurer,adventurer_entropy);
-
-        }
+            let stat_upgrades = _cc_dispatcher(ref self).buff_adventurer_cc(get_caller_address(), adventurer_id,buff_index,adventurer,adventurer_entropy);
+            if stat_upgrades.strength > 0{
+                adventurer.stats.increase_strength(stat_upgrades.strength);
+            }
+            if stat_upgrades.dexterity > 0{
+                adventurer.stats.increase_dexterity(stat_upgrades.dexterity);
+            }
+            if stat_upgrades.vitality > 0{
+                adventurer.stats.increase_vitality(stat_upgrades.vitality);
+            }
+            if stat_upgrades.intelligence > 0{
+                adventurer.stats.increase_intelligence(stat_upgrades.intelligence);
+            }
+            if stat_upgrades.wisdom > 0{
+                adventurer.stats.increase_wisdom(stat_upgrades.wisdom);
+            }
+            if stat_upgrades.charisma > 0{
+                adventurer.stats.increase_charisma(stat_upgrades.charisma);
+            }
+            _save_adventurer(ref self, ref adventurer, adventurer_id);
+            __event_AdventurerUpgraded(ref self, adventurer, adventurer_id, bag, stat_upgrades);
+         }
 
 
         /// @title New Game

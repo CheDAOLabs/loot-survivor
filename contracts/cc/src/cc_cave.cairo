@@ -51,7 +51,6 @@ struct CcCave {
 
 impl CcCavePacking of StorePacking<CcCave,felt252> {
     fn pack(value: CcCave) -> felt252 {
-
         (value.map_id.into()
             + value.curr_beast.into() * TWO_POW_9
             + value.cc_points.into() * TWO_POW_18
