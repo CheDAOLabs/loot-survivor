@@ -2,9 +2,9 @@ mod game {
     mod constants;
     mod interfaces;
 }
-mod tests {
-    mod test_game;
-}
+//mod tests {
+//    mod test_game;
+//}
 
 
 
@@ -42,13 +42,13 @@ mod Game {
         ISRC5Dispatcher, ISRC5DispatcherTrait, ISRC5CamelDispatcher, ISRC5CamelDispatcherTrait
     };
 
-    use openzeppelin::token::erc721::interface::{
-        IERC721, IERC721Dispatcher, IERC721DispatcherTrait, IERC721LibraryDispatcher
-    };
+    //use openzeppelin::token::erc721::interface::{
+    //    IERC721, IERC721Dispatcher, IERC721DispatcherTrait, IERC721LibraryDispatcher
+    //};
 
-    use goldenToken::ERC721::{
-        GoldenToken, GoldenTokenDispatcher, GoldenTokenDispatcherTrait, GoldenTokenLibraryDispatcher
-    };
+    //use goldenToken::ERC721::{
+    //    GoldenToken, GoldenTokenDispatcher, GoldenTokenDispatcherTrait, GoldenTokenLibraryDispatcher
+    //};
 
     use arcade_account::{
         account::interface::{
@@ -119,8 +119,8 @@ mod Game {
         _lords: ContractAddress,
         _owner: LegacyMap::<felt252, ContractAddress>,
         _item_specials: LegacyMap::<(felt252, u8), ItemSpecialsStorage>,
-        _golden_token_last_use: LegacyMap::<felt252, felt252>,
-        _golden_token: ContractAddress,
+        //_golden_token_last_use: LegacyMap::<felt252, felt252>,
+        //_golden_token: ContractAddress,
         _cost_to_play: u128,
         _games_played_snapshot: GamesPlayedSnapshot,
         _terminal_timestamp: u64,
@@ -177,7 +177,7 @@ mod Game {
         self._genesis_timestamp.write(starknet::get_block_info().unbox().block_timestamp.into());
 
         // set the golden token address
-        self._golden_token.write(golden_token_address);
+        //self._golden_token.write(golden_token_address);
 
         // set the cost to play
         self._cost_to_play.write(COST_TO_PLAY);
@@ -259,24 +259,24 @@ mod Game {
             adventurer.set_last_action_block(block_number);
 
             let stat_upgrades = _cc_dispatcher(ref self).buff_adventurer_cc(get_caller_address(), adventurer_id,buff_index,adventurer,adventurer_entropy);
-            if stat_upgrades.strength > 0{
+            // if stat_upgrades.strength > 0{
                 adventurer.stats.increase_strength(stat_upgrades.strength);
-            }
-            if stat_upgrades.dexterity > 0{
+            // }
+            // if stat_upgrades.dexterity > 0{
                 adventurer.stats.increase_dexterity(stat_upgrades.dexterity);
-            }
-            if stat_upgrades.vitality > 0{
+            // }
+            // if stat_upgrades.vitality > 0{
                 adventurer.stats.increase_vitality(stat_upgrades.vitality);
-            }
-            if stat_upgrades.intelligence > 0{
+            // }
+            // if stat_upgrades.intelligence > 0{
                 adventurer.stats.increase_intelligence(stat_upgrades.intelligence);
-            }
-            if stat_upgrades.wisdom > 0{
+            // }
+            // if stat_upgrades.wisdom > 0{
                 adventurer.stats.increase_wisdom(stat_upgrades.wisdom);
-            }
-            if stat_upgrades.charisma > 0{
+            // }
+            // if stat_upgrades.charisma > 0{
                 adventurer.stats.increase_charisma(stat_upgrades.charisma);
-            }
+            // }
             _save_adventurer(ref self, ref adventurer, adventurer_id);
             __event_AdventurerUpgraded(ref self, adventurer, adventurer_id, bag, stat_upgrades);
          }
@@ -1329,9 +1329,9 @@ mod Game {
         }
     }
 
-    fn _golden_token_dispatcher(ref self: ContractState) -> IERC721Dispatcher {
-        IERC721Dispatcher { contract_address: self._golden_token.read() }
-    }
+    //fn _golden_token_dispatcher(ref self: ContractState) -> IERC721Dispatcher {
+    //    IERC721Dispatcher { contract_address: self._golden_token.read() }
+    //}
 
     fn _lords_dispatcher(ref self: ContractState) -> IERC20CamelDispatcher {
         IERC20CamelDispatcher { contract_address: self._lords.read() }
@@ -3753,7 +3753,8 @@ mod Game {
     }
 
     fn _can_play(self: @ContractState, token_id: u256) -> bool {
-        _last_usage(self, token_id) + SECONDS_IN_DAY.into() <= get_block_timestamp().into()
+        true
+        //_last_usage(self, token_id) + SECONDS_IN_DAY.into() <= get_block_timestamp().into()
     }
 
     fn _get_primary_account_address(
@@ -3779,21 +3780,21 @@ mod Game {
     fn _play_with_token(ref self: ContractState, token_id: u256, interface_camel: bool) {
         assert(_can_play(@self, token_id), messages::CANNOT_PLAY_WITH_TOKEN);
 
-        let golden_token = _golden_token_dispatcher(ref self);
+        //let golden_token = _golden_token_dispatcher(ref self);
 
         // we use caller address here because we don't have an adventurer id yet
         let address = get_caller_address();
         let player = _get_primary_account_address(@self, address, interface_camel);
-        assert(golden_token.owner_of(token_id) == player, messages::NOT_OWNER_OF_TOKEN);
+        //assert(golden_token.owner_of(token_id) == player, messages::NOT_OWNER_OF_TOKEN);
 
-        self
-            ._golden_token_last_use
-            .write(token_id.try_into().unwrap(), get_block_timestamp().into());
+        //self
+        //    ._golden_token_last_use
+        //    .write(token_id.try_into().unwrap(), get_block_timestamp().into());
     }
 
-    fn _last_usage(self: @ContractState, token_id: u256) -> u256 {
-        self._golden_token_last_use.read(token_id.try_into().unwrap()).into()
-    }
+    //fn _last_usage(self: @ContractState, token_id: u256) -> u256 {
+    //    self._golden_token_last_use.read(token_id.try_into().unwrap()).into()
+    //}
 
     fn _assert_week_past(self: @ContractState, time: u64) {
         let difference: u64 = get_block_timestamp() - time;

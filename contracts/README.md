@@ -1,7 +1,7 @@
 export RUST_BACKTRACE=1
-export STARKNET_KEYSTORE="~/StarkLiWallet/key.json"
-export STARKNET_ACCOUNT="~/StarkLiWallet/account.json"
-export STARKNET_NETWORK="goerli-1"
+export STARKNET_KEYSTORE=~/StarkLiWallet/key.json
+export STARKNET_ACCOUNT=~/StarkLiWallet/account.json
+export STARKNET_NETWORK=goerli-1
 export STARKNET_RPC=https://goerli1-juno.rpc.nethermind.io/
 
 export STARKNET_RPC="https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a"
@@ -12,17 +12,19 @@ export STARKNET_RPC="https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a8
 ../scarb0.7.0  build  
 ../starkli0.1.15 declare ./target/dev/game_Game.sierra.json
 
+starkli declare ./target/release/game_Game.sierra.json
 
-
-export CLASS_HASH=0x05af1aef8b0b08fc6f88076ad53c3ea68b7094ce9b0e6cf8e5fb58135aa9f1e5;
+export CLASS_HASH=0x02fbd47ac7c4a2f426228619077edbf1a49afdbcfc0ceb2c29bdc12ad967f692;
 export LORDS_ADDRESS=0x05e367ac160e5f90c5775089b582dfc987dd148a5a2f977c49def2a6644f724b;
 export DAO_ADDRESS=0x0628d41075659afebfc27aa2aab36237b08ee0b112debd01e56d037f64f6082a;
 export BEASTS=0x05c909139dbef784180eef8ce7a2f5bf52afe567aa73aaa77b8d8243ad5b6b96;
 export GOLDEN_TOKEN=0x003583470A8943479F8609192Da4427caC45BdF66a58C84043c7Ab2FC722C0C0
 export TIMESTAMP=1735664461
-export CC_ADDRESS=0x02bfc164846444de7cf396a125fb4e2eee628d730f22ad02d0aa0356c11d9ee9
+export CC_ADDRESS=0x079ef8699bf424157f7ef090e5397cdf7fc323fc4321a10984d951cff5a84382
 
-../starkli0.1.15 deploy $CLASS_HASH $LORDS_ADDRESS $DAO_ADDRESS $BEASTS $GOLDEN_TOKEN $TIMESTAMP $CC_ADDRESS
+../starkli0.1.15
+starkli deploy $CLASS_HASH $LORDS_ADDRESS $DAO_ADDRESS $BEASTS $GOLDEN_TOKEN $TIMESTAMP $CC_ADDRESS
 
 [0x05e367ac160e5f90c5775089b582dfc987dd148a5a2f977c49def2a6644f724b,0x0628d41075659afebfc27aa2aab36237b08ee0b112debd01e56d037f64f6082a,0x05c909139dbef784180eef8ce7a2f5bf52afe567aa73aaa77b8d8243ad5b6b96,0x003583470A8943479F8609192Da4427caC45BdF66a58C84043c7Ab2FC722C0C0,1735664461,0x02bfc164846444de7cf396a125fb4e2eee628d730f22ad02d0aa0356c11d9ee9]
 
+0x04ab5ffc7a83cec906b4f6914add7ee498b12d68ca51cecf9eac189c6c113d38

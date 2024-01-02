@@ -734,6 +734,19 @@ export function syscalls({
 
     }
 
+
+    const adventurerUpgradedEvents = events.filter(
+        (event) => event.name === "AdventurerUpgraded"
+    );
+    if (adventurerUpgradedEvents.length > 0) {
+      for (let adventurerUpgradedEvent of adventurerUpgradedEvents) {
+        setData("adventurerByIdQuery", {
+          adventurers: [adventurerUpgradedEvent.data],
+        });
+        setAdventurer(adventurerUpgradedEvent.data);
+      }
+    }
+
     stopLoading("you increased adventurer buff");
   }
 
