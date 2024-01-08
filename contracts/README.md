@@ -4,7 +4,7 @@ export STARKNET_ACCOUNT=~/StarkLiWallet/account.json
 export STARKNET_NETWORK=goerli-1
 export STARKNET_RPC=https://goerli1-juno.rpc.nethermind.io/
 
-export STARKNET_RPC="https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a"
+export STARKNET_RPC=https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a86415c6008a
 
 
 
@@ -14,7 +14,7 @@ export STARKNET_RPC="https://starknet-goerli.infura.io/v3/89d267bf72f346b78cf8a8
 
 starkli declare ./target/release/game_Game.sierra.json
 
-export CLASS_HASH=0x02fbd47ac7c4a2f426228619077edbf1a49afdbcfc0ceb2c29bdc12ad967f692;
+export CLASS_HASH=0x0181b3a416d580753c1aa8793b047b5b205fc7769611e7795835c456a89a964c;
 export LORDS_ADDRESS=0x05e367ac160e5f90c5775089b582dfc987dd148a5a2f977c49def2a6644f724b;
 export DAO_ADDRESS=0x0628d41075659afebfc27aa2aab36237b08ee0b112debd01e56d037f64f6082a;
 export BEASTS=0x05c909139dbef784180eef8ce7a2f5bf52afe567aa73aaa77b8d8243ad5b6b96;
