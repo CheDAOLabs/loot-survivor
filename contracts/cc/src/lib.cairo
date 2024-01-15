@@ -350,34 +350,51 @@ mod cc {
 
             let cc_buff_config:CcBuff = get_buff_by_id(cc_cave.has_reward);
 
+            let mut buff = Stats{
+                strength: 0,
+                dexterity: 0,
+                vitality: 0,
+                intelligence: 0,
+                wisdom: 0,
+                charisma: 0,
+                luck:0//todo
+            };
+
 
             if buff_index == 1{
                 adventurer.stats.increase_strength(cc_buff_config.strength);
                 cc_cave.increase_strength(cc_buff_config.strength);
+                buff.strength = buff.strength + cc_buff_config.strength;
             }
             if  buff_index == 2 {
                 adventurer.stats.increase_dexterity(cc_buff_config.dexterity);
                 cc_cave.increase_dexterity(cc_buff_config.dexterity);
+                buff.dexterity = buff.dexterity + cc_buff_config.dexterity;
             }
             if  buff_index == 3 {
                 adventurer.stats.increase_vitality(cc_buff_config.vitality);
                 adventurer
                     .increase_health(VITALITY_INSTANT_HEALTH_BONUS * cc_buff_config.vitality.into());
                 cc_cave.increase_vitality(cc_buff_config.vitality);
+                buff.vitality = buff.vitality + cc_buff_config.vitality;
             }
             if buff_index == 4{
                 adventurer.stats.increase_intelligence(cc_buff_config.intelligence);
                 cc_cave.increase_intelligence(cc_buff_config.intelligence);
+                buff.intelligence = buff.intelligence + cc_buff_config.intelligence;
             }
             if buff_index == 5{
                 adventurer.stats.increase_wisdom(cc_buff_config.wisdom);
                 cc_cave.increase_wisdom(cc_buff_config.wisdom);
+                buff.wisdom = buff.wisdom + cc_buff_config.wisdom;
             }
             if buff_index == 6{
                 adventurer.stats.increase_charisma(cc_buff_config.charisma);
                 cc_cave.increase_charisma(cc_buff_config.charisma);
+                buff.charisma = buff.charisma + cc_buff_config.charisma;
             }
             cc_cave.has_reward = 0;
+
 
             let now_buff = Stats{
                 strength: cc_cave.strength_increase,
@@ -393,7 +410,7 @@ mod cc {
 
             _pack_cc_cave(ref self, adventurer_id, cc_cave);
 
-            now_buff
+            buff
         }
 
 }
